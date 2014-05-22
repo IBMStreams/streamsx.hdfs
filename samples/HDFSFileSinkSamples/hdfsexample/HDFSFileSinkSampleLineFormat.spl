@@ -1,0 +1,87 @@
+// begin_generated_IBM_copyright_prolog                             
+//                                                                  
+// This is an automatically generated copyright prolog.             
+// After initializing,  DO NOT MODIFY OR MOVE                       
+// **************************************************************** 
+// THIS SAMPLE CODE IS PROVIDED ON AN "AS IS" BASIS. IBM MAKES NO   
+// REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, CONCERNING    
+// USE OF THE SAMPLE CODE, OR THE COMPLETENESS OR ACCURACY OF THE   
+// SAMPLE CODE. IBM DOES NOT WARRANT UNINTERRUPTED OR ERROR-FREE    
+// OPERATION OF THIS SAMPLE CODE. IBM IS NOT RESPONSIBLE FOR THE    
+// RESULTS OBTAINED FROM THE USE OF THE SAMPLE CODE OR ANY PORTION  
+// OF THIS SAMPLE CODE.                                             
+//                                                                  
+// LIMITATION OF LIABILITY. IN NO EVENT WILL IBM BE LIABLE TO ANY   
+// PARTY FOR ANY DIRECT, INDIRECT, SPECIAL OR OTHER CONSEQUENTIAL   
+// DAMAGES FOR ANY USE OF THIS SAMPLE CODE, THE USE OF CODE FROM    
+// THIS [ SAMPLE PACKAGE,] INCLUDING, WITHOUT LIMITATION, ANY LOST  
+// PROFITS, BUSINESS INTERRUPTION, LOSS OF PROGRAMS OR OTHER DATA   
+// ON YOUR INFORMATION HANDLING SYSTEM OR OTHERWISE.                
+//                                                                  
+// (C) Copyright IBM Corp. 2013, 2014  All Rights reserved.         
+//                                                                  
+// end_generated_IBM_copyright_prolog                               
+namespace hdfsexample ;
+
+use com.ibm.streamsx.hdfs::HDFSFileSink ;
+
+/**
+ * The [HDFSFileSinkSampleLineFormat] composite demonstrates how you can
+ * use the HDFSFileSink operator to write data to a file on the Hadoop File System.
+ * 
+ * This sample reads the "LineInput.txt" file from data directory.  The content of the
+ * file is read in one line at a time and sent to a HDFSFileSink operator to write
+ * the data to the Hadoop File System.  We make use of the "bytesPerFile" optional parameter
+ * to break up the output file.  A new file is created when the output file size is
+ * approximately 100 bytes.
+ *  
+ * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
+ * * export HADOOP_HOME=<Hadoop installation>
+ * 
+ * To compile and run this sample in Streams Studio:
+ * 1. Start Streams Studio
+ * 1. In Streams Explorer view, add the "com.ibm.streams.bigdata" toolkit as one of the toolkit locations
+ * 1. From the main menu, select File -> Import.
+ * 1. Expand InfoSphere Streams Studio
+ * 1. Select Sample SPL Application
+ * 1. Select this sample from the Import SPL Sample Application dialog
+ * 1. Once the sample is imported, wait for the build to finish.  If autobuild is turned off, select resulting project, right click -> Build Project
+ * 1. Once the project is built, select the main composite of the sample, right click -> Launch Active Build Config
+ *
+ * 
+  * To compile and run this sample at the command line:
+  *  1. Create a directory. For example, you can create a directory in your home directory.
+  *   * mkdir $HOME/hdfssamples
+  *  1. Copy the samples to this directory.
+  *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
+  *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
+  *  1. Run the sample application.  
+  *   * To run the HDFSFileSinkSampleLineFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build.
+  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFSFileSinkSampleLineFormat/hdfsexample.HDFSFileSinkSampleLineFormat.adl -P hdfsUri="hdfs://<machine_name>:<port>" -P hdfsUser="<user_name>"
+  *   * To run the HDFSFileSinkSampleLineFormat sample application in standalone mode, issue the command:
+  *    * ./output/Standalone/hdfsexample::HDFSFileSinkSampleLineFormat/bin/standalone hdfsUri="hdfs://<machine_name>:<port>" hdfsUser="<user_name>"
+  *
+  * @param hdfsUri URI to HDFS. If unspecified, the operator expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
+  * @param hdfsUser User to connect to HDFS.  If unspecified the instance owner running the application will be used as the user
+  * to log onto the HDFS. Example value: "streamsadmin"
+ */
+composite HDFSFileSinkSampleLineFormat
+{
+	graph
+		// read file "LineInput.txt" from sample's data directory
+		stream<rstring lines> LineIn = FileSource()
+		{
+			param
+				file : "LineInput.txt" ;
+		}
+
+		// Write content of input file to /user/<userid>/pattern0%FILENUM.txt
+		// Each file is about 100 bytes in size.
+		() as lineSink1 = HDFSFileSink(LineIn)
+		{
+			param
+				file : "pattern0%FILENUM.txt" ;
+				bytesPerFile : 100l ;
+		}
+
+}

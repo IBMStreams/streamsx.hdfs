@@ -1,0 +1,99 @@
+// begin_generated_IBM_copyright_prolog                             
+//                                                                  
+// This is an automatically generated copyright prolog.             
+// After initializing,  DO NOT MODIFY OR MOVE                       
+// **************************************************************** 
+// THIS SAMPLE CODE IS PROVIDED ON AN "AS IS" BASIS. IBM MAKES NO   
+// REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, CONCERNING    
+// USE OF THE SAMPLE CODE, OR THE COMPLETENESS OR ACCURACY OF THE   
+// SAMPLE CODE. IBM DOES NOT WARRANT UNINTERRUPTED OR ERROR-FREE    
+// OPERATION OF THIS SAMPLE CODE. IBM IS NOT RESPONSIBLE FOR THE    
+// RESULTS OBTAINED FROM THE USE OF THE SAMPLE CODE OR ANY PORTION  
+// OF THIS SAMPLE CODE.                                             
+//                                                                  
+// LIMITATION OF LIABILITY. IN NO EVENT WILL IBM BE LIABLE TO ANY   
+// PARTY FOR ANY DIRECT, INDIRECT, SPECIAL OR OTHER CONSEQUENTIAL   
+// DAMAGES FOR ANY USE OF THIS SAMPLE CODE, THE USE OF CODE FROM    
+// THIS [ SAMPLE PACKAGE,] INCLUDING, WITHOUT LIMITATION, ANY LOST  
+// PROFITS, BUSINESS INTERRUPTION, LOSS OF PROGRAMS OR OTHER DATA   
+// ON YOUR INFORMATION HANDLING SYSTEM OR OTHERWISE.                
+//                                                                  
+// (C) Copyright IBM Corp. 2013, 2014  All Rights reserved.         
+//                                                                  
+// end_generated_IBM_copyright_prolog                               
+namespace hdfsexample ;
+
+use com.ibm.streamsx.hdfs::HDFSDirectoryScan ;
+use com.ibm.streamsx.hdfs::HDFSFileSource ;
+
+/**
+ * The [ScanAndRead] composite demonstrates how you can use the HDFSDirectoryScan operator
+ * to scan for new files from a directory in HDFS.  The HDFSDirectoryScan can be used in conjunction
+ * with the HDFSFileSource operator, where you can read new files from HDFS as they are created in 
+ * a directory.
+ * 
+ * To see the effect of HDFSDirectoryScan, let the application run for a few minutes, and then copy more
+ * files to the testDirectory.  You should see that the directory scan will discover the new files for the
+ * HDFSFileSource operator to read.
+ *
+ * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
+ * * export HADOOP_HOME=<Hadoop installation>
+ * 
+ * Setup:
+ * You will need to create new directory for the HDFSDirectoryScan operator to scan.
+ * 1. Create a new directory in HDFS by running this command at the command line:
+ *  * <HADOOP_HOME>/bin/hadoop fs -mkdir /user/<userid>/testDirectory
+ * 1. Copy a few files from local file system to the testDirectory on HDFS:
+ *  * <HADOOP_HOME>/bin/hadoop fs -copyFromLocal <localFile> /user/<userid>/testDirectory
+ *
+ * To compile and run this sample in Streams Studio:
+ * 1. Start Streams Studio
+ * 1. In Streams Explorer view, add the "com.ibm.streams.bigdata" toolkit as one of the toolkit locations
+ * 1. From the main menu, select File -> Import.
+ * 1. Expand InfoSphere Streams Studio
+ * 1. Select Sample SPL Application
+ * 1. Select this sample from the Import SPL Sample Application dialog
+ * 1. Once the sample is imported, wait for the build to finish.  If autobuild is turned off, select resulting project, right click -> Build Project
+ * 1. Once the project is built, select the main composite of the sample, right click -> Launch Active Build Config * 
+ *
+ * To compile and run this sample at the command line:
+ *  1. Create a directory. For example, you can create a directory in your home directory. 
+ *   * mkdir $HOME/hdfssamples
+ *  1. Copy the samples to this directory. For example, you can copy the samples to the directory created above. 
+ *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
+ *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
+ *  1. Run the sample application. 
+ *   * To run the ScanAndRead sample application in distributed mode, Start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
+ *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::ScanAndRead/hdfsexample.ScanAndRead.adl -P hdfsUri="hdfs://<machine_name>:<port>" -P hdfsUser="<user_name>"
+ *   * To run the ScanAndRead sample application in standalone mode, issue the command:
+ *    * ./output/Standalone/hdfsexample::ScanAndRead/bin/standalone hdfsUri="hdfs://<machine_name>:<port>" hdfsUser="<user_name>"
+ *
+ * @param hdfsUri URI to HDFS. If unspecified, the operator expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
+ * @param hdfsUser User to connect to HDFS.  If unspecified the instance owner running the application will be used as the user
+ * to log onto the HDFS. Example value: "streamsadmin".
+ */
+composite ScanAndRead
+{
+	graph
+
+		// scan /user/<userid>/testDirectory from HDFS
+		stream<rstring fileNames> FileNameStream1 = HDFSDirectoryScan()
+		{
+			param
+				directory : "testDirectory" ;
+		}
+
+		// use the file name from directory scan to read the file
+		stream<rstring lines> LineStream = HDFSFileSource(FileNameStream1)
+		{
+		} 
+
+		// write out content of file in the "FileContents.txt" file in data directory
+		() as LineSink1 = FileSink(LineStream)
+		{
+			param
+				file : "FileContents.txt" ;
+				flush: 1u;
+		}
+
+}
