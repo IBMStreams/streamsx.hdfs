@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.ibm.streams.java/com.ibm.streams.operator"/>
+	<classpathentry kind="src" path="impl/java/src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="opt/downloaded/hadoop-common-2.1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="output" path="impl/java/bin"/>
+</classpath>

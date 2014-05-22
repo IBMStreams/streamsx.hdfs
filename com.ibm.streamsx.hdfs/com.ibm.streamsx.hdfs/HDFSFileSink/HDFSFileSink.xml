@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- begin_generated_IBM_copyright_prolog                             -->
+<!--                                                                  -->
+<!-- This is an automatically generated copyright prolog.             -->
+<!-- After initializing,  DO NOT MODIFY OR MOVE                       -->
+<!-- **************************************************************** -->
+<!-- Licensed Materials - Property of IBM                             -->
+<!-- 5724-Y95                                                         -->
+<!-- (C) Copyright IBM Corp.  2013, 2014    All Rights Reserved.      -->
+<!-- US Government Users Restricted Rights - Use, duplication or      -->
+<!-- disclosure restricted by GSA ADP Schedule Contract with          -->
+<!-- IBM Corp.                                                        -->
+<!--                                                                  -->
+<!-- end_generated_IBM_copyright_prolog                               -->
+<operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
+  <javaOperatorModel>
+    <context>
+      <description>The HDFSFileSink operator writes files to a Hadoop Distributed File System. </description>
+      <iconUri size="32">HDFSFileSink_32.gif</iconUri>
+      <iconUri size="16">HDFSFileSink_16.gif</iconUri>
+      <executionSettings>
+        <className>com.ibm.streamsx.hdfs.HDFSFileSink</className>
+        <vmArgs/>
+      </executionSettings>
+      <libraryDependencies>
+        <library>
+          <cmn:description>Java operator class library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
+            <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:command></cmn:command>
+          </cmn:managedLibrary>
+        </library>
+        <library>
+          <cmn:description>apache library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/etc/hadoop</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/hdfs/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/client/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-hdfs/*</cmn:libPath>            
+          </cmn:managedLibrary>
+        </library>
+      </libraryDependencies>
+      <codeTemplates>
+        <codeTemplate name="HDFSFileSink">
+          <description sampleUri="">Basic HDFSFileSink template</description>
+          <template>() as ${operatorName} = HDFSFileSink(${inputStream} ) {
+            param
+                file: &quot;${filename}&quot;;
+        }</template>
+        </codeTemplate>
+        <codeTemplate name="HDFSFileSink with hdfsUser and hdfsUri">
+          <description sampleUri="">HDFSFileSink template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+          <template>() as ${operatorName} = HDFSFileSink(${inputStream} ) {
+            param
+                file: &quot;${filename}&quot;;
+                hdfsUser: &quot;${hdfsUser}&quot;;
+                hdfsUri: &quot;${hdfsUri}&quot;;
+        }</template>
+        </codeTemplate>
+      </codeTemplates>
+    </context>
+    <parameters>
+      <description></description>
+      <parameter>
+        <name>file</name>
+        <description>This parameter specifies the filename. The filename can contain the following variables:
+* %HOST - the host running the processing element of this operator
+* %FILENUM - file number (starts at 0 and counts up as a new file is created for writing)
+* %PROCID - the process ID of the processing element
+* %PEID - the process element ID
+* %PELAUNCHNUM - PE launch count
+* %TIME - the time when the file is created.  If the timeFormat parameter is not specified, the default time format is yyyyMMdd_HHmmss.
+</description>
+        <optional>false</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>timeFormat</name>
+        <description>If %TIME appears in the filename, this parameter is used to give the time format.  Default format is yyyyMMdd_HHmmss.  
+Refer to java.text.SimpleDateFormat for supported patterns for this parameter.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUri</name>
+        <description>URI to HDFS file system.  Supported schemes are &quot;hdfs&quot;, &quot;gpfs&quot;, and &quot;webhdfs&quot;.  If unspecified, the operator
+expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
+The operator expects core-site.xml to be located in $HADOOP_HOME/../hadoop-conf or $HADOOP_HOME/etc/hadoop. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>bytesPerFile</name>
+        <description>This parameter is used to specify the approximate size of the output file, in bytes. 
+When the file size exceeds the specified number of bytes, the current output file is closed and a new file is opened. 
+This parameter is of type int64.  bytesPerFile, timePerFile, and tuplesPerFile parameters are mutually exclusive.  Only one of 
+them can be specified per invocation.  </description>
+        <optional>true</optional>
+        <type>int64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>tuplesPerFile</name>
+        <description>This parameter is used to specify the maximum number of tuples that can be received for each output file. 
+When the specified number of tuples are received, the current output file is closed and a new file is opened for writing. 
+This parameter is of type int64.  bytesPerFile, timePerFile, and tuplesPerFile parameters are mutually exclusive.  Only one of 
+them can be specified per invocation.</description>
+        <optional>true</optional>
+        <type>int64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>closeOnPunct</name>
+        <description>Close file and create new file to write when a punctuation is received.  Default is false.</description>
+        <optional>true</optional>
+        <type>boolean</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>timePerFile</name>
+        <description>This parameter of type float64 is used to specify the approximate time, in seconds, after which the current output file 
+is closed and a new file is opened.  bytesPerFile, timePerFile, and tuplesPerFile parameters are mutually exclusive.  Only one of 
+them can be specified per invocation.</description>
+        <optional>true</optional>
+        <type>float64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUser</name>
+        <description>User to connect to HDFS file system.  If unspecified the instance owner running the application will be used as the user
+to log onto the HDFS file system. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authPrincipal</name>
+        <description>The principal to authenticate as. This should be set to the instance owner principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authKeytab</name>
+        <description>The keytab file that should be used to authenticate the principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>credFile</name>
+        <description>The file containing the login credentials. This is only used when connecting via WebHDFS that requires login credentials.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>configPath</name>
+        <description>The absolute path to the configuration directory containing the core-site.xml file. If this parameter is not specified, the operator will search the default config location for the core-site.xml.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>encoding</name>
+        <description>This optional rstring parameter can be used to specify the character set encoding used in the output ﬁle.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+    </parameters>
+    <inputPorts>
+      <inputPortSet>
+        <description docHref="" sampleUri="">Writes the contents of the input stream to the file specified.
+The expected schema of the input port is of type tuple&lt;rstring line> or tuple&lt;ustring line>, a single rstring or ustring attribute that
+represents a line to be written to the file.</description>
+        <windowingDescription></windowingDescription>
+        <windowingMode>NonWindowed</windowingMode>
+        <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
+        <cardinality>1</cardinality>
+        <optional>false</optional>
+      </inputPortSet>
+    </inputPorts>
+    <outputPorts>
+      <outputPortSet>
+        <description>The HDFSFileSink operator is configurable with an optional output stream of type &lt;string fileName, uint64 fileSize> 
+that gives the name and size of files written.</description>
+        <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
+        <windowPunctuationInputPort>-1</windowPunctuationInputPort>
+        <cardinality>1</cardinality>
+        <optional>true</optional>
+      </outputPortSet>
+    </outputPorts>
+  </javaOperatorModel>
+</operatorModel>

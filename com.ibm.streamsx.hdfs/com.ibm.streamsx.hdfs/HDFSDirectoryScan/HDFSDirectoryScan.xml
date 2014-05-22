@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- begin_generated_IBM_copyright_prolog                             -->
+<!--                                                                  -->
+<!-- This is an automatically generated copyright prolog.             -->
+<!-- After initializing,  DO NOT MODIFY OR MOVE                       -->
+<!-- **************************************************************** -->
+<!-- Licensed Materials - Property of IBM                             -->
+<!-- 5724-Y95                                                         -->
+<!-- (C) Copyright IBM Corp.  2013, 2014    All Rights Reserved.      -->
+<!-- US Government Users Restricted Rights - Use, duplication or      -->
+<!-- disclosure restricted by GSA ADP Schedule Contract with          -->
+<!-- IBM Corp.                                                        -->
+<!--                                                                  -->
+<!-- end_generated_IBM_copyright_prolog                               -->
+<operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
+  <javaOperatorModel>
+    <context>
+      <description>The HDFSDirectoryScan operator scans a Hadoop Distributed File System directory for new files.</description>
+      <iconUri size="32">HDFSDirectoryScan_32.gif</iconUri>
+      <iconUri size="16">HDFSDirectoryScan_16.gif</iconUri>
+      <metrics>
+        <metric>
+          <name>nScans</name>
+          <description sampleUri="">Number of scans that have been done</description>
+          <kind>Counter</kind>
+        </metric>
+      </metrics>
+      <executionSettings>
+        <className>com.ibm.streamsx.hdfs.HDFSDirectoryScan</className>
+        <vmArgs/>
+      </executionSettings>
+      <libraryDependencies>
+        <library>
+          <cmn:description>Java operator class library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
+            <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:command></cmn:command>
+          </cmn:managedLibrary>
+        </library>
+        <library>
+          <cmn:description>apache library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/etc/hadoop</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/hdfs/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/client/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-hdfs/*</cmn:libPath>
+          </cmn:managedLibrary>
+        </library>
+      </libraryDependencies>
+      <codeTemplates>
+        <codeTemplate name="HDFSDirectoryScan">
+          <description>Basic use of HDFS Directory Scan</description>
+          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+            param
+                directory: &quot;${directoryToScan}&quot;;
+        } </template>
+        </codeTemplate>
+        <codeTemplate name="HDFSDirectoryScan with hdfsUser and hdfsUri">
+          <description>HDFSDirectoryScan template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+            param
+                directory: &quot;${directoryToScan}&quot;
+                hdfsUser: &quot;${hdfsUser}&quot;;
+                hdfsUri: &quot;${hdfsUri}&quot;;
+        } </template>
+        </codeTemplate>
+        <codeTemplate name="HDFSDirectoryScan with HDFSFileSource">
+          <description>Read all the files in an HDFS directory</description>
+          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+            param
+                directory: &quot;${directoryToScan}&quot;;
+        }
+        
+        stream&lt;${schema}> ${fileSourceStream} = HDFSFileSource(${outputStream})   {
+        }</template>
+        </codeTemplate>
+      </codeTemplates>
+    </context>
+    <parameters>
+      <description></description>
+      <parameter>
+        <name>directory</name>
+        <description>Directory to be scanned.  This parameter is required if there is no input port specified.  
+If an input port is specified, this parameter is optional.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>initDelay</name>
+        <description sampleUri="">Time to wait in seconds before starting to scan directory.  Defaults to zero second.</description>
+        <optional>true</optional>
+        <type>float64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>sleepTime</name>
+        <description sampleUri="">Minimum time in seconds between scans.  Defaults to 5 seconds.</description>
+        <optional>true</optional>
+        <type>float64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>pattern</name>
+        <description sampleUri="">Include only files matching this pattern.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>strictMode</name>
+        <description sampleUri="">Scan directory using strict mode.  In strict mode, the operator will report an error and abend if directory to scan does not exist, 
+or if there is any problem accessing the directory specified.  In non-strict-mode, the operator will report a warning and continue to run.</description>
+        <optional>true</optional>
+        <type>boolean</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUri</name>
+        <description>URI to HDFS file system.  Supported schemes are &quot;hdfs&quot;, &quot;gpfs&quot;, and &quot;webhdfs&quot;.  If unspecified, the operator
+expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
+The operator expects core-site.xml to be located in $HADOOP_HOME/../hadoop-conf or $HADOOP_HOME/etc/hadoop. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUser</name>
+        <description>User to connect to HDFS file system.  If unspecified the instance owner running the application will be used as the user
+to log onto the HDFS file system. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authPrincipal</name>
+        <description>The principal to authenticate as. This should be set to the instance owner principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authKeytab</name>
+        <description>The keytab file that should be used to authenticate the principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>credFile</name>
+        <description>The file containing the login credentials. This is only used when connecting via WebHDFS that requires login credentials.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>configPath</name>
+        <description>The absolute path to the configuration directory containing the core-site.xml file. If this parameter is not specified, the operator will search the default config location for the core-site.xml.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+    </parameters>
+    <inputPorts>
+      <inputPortSet>
+        <description>Input port to control the directory to scan at runtime.  The expected schema for the input
+port is of tuple&lt;rstring directory>, a schema containing a single attribute of type rstring.  If a directory scan is in progress when        
+a tuple is received, the scan will complete and a new scan will start immediately after using the new directory specified.
+If the operator is currently sleeping, the operator will start scanning the new directory immediately after an input
+tuple is received.</description>
+        <windowingDescription></windowingDescription>
+        <windowingMode>NonWindowed</windowingMode>
+        <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
+        <controlPort>true</controlPort>
+        <cardinality>1</cardinality>
+        <optional>true</optional>
+      </inputPortSet>
+    </inputPorts>
+    <outputPorts>
+      <outputPortSet>
+        <description>The HDFSDirectoryScan operator has one output port. This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order. The port is non-mutating and punctuation free.</description>
+        <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
+        <windowPunctuationInputPort>-1</windowPunctuationInputPort>
+        <cardinality>1</cardinality>
+        <optional>false</optional>
+      </outputPortSet>
+    </outputPorts>
+  </javaOperatorModel>
+</operatorModel>

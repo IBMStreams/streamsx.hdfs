@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- begin_generated_IBM_copyright_prolog                             -->
+<!--                                                                  -->
+<!-- This is an automatically generated copyright prolog.             -->
+<!-- After initializing,  DO NOT MODIFY OR MOVE                       -->
+<!-- **************************************************************** -->
+<!-- Licensed Materials - Property of IBM                             -->
+<!-- 5724-Y95                                                         -->
+<!-- (C) Copyright IBM Corp.  2013, 2014    All Rights Reserved.      -->
+<!-- US Government Users Restricted Rights - Use, duplication or      -->
+<!-- disclosure restricted by GSA ADP Schedule Contract with          -->
+<!-- IBM Corp.                                                        -->
+<!--                                                                  -->
+<!-- end_generated_IBM_copyright_prolog                               -->
+<operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
+  <javaOperatorModel>
+    <context>
+      <description>The HDFSFileSource operator opens a file on HDFS and sends out its contents in tuple format.  If it has no input ports, it reads the HDFS file that is specified in the file parameter and provides the contents on the output port. If it has an input port, it reads the files that are named by the strings that are arriving on the input port, and places a punctuation between each file.</description>
+      <iconUri size="32">HDFSFileSource_32.gif</iconUri>
+      <iconUri size="16">HDFSFileSource_16.gif</iconUri> 
+      <metrics> 
+        <metric>
+          <name>nFilesOpened</name>
+          <description sampleUri="">Number of files opened for reading.</description>
+          <kind>Counter</kind>
+        </metric>
+      </metrics>
+      <executionSettings>
+        <className>com.ibm.streamsx.hdfs.HDFSFileSource</className>
+        <vmArgs/>
+      </executionSettings>
+      <libraryDependencies>
+        <library>
+          <cmn:description>Java operator class library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
+            <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:command></cmn:command>
+          </cmn:managedLibrary>
+        </library>
+        <library>
+          <cmn:description>apache library</cmn:description>
+          <cmn:managedLibrary>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/etc/hadoop</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/conf</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/hdfs/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/lib/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/client/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/*</cmn:libPath>
+            <cmn:libPath>@HADOOP_HOME@/../hadoop-hdfs/*</cmn:libPath>
+          </cmn:managedLibrary>
+        </library>
+      </libraryDependencies>
+      <codeTemplates>
+        <codeTemplate name="HDFSFileSource">
+          <description sampleUri="">HDFSFileSource basic template</description>
+          <template>stream&lt;${streamType}> ${streamName} = HDFSFileSource() {
+                param
+                file : &quot;${filename}&quot;;
+                }</template>
+        </codeTemplate>
+        <codeTemplate name="HDFSFileSource with hdfsUser and hdfsUri">
+          <description sampleUri="">HDFSFileSource template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+          <template>stream&lt;${streamType}> ${streamName} = HDFSFileSource() {
+                param
+                file: &quot;${filename}&quot;;
+                hdfsUser: &quot;${hdfsUser}&quot;;
+                hdfsUri: &quot;${hdfsUri}&quot;;
+                }</template>
+        </codeTemplate>
+      </codeTemplates>
+    </context>
+    <parameters>
+      <description></description>
+      <parameter>
+        <name>file</name>
+        <description>This optional rstring parameter provides the name of file that you want to open. It is required if there is no input port, and produces an error if there is an input port.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>initDelay</name>
+        <description sampleUri="">Time to wait in seconds before starting tuple reading.  Defaults to zero.</description>
+        <optional>true</optional>
+        <type>float64</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUri</name>
+        <description>URI to HDFS file system.  Supported schemes are &quot;hdfs&quot;, &quot;gpfs&quot;, and &quot;webhdfs&quot;.  If unspecified, the operator
+expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
+The operator expects core-site.xml to be located in $HADOOP_HOME/../hadoop-conf or $HADOOP_HOME/etc/hadoop. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>hdfsUser</name>
+        <description>User to connect to HDFS file system.  If unspecified the instance owner running the application will be used as the user
+to log onto the HDFS file system. </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authPrincipal</name>
+        <description>The principal to authenticate as. This should be set to the instance owner principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>authKeytab</name>
+        <description>The keytab file that should be used to authenticate the principal.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>credFile</name>
+        <description>The file containing the login credentials. This is only used when connecting via WebHDFS that requires login credentials.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>configPath</name>
+        <description>The absolute path to the configuration directory containing the core-site.xml file. If this parameter is not specified, the operator will search the default config location for the core-site.xml.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>encoding</name>
+        <description>The encoding to use when reading files, default is UTF-8</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+    </parameters>
+    <inputPorts>
+      <inputPortSet>
+        <description>The HDFSFileSource operator has one optional input port. If an input port is specified, it expects a single attribute of type rstring. It treats input tuples as file names to be opened.</description>
+        <windowingDescription></windowingDescription>
+        <windowingMode>NonWindowed</windowingMode>
+        <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
+        <cardinality>1</cardinality>
+        <optional>true</optional>
+      </inputPortSet>
+    </inputPorts>
+    <outputPorts>
+      <outputPortSet>
+        <description>The HDFSFileSource operator has one output port that lists the content of the files. It includes a punctuation at the conclusion of each file. The output port is mutating and its punctuation mode is Generating. </description>
+        <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
+        <windowPunctuationInputPort>-1</windowPunctuationInputPort>
+        <cardinality>1</cardinality>
+        <optional>false</optional>
+      </outputPortSet>
+    </outputPorts>
+  </javaOperatorModel>
+</operatorModel>
