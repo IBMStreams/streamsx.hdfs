@@ -287,28 +287,6 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 						null);
 			}
 		}
-
-		// List<String> encodings =
-		// checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_ENCODING);
-		// if (encodings != null)
-		// {
-		// String encoding = "";
-		// if (encodings.size() > 1)
-		// {
-		// checker.setInvalidContext("Operator parameter encoding should not contain more than one value.",
-		// null);
-		// }
-		// else if (encodings.size() == 1){
-		// try {
-		// encoding = encodings.get(0);
-		// Charset.forName(encoding);
-		// } catch (Exception e) {
-		// checker.setInvalidContext("The specified encoding is invalid: " +
-		// encoding, encodings.toArray());
-		// }
-		// }
-		// }
-
 	}
 
 	@ContextCheck(compile=false)

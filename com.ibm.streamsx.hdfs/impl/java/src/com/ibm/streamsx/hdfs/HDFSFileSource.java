@@ -280,7 +280,6 @@ public class HDFSFileSource extends AbstractHdfsOperator {
 				.getCustomMetric(FILES_OPENED_METRIC);
 	}
 
-	// TODO:  Is this thread-safe?  what happens when a tuples comes in when we are processing?
 	private void processFile(String filename) throws Exception {
 		
 		if (logger.isLoggable(LogLevel.INFO))
