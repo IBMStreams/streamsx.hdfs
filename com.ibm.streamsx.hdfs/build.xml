@@ -94,8 +94,16 @@
 			<compilerarg line="-s ${gensrc.dir}"/>
 		</javac>
 	</target>
+	
+	<target name="copy">
+		<copy todir="${build.dir}">
+		    <fileset dir="${src.dir}">
+		       <exclude name="**/*.java"/>
+		    </fileset>
+		</copy>
+	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar" depends="compile, copy">
 	<jar destfile="${impl.lib.dir}/${jarfile}" basedir="${build.dir}" includes="com/ibm/streamsx/hdfs/**" filesonly="true" >
 		</jar>
 		<delete dir="${build.dir}" />		
