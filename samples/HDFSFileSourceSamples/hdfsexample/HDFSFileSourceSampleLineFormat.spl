@@ -94,8 +94,7 @@ composite HDFSFileSourceSampleLineFormat
 		{
 			param
 				file : "lineFile.txt" ;
-				initDelay : 10.0l ;
-		}
+		} 
 
 		() as MySink = FileSink(LineStream)
 		{
