@@ -24,7 +24,7 @@
                             
 .PHONY: all clean
 
-SPLC_FLAGS = -a -z -t $(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.bigdata
+SPLC_FLAGS = -a -z -t ../../com.ibm.streamsx.hdfs
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
