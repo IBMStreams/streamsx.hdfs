@@ -190,9 +190,10 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		boolean dynamicParam = false;
 		if (checker.getOperatorContext().getParameterNames()
 		    .contains(DYNAMIC_PARAM)) {
-		dynamicParam = Boolean.parseBoolean(checker
+			dynamicParam = Boolean.parseBoolean(checker
 						    .getOperatorContext().getParameterValues(DYNAMIC_PARAM).get(0));
 		}
+		
 		if ((dynamicParam && inputSchema.getAttributeCount() != 2)
 				|| (!dynamicParam && inputSchema.getAttributeCount() != 1)) {
 			checker.setInvalidContext(
