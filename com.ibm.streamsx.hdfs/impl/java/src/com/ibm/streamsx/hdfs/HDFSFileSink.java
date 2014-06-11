@@ -187,8 +187,12 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		
 		StreamSchema inputSchema = checker.getOperatorContext()
 				.getStreamingInputs().get(0).getStreamSchema();
-		boolean dynamicParam = Boolean.parseBoolean(checker
-				.getOperatorContext().getParameterValues(DYNAMIC_PARAM).get(0));
+		boolean dynamicParam = false;
+		if (checker.getOperatorContext().getParameterNames()
+		    .contains(DYNAMIC_PARAM)) {
+		dynamicParam = Boolean.parseBoolean(checker
+						    .getOperatorContext().getParameterValues(DYNAMIC_PARAM).get(0));
+		}
 		if ((dynamicParam && inputSchema.getAttributeCount() != 2)
 				|| (!dynamicParam && inputSchema.getAttributeCount() != 1)) {
 			checker.setInvalidContext(
