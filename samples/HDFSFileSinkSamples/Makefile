@@ -31,9 +31,11 @@ clean: clean-standalone clean-distributed
 clean-standalone:
 	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE1) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
 	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE2) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
+	$(SPLC) $(SPLC_FLAGS) -C -T -M $(SPL_MAIN_DYNAMIC) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
 	-rm -rf toolkit.xml
-	
+
 clean-distributed:
 	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE1) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
 	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE2) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
+	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_DYNAMIC) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
 	-rm -rf toolkit.xml
