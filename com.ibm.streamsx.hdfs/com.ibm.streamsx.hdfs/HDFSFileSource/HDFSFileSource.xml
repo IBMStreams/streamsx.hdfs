@@ -3,7 +3,7 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>The HDFSFileSource operator opens a file on HDFS and sends out its contents in tuple format.  If it has no input ports, it reads the HDFS file that is specified in the file parameter and provides the contents on the output port. If it has an input port, it reads the files that are named by the strings that are arriving on the input port, and places a punctuation between each file.</description>
+      <description>The HDFSFileSource operator opens a file on HDFS and sends out its contents in tuple format.  If it has no input ports, it reads the HDFS file that is specified in the file parameter and provides the contents on the output port. If it has an input port, it reads the files that are named by the strings that are arriving on the input port, and places a punctuation between each file.  This operator writes to HDFS.</description>
       <iconUri size="32">HDFSFileSource_32.gif</iconUri>
       <iconUri size="16">HDFSFileSource_16.gif</iconUri> 
       <metrics> 
