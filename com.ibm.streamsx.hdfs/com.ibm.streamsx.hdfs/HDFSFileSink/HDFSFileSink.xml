@@ -66,7 +66,7 @@
 * %PELAUNCHNUM - PE launch count
 * %TIME - the time when the file is created.  If the timeFormat parameter is not specified, the default time format is yyyyMMdd_HHmmss.
 </description>
-        <optional>false</optional>
+        <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
@@ -110,6 +110,13 @@ them can be specified per invocation.</description>
       <parameter>
         <name>closeOnPunct</name>
         <description>Close file and create new file to write when a punctuation is received.  Default is false.</description>
+        <optional>true</optional>
+        <type>boolean</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>dynamicFilename</name>
+        <description>If true, the second attribute is taken to be the file name</description>
         <optional>true</optional>
         <type>boolean</type>
         <cardinality>1</cardinality>
