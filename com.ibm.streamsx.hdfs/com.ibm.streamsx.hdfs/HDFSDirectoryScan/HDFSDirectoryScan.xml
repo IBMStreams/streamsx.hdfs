@@ -161,7 +161,7 @@ You can use the **hdfsUri** parameter to override the value that is specified fo
         <description>This optional parameter specifies the user ID to use when you connect to HDFS. If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
 
 When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the **authPrincipal** and **authKeytab** parameters. After successful authentication, the operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.
-	
+
 Note: When using Kerberos authentication, to perform operations as the user specified by the **hdfsUser** parameter, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS.
 </description>
         <optional>true</optional>
@@ -220,8 +220,7 @@ The HDFSDirectoryScan operator has an optional control input port. You can use t
     </inputPorts>
     <outputPorts>
       <outputPortSet>
-        <description>	
-The HDFSDirectoryScan operator has one output port. This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order. The port is non-mutating and punctuation free.</description>
+        <description>The HDFSDirectoryScan operator has one output port. This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order. The port is non-mutating and punctuation free.</description>
         <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>
         <cardinality>1</cardinality>
