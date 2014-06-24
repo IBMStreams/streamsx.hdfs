@@ -19,10 +19,10 @@ The operator terminates in the following cases:
 
  **Examples**
  
-In the following example, the HDFS2DirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
+In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
 
 	
-	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
+	(stream&lt;rstring filename&gt; Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan()
 	{
 		param
 			directory :"/user/myuser/";
@@ -130,7 +130,7 @@ In the following example, the HDFS2DirectoryScan operator scans the HDFS directo
       </parameter>
       <parameter>
         <name>strictMode</name>
-        <description sampleUri="">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. If you set this parameter to false and the specified directory does not exist or there is a problem accessin the directory, the operator treats it as an empty directory and does not report an error. </description>
+        <description sampleUri="">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. </description>
         <optional>true</optional>
         <type>boolean</type>
         <cardinality>1</cardinality>
