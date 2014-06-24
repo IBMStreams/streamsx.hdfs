@@ -1,0 +1,12 @@
+/**
+**Developing and running applications that use the operators in the HDFS Toolkit**
+
+To create applications that use the HDFS Toolkit operators, you must set environment variables and configure either IBM InfoSphere Streams or the SPL compiler to be aware of the location of the toolkit. 
+
+**Before you begin**
+
+ * Install IBM InfoSphere Streams and set the STREAMS_INSTALL environment variable to the InfoSphere Streams installation directory.  For example: `export STREAMS_INSTALL=Streams-Install-Directory`
+*/
+
+namespace com.ibm.streamsx.hdfs;
+
