@@ -18,8 +18,8 @@ The operator terminates in the following cases:
  * The pattern that is specified in the pattern parameter fails to compile.
 
 **Examples**
- 
- In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
+
+In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
 
 	
 	(stream&lt;rstring filename&gt; Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan()

@@ -4,19 +4,19 @@
   <javaOperatorModel>
     <context>
       <description>The HDFSFileSink operator writes files to a Hadoop Distributed File System. 
-            
+
 The HDFSFileSink operator is similar to the FileSink operator.  This operator writes tuples that arrive on its input port to the output file that is named by the **file** parameter.  
 You can optionally control whether the operator closes the current output file and creates a new file for writing based on the size of the file in bytes, the number of tuples that are written to the file,
 or the time in seconds that the file is open for writing, or when the operator receives a punctuation marker.
-      
+
 **Exceptions**
 
 The HDFSFileSink operator terminates in the following cases:
  * The operator cannot connect to HDFS.
  * The file cannot be written.     
- 
+
 **Examples**
-     
+
 The following example shows how to use the HDFSFileSink operator:
 
       stream&lt;PersonSchema&gt; In = FileSource(){
