@@ -34,7 +34,7 @@
 		<!-- Extract info from the toolkit's info.xml -->
 		<xmlproperty file="${toolkit}/info.xml" prefix="tkinfo" keepRoot="no" />
 
-		<echo message="Toolkit Version: ${tkinfo.info:identity.info:version}" />
+		<echo message="Toolkit Version: ${tkinfo.identity.version}" />
 		<echo message="Git Hash: ${commithash}" />
 
 	</target>
