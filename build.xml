@@ -65,7 +65,7 @@
 	<target name="spldoc_work" depends="setcommitversion, samples">
 		<antcall target="spldoctoolkit">
 			<param name="tkdir" value="${toolkit}" />
-			<param name="tktitle" value="IBMStreams ${tkinfo.info:identity.info:name} Toolkit" />
+			<param name="tktitle" value="IBMStreams ${tkinfo.identity.name} Toolkit" />
 		</antcall>
 		<subant target="spldoctoolkit" genericantfile="${basedir}/build.xml">
 			<dirset dir="samples" includes="*" />
@@ -126,7 +126,7 @@
 		<tar compression="gzip" longfile="gnu"
              destfile="${releasefilename}"
     	     basedir="${basedir}"
-             includes="${tkinfo.info:identity.info:name}/** samples/**"
+             includes="${tkinfo.identity.name}/** samples/**"
              excludes="**/.gitignore **/.settings/** **/.settings **/.project **/.classpath"
     	/>		
 		<checksum file="${releasefilename}" />
