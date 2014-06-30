@@ -122,7 +122,7 @@
 	<!-- Targets to build releases -->
 	<target name="release" depends="clean, all, spldoc, toolkitIndexOnly">		
 		<mkdir dir="${tmp}" />
-		<property name="releasefilename" value="${tmp}/streamx.hdfs.toolkits-${tkinfo.info:identity.info:version}-${DSTAMP}-${TSTAMP}.tgz" />
+		<property name="releasefilename" value="${tmp}/streamx.hdfs.toolkits-${tkinfo.identity.version}-${DSTAMP}-${TSTAMP}.tgz" />
 		<tar compression="gzip" longfile="gnu"
              destfile="${releasefilename}"
     	     basedir="${basedir}"
