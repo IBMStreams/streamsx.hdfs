@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="reference"/>
+<meta name="DC.Title" content="IBMStreams com.ibm.streamsx.hdfs Toolkit"/>
+<meta name="abstract" content="com.ibm.streamsx.hdfs"/>
+<meta name="description" content="com.ibm.streamsx.hdfs"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="spldoc_toolkit__toolkit__1.0.0"/>
+<link rel="stylesheet" type="text/css" href="../html/commonltr.css"/>
+<link rel="stylesheet" type="text/css" href="../html/spldoc.css"/>
+<title>IBMStreams com.ibm.streamsx.hdfs Toolkit</title>
+</head>
+<body id="spldoc_toolkit__toolkit__1.0.0">
+
+
+<h1 class="title topictitle1">IBMStreams com.ibm.streamsx.hdfs Toolkit</h1>
+
+
+<div class="body refbody"><p class="shortdesc spltoolkitname">com.ibm.streamsx.hdfs</p>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">General Information</h2>
+
+
+<p class="p">The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later. 
+</p>
+
+<p class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions: 
+</p>
+
+<ul class="ul">
+<li class="li"> Apache Hadoop versions 1.2.1 and 2.x  </li>
+
+<li class="li"> InfoSphere BigInsights 2.1.2  </li>
+
+<li class="li"> Cloudera distribution including Apache Hadoop version 4 (CDH4)  </li>
+
+<li class="li"> Hortonworks Data Platform (HDP) 2.0  </li>
+
+</ul>
+
+<p class="p"> Note: The reference platforms that were used for testing are Hadoop 2.2.0, InfoSphere BigInsights 2.1.2 and CDH 4.6. 
+</p>
+
+<p class="p">When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS. 
+</p>
+
+<p class="p">For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> operator parameters at compile time. The <strong class="ph b">authPrincipal</strong> parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The <strong class="ph b">authKeytab</strong> parameter specifies the keytab file that is created for the principal. 
+</p>
+
+<p class="p">Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2.	     
+</p>
+
+<dl class="dl">
+  
+  <dt class="dt dlterm">Version</dt>
+
+  <dd class="dd">1.0.0</dd>
+
+  
+  
+  <dt class="dt dlterm">Required Product Version</dt>
+
+  <dd class="dd">3.2.1</dd>
+
+  
+  
+  <dt class="dt dlterm">Author</dt>
+
+  <dd class="dd">IBMStreams Open Source Community at GitHub - https://github.com/IBMStreams/streamsx.hdfs</dd>
+
+  
+</dl>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Namespaces</h2>
+  
+<dl class="dl">
+   
+     <dt class="dt dlterm splpart"><a class="xref" href="com.ibm.streamsx.hdfs$.html">com.ibm.streamsx.hdfs</a></dt>
+
+  <dd class="dd">SPL Files
+       <ul class="sl simple">
+         <li class="sli"><a class="xref" href="com.ibm.streamsx.hdfs$namespaceHdfs$spl.html">com.ibm.streamsx.hdfs/namespaceHdfs.spl</a></li>
+
+       </ul>
+
+   </dd>
+
+   <dd class="dd">Operators
+       <ul class="sl simple">
+         <li class="sli"><a class="xref" href="com.ibm.streamsx.hdfs$HDFSDirectoryScan.html">HDFSDirectoryScan</a></li>
+
+         <li class="sli"><a class="xref" href="com.ibm.streamsx.hdfs$HDFSFileSink.html">HDFSFileSink</a></li>
+
+         <li class="sli"><a class="xref" href="com.ibm.streamsx.hdfs$HDFSFileSource.html">HDFSFileSource</a></li>
+
+       </ul>
+
+   </dd>
+
+     </dl>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">References</h2>
+  
+    <ul class="sl simple">
+    <li class="sli"><a class="xref" href="OperatorModel.html">Operator Model</a></li>
+
+    </ul>
+
+</div>
+
+</div>
+
+
+</body>
+</html>
