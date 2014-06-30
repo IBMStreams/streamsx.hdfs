@@ -3,13 +3,57 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>The HDFSFileSource operator opens a file on HDFS and sends out its contents in tuple format.  If it has no input ports, it reads the HDFS file that is specified in the file parameter and provides the contents on the output port. If it has an input port, it reads the files that are named by the strings that are arriving on the input port, and places a punctuation between each file.  This operator writes to HDFS.</description>
+      <description>The HDFSFileSource operator reads files from a Hadoop Distributed File System (HDFS).
+
+The operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
+
+If the optional input port is not specified, the operator reads the HDFS file that is specified in the **file** parameter and 
+provides the file contents on the output port.  If the optional input port is configured, the operator reads the files that are 
+named by the attribute in the tuples that arrive on its input port and places a punctuation marker between each file.
+
+**Exceptions**
+
+The HDFSFileSource operator terminates in the following cases:
+ * The operator cannot connect to HDFS.
+ * The file cannot be opened.
+ * The file does not exist.
+ * The file becomes unreadable.
+ * A tuple cannot be created from the file contents (such as a problem with the file format).
+
+**Examples**
+
+In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds and the HDFSFileSource
+operator reads the files output by the HDFSDirectoryScan operator.
+   
+	/*
+    * HDFSDirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
+    * Overrides the URI in the fs.defaultFS option from core-site.xml file
+    */
+    (stream&lt;rstring filename&gt; Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan(){
+  		param
+   			directory     : "/user/myuser/";
+   			hdfsUri:"hdfs : //hdfsServer:1883";
+   			sleepTime     : 2.0;
+	}
+	// HDFSFileSource operator reads from files discovered by HDFSDirectoryScan operator
+	(stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 =	HDFSFileSource(Files){
+  		param
+    		hdfsUri:"hdfs://hdfsSever:1883"; 
+   	}
+
+The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
+
+  	(stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 = HDFSFileSource(){
+  		param
+    		hdfsUri:"webhdfs://bigInsightSever:1883"; 
+   			file   :"/user/myser/myfile.txt"; 
+</description>
       <iconUri size="32">HDFSFileSource_32.gif</iconUri>
       <iconUri size="16">HDFSFileSource_16.gif</iconUri> 
       <metrics> 
         <metric>
           <name>nFilesOpened</name>
-          <description sampleUri="">Number of files opened for reading.</description>
+          <description sampleUri="">The number of files that are opened by the operator for reading data.</description>
           <kind>Counter</kind>
         </metric>
       </metrics>
@@ -65,66 +109,98 @@
       <description></description>
       <parameter>
         <name>file</name>
-        <description>This optional rstring parameter provides the name of file that you want to open. It is required if there is no input port, and produces an error if there is an input port.</description>
+        <description>
+This parameter specifies the name of file that the operator opens and reads. 
+This parameter must be specified when the optional input port is not configured.
+If the optional input port is used and the file name is specified, the operator generates an error.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>initDelay</name>
-        <description sampleUri="">Time to wait in seconds before starting tuple reading.  Defaults to zero.</description>
+        <description sampleUri="">
+This parameter specifies the time to wait in seconds before the operator reads the first file.  
+The default value is `0`.</description>
         <optional>true</optional>
         <type>float64</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>hdfsUri</name>
-        <description>URI to HDFS file system.  Supported schemes are &quot;hdfs&quot;, &quot;gpfs&quot;, and &quot;webhdfs&quot;.  If unspecified, the operator
-expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
-The operator expects core-site.xml to be located in $HADOOP_HOME/../hadoop-conf or $HADOOP_HOME/etc/hadoop. </description>
+        <description>
+This parameter specifies the uniform resource identifier (URI) that you can use to connect to 
+the HDFS file system.  The URI has the following format:
+ * To access HDFS locally or remotely, use `hdfs://*hdfshost*:*hdfsport*
+ * To access GPFS locally, use `gpfs:///`.
+ * To access GPFS remotely, use `webhdfs://*hdfshost*:*webhdfsport*
+
+If this parameter is not specified, the operator expects that the HDFS URI is specified as the `fs.defaultFS` or 
+`fs.default.name` property in the `core-site.xml` HDFS configuration file.  The operator expects the `core-site.xml` 
+file to be in `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`. </description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>hdfsUser</name>
-        <description>User to connect to HDFS file system.  If unspecified the instance owner running the application will be used as the user
-to log onto the HDFS file system. </description>
+        <description>
+This parameter specifies the user ID to use when you connect to the HDFS file system.  
+If this parameter is not specified, the operator uses the instance owner to connect to the HDFS file system.
+
+When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the 
+values that are specified in the **authPrincipal** and **authKeytab** parameters.  After successful authentication, the
+operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.
+
+**NOTE:** When using Kerberos authentication, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS
+to perform operations as the user that is specified by the **hdfsUser** parameter.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>authPrincipal</name>
-        <description>The principal to authenticate as. This should be set to the instance owner principal.</description>
+        <description>
+This parameter specifies the Kerberos principal that you use for authentication.
+This value is set to the principal that is created for the InfoSphere Streams instance owner.
+You must specify this parameter if you want to use Kerberos authentication.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>authKeytab</name>
-        <description>The keytab file that should be used to authenticate the principal.</description>
+        <description>
+This parameter specifies the file that contains the encrypted keys for the user that is specified
+by the **authPrincipal** parameter.  The operator uses this keytab file to authenticate the user.
+The keytab file is generated by the administrator.  You must specify this parameter to use Kerberos authentication.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>credFile</name>
-        <description>The file containing the login credentials. This is only used when connecting via WebHDFS that requires login credentials.</description>
+        <description>
+This parameter specifies a file that contains login credentials. The credentials are used to
+connect to GPFS remotely by using the `webhdfs://*hdfshost*:*webhdfsport*` schema.  The credentials file must contain information
+about how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema.  For example, the file must contain the 
+user name and password for an IBM InfoSphere BigInsights user.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>configPath</name>
-        <description>The absolute path to the configuration directory containing the core-site.xml file. If this parameter is not specified, the operator will search the default config location for the core-site.xml.</description>
+        <description>
+This parameter specifies the absolute path to the directory that contains the `core-site.xml` file, which is an HDFS
+configuration file. If this parameter is not specified, the operator searches the default location for the `core-site.xml` file.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
         <name>encoding</name>
-        <description>The encoding to use when reading files, default is UTF-8</description>
+        <description>This parameter specifies the encoding to use when reading files. The default value is `UTF-8`.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -132,7 +208,10 @@ to log onto the HDFS file system. </description>
     </parameters>
     <inputPorts>
       <inputPortSet>
-        <description>The HDFSFileSource operator has one optional input port. If an input port is specified, it expects a single attribute of type rstring. It treats input tuples as file names to be opened.</description>
+        <description>
+The HDFSFileSource operator has one optional input port. If an input port is specified, the operator expects
+an input tuple with a single attribute of type rstring. The input tuples contain the file names that the operator opens for reading.
+The input port is non-mutating.</description>
         <windowingDescription></windowingDescription>
         <windowingMode>NonWindowed</windowingMode>
         <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
@@ -142,7 +221,9 @@ to log onto the HDFS file system. </description>
     </inputPorts>
     <outputPorts>
       <outputPortSet>
-        <description>The HDFSFileSource operator has one output port that lists the content of the files. It includes a punctuation at the conclusion of each file. The output port is mutating and its punctuation mode is Generating. </description>
+        <description>
+The HDFSFileSource operator has one output port.  The tuples on the output port contain the data that is read from the files.
+The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.</description>
         <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>
         <cardinality>1</cardinality>
