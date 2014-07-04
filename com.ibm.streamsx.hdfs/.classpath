@@ -7,6 +7,6 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="opt/downloaded/hadoop-common-2.1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="opt/downloaded/hadoop-common-2.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="impl/java/bin"/>
 </classpath>

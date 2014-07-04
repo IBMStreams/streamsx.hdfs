@@ -115,10 +115,10 @@ them can be specified per invocation.</description>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
-        <name>dynamicFilename</name>
-        <description>If true, the second attribute is taken to be the file name</description>
+        <name>fileAttributeName</name>
+        <description>If set, this points to an attribute containing the filename.  The operator will close a file when value of this attribute changes.  If the string contains substitutions, the check for a change happens before substituations, and the filename contains the substitutions based on the first tuple.    </description>
         <optional>true</optional>
-        <type>boolean</type>
+        <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
