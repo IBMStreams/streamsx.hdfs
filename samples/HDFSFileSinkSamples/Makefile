@@ -1,6 +1,8 @@
-# Copyright (C) 2013-2014, International Business Machines Corporation  
-# All Rights Reserved      
-                            
+##################################################################### 
+# Copyright (C)2014, International Business Machines Corporation and 
+# others. All Rights Reserved. 
+#####################################################################
+
 .PHONY: all clean
 
 STREAMS_SPLPATH ?=../../com.ibm.streamsx.hdfs

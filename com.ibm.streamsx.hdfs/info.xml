@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+// *******************************************************************************
+// * Copyright (C)2014, International Business Machines Corporation and *
+// * others. All Rights Reserved. *
+// *******************************************************************************
+-->
 <toolkitInfoModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/toolkitInfo" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/toolkitInfo toolkitInfoModel.xsd">
   <identity>
     <name>com.ibm.streamsx.hdfs</name>
-    <description>BigData HDFS Toolkit</description>
+    <description>
+The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
+
+The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
+ * Apache Hadoop versions 1.2.1 and 2.x 
+ * InfoSphere BigInsights 2.1.2 
+ * Cloudera distribution including Apache Hadoop version 4 (CDH4) 
+ * Hortonworks Data Platform (HDP) 2.0 
+
+Note: The reference platforms that were used for testing are Hadoop 2.2.0, InfoSphere BigInsights 2.1.2 and CDH 4.6.
+
+When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
+
+For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
+
+Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2.	
+    </description>
     <version>1.0.0</version>
     <requiredProductVersion>3.2.1</requiredProductVersion>
   </identity>
