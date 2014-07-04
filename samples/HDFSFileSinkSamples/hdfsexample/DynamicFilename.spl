@@ -1,12 +1,12 @@
+
 /*
  * Copyright (C) 2013-2014, International Business Machines Corporation  
  * All Rights Reserved   
  * 
- */                              	                 
+ */
+namespace hdfsexample ;
 
-namespace hdfsexample;
-
-use com.ibm.streamsx.hdfs::HDFSFileSink;
+use com.ibm.streamsx.hdfs::HDFSFileSink ;
 
 /**
  * Returns a filename for a particular iteration.
@@ -16,25 +16,35 @@ use com.ibm.streamsx.hdfs::HDFSFileSink;
  * tuple, and use fields of the tuple to generate a file name.  remember, though, that
  * this is called for every tuple, so you want to avoid heavy-weight operations.
  */
-rstring getFileName(uint64 n) {
-	uint64 fileNum = n/(uint64)30u;
-	
-	if (fileNum == (uint64)0) {
-		return "firstFile";
+rstring getFileName(uint64 n)
+{
+	uint64 fileNum = n /(uint64) 30u ;
+	if(fileNum ==(uint64) 0)
+	{
+		return "firstFile" ;
 	}
-	else if (fileNum == (uint64)1) {
-		return "secondFile";
+
+	else if(fileNum ==(uint64) 1)
+	{
+		return "secondFile" ;
 	}
-	else if (fileNum == (uint64)2) {
-		return "thirdFile";
+
+	else if(fileNum ==(uint64) 2)
+	{
+		return "thirdFile" ;
 	}
-	else if (fileNum == (uint64)3) {
-		return "fourthFile";
+
+	else if(fileNum ==(uint64) 3)
+	{
+		return "fourthFile" ;
 	}
-	else {
-		// Watership down joke 
-		return "HrairFile";
+
+	else
+	{
+	// Watership down joke 
+		return "HrairFile" ;
 	}
+
 }
 
 /**
@@ -64,27 +74,37 @@ rstring getFileName(uint64 n) {
  * "fourthFile3_20140611_140138.txt",240
  * </code>
  */
-composite DynamicFilename {
+composite DynamicFilename
+{
+	graph
+		stream<rstring toWrite, rstring filename> sinkStream = Beacon() {
+			param
+				iterations : 100 ;
+				period : 1.0 ;
+			output
+				sinkStream : toWrite = "This is tuple number " +(rstring) IterationCount(),
+					filename = getFileName(IterationCount()) + "%FILENUM_%TIME.txt" ;
+		}
+		
+		stream<rstring filename, uint64 size> namesWritten = HDFSFileSink(sinkStream){
+			param fileAttributeName : "filename" ;
+		}
 
-graph
+		() as filesWritten = FileSink(namesWritten) {
+			param file : "names.csv" ;
+		}
 
-stream<rstring toWrite, rstring filename> sinkStream = Beacon() {
-param
-iterations: 100;
-period: 1.0;
-output sinkStream:
-toWrite = "This is tuple number "+(rstring)IterationCount(),
-filename = getFileName(IterationCount())+"%FILENUM_%TIME.txt";
-
+		// Now, let's have the filename be the first attribute and the data be the second.
+		stream<rstring filename, rstring toWrite> reversed = Functor(sinkStream) {
+		output reversed: filename = "rev_"+filename;
 }
 
-stream<rstring filename, uint64 size> namesWritten = HDFSFileSink(sinkStream) {
-param 
-dynamicFilename: true;
-}
+		stream<rstring filename, uint64 size> namesWritten2 = HDFSFileSink(reversed) {
+			param fileAttributeName : "filename" ;
+		}
 
-() as filesWritten = FileSink(namesWritten) {
-param file: "names.csv";
-}
+		() as filesWritten2 = FileSink(namesWritten2) {
+			param file : "names2.csv" ;
+		}
 
 }
