@@ -43,10 +43,12 @@ operator reads the files output by the HDFSDirectoryScan operator.
 
 The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
-  	(stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 = HDFSFileSource(){
+    (stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 = HDFSFileSource(){
   		param
     		hdfsUri:"webhdfs://bigInsightSever:1883"; 
    			file   :"/user/myser/myfile.txt"; 
+   			
+
 </description>
       <iconUri size="32">HDFSFileSource_32.gif</iconUri>
       <iconUri size="16">HDFSFileSource_16.gif</iconUri> 
