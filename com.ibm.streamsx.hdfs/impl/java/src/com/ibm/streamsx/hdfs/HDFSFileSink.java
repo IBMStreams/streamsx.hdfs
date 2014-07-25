@@ -246,7 +246,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 
 		// checks for negative values
 		if (!bytesPerFileVal.isEmpty()) {
-			if (Integer.valueOf(bytesPerFileVal.get(0)) < 0) {
+			if (Long.valueOf(bytesPerFileVal.get(0)) < 0) {
 				checker.setInvalidContext(
 						"Operator parameter bytesPerFile value should not be less than 0.",
 						null);
@@ -254,7 +254,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		}
 
 		if (!tuplesPerFileVal.isEmpty()) {
-			if (Integer.valueOf(tuplesPerFileVal.get(0)) < 0) {
+			if (Long.valueOf(tuplesPerFileVal.get(0)) < 0) {
 				checker.setInvalidContext(
 						"Operator parameter tuplesPerFile value should not be less than 0.",
 						null);
