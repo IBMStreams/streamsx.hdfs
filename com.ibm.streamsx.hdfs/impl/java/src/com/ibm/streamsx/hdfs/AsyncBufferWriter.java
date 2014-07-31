@@ -134,7 +134,7 @@ public class AsyncBufferWriter extends Writer {
 		}
 	}
 	
-	public void flushNow() throws IOException {
+	protected void flushNow() throws IOException {
 		if (buffer.length > 0)
 		{
 			FlushRunnable runnable = new FlushRunnable(buffer, false, position);
