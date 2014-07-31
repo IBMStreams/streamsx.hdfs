@@ -98,13 +98,18 @@ public class AsyncBufferWriter extends Writer {
 		if (!isClosed)
 		{
 			isClosed = true;
-			flush();			
+			
+			// shut down the execution service, so no other flush runnable can be scheduled 
+			// and wait for any flush job currently scheduled or running to finish
 			exService.shutdown();
 			try {
-				exService.awaitTermination(10000, TimeUnit.MILLISECONDS);
+				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.WARN, "Execution Service shutdown is interrupted.", e);
 			}finally {
+				
+				// do final flushing of buffer
+				flushNow();
 				out.close();
 				bufferQueue.clear();
 			}
@@ -125,10 +130,18 @@ public class AsyncBufferWriter extends Writer {
 				position = 0;
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.ERROR, "Unable to retrieve buffer from buffer queue.", e);
-			}
-			
+			}			
 		}
 	}
+	
+	public void flushNow() throws IOException {
+		if (buffer.length > 0)
+		{
+			FlushRunnable runnable = new FlushRunnable(buffer, false, position);
+			runnable.run();
+		}
+	}
+	
 
 	@Override
 	public void write(char[] src, int offset, int len) throws IOException {		
