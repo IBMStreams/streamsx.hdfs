@@ -51,8 +51,7 @@ public class AsyncBufferWriter extends Writer {
 		@Override
 		public void run() {
 			try {
-				out.write(flushBuffer, 0, bufferPosition);	
-	
+				out.write(flushBuffer, 0, bufferPosition);				
 			} catch (IOException e) {
 				LOGGER.log(LogLevel.ERROR, "Unable to write to HDFS output stream.", e);
 			}		
@@ -103,7 +102,7 @@ public class AsyncBufferWriter extends Writer {
 			// and wait for any flush job currently scheduled or running to finish
 			exService.shutdown();
 			try {
-				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.MILLISECONDS);
+				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.WARN, "Execution Service shutdown is interrupted.", e);
 			}finally {
