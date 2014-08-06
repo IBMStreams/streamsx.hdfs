@@ -127,7 +127,7 @@
              destfile="${releasefilename}"
     	     basedir="${basedir}"
              includes="${tkinfo.identity.name}/** samples/**"
-             excludes="**/.gitignore **/.settings/** **/.settings **/.project **/.classpath opt/downloaded/*"
+             excludes="**/.gitignore **/.settings/** **/.settings **/.project **/.classpath **/opt/downloaded/**"
     	/>		
 		<checksum file="${releasefilename}" />
 		<checksum algorithm="sha1" file="${releasefilename}" />
