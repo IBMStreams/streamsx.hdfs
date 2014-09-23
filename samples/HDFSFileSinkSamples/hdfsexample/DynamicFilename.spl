@@ -1,9 +1,8 @@
 
-/*
- * Copyright (C) 2013-2014, International Business Machines Corporation  
- * All Rights Reserved   
- * 
- */
+/*******************************************************************************
+* Copyright (C) 2014, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/   
 namespace hdfsexample ;
 
 use com.ibm.streamsx.hdfs::HDFSFileSink ;
@@ -77,7 +76,8 @@ rstring getFileName(uint64 n)
 composite DynamicFilename
 {
 	graph
-		stream<rstring toWrite, rstring filename> sinkStream = Beacon() {
+		stream<rstring toWrite, rstring filename> sinkStream = Beacon()
+		{
 			param
 				iterations : 100 ;
 				period : 1.0 ;
@@ -85,26 +85,36 @@ composite DynamicFilename
 				sinkStream : toWrite = "This is tuple number " +(rstring) IterationCount(),
 					filename = getFileName(IterationCount()) + "%FILENUM_%TIME.txt" ;
 		}
-		
-		stream<rstring filename, uint64 size> namesWritten = HDFSFileSink(sinkStream){
-			param fileAttributeName : "filename" ;
+
+		stream<rstring filename, uint64 size> namesWritten = HDFSFileSink(sinkStream)
+		{
+			param
+				fileAttributeName : "filename" ;
 		}
 
-		() as filesWritten = FileSink(namesWritten) {
-			param file : "names.csv" ;
+		() as filesWritten = FileSink(namesWritten)
+		{
+			param
+				file : "names.csv" ;
 		}
 
 		// Now, let's have the filename be the first attribute and the data be the second.
-		stream<rstring filename, rstring toWrite> reversed = Functor(sinkStream) {
-		output reversed: filename = "rev_"+filename;
-}
-
-		stream<rstring filename, uint64 size> namesWritten2 = HDFSFileSink(reversed) {
-			param fileAttributeName : "filename" ;
+		stream<rstring filename, rstring toWrite> reversed = Functor(sinkStream)
+		{
+			output
+				reversed : filename = "rev_" + filename ;
 		}
 
-		() as filesWritten2 = FileSink(namesWritten2) {
-			param file : "names2.csv" ;
+		stream<rstring filename, uint64 size> namesWritten2 = HDFSFileSink(reversed)
+		{
+			param
+				fileAttributeName : "filename" ;
+		}
+
+		() as filesWritten2 = FileSink(namesWritten2)
+		{
+			param
+				file : "names2.csv" ;
 		}
 
 }
