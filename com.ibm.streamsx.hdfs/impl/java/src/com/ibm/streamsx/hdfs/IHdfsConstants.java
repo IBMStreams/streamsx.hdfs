@@ -11,6 +11,7 @@ public interface IHdfsConstants {
 	public static final String PARAM_CLOSE_ON_PUNCT = "closeOnPunct";
 	public static final String PARAM_TUPLES_PER_FILE = "tuplesPerFile";
 	public static final String PARAM_BYTES_PER_FILE = "bytesPerFile";
+	public static final String PARAM_FILE_NAME_ATTR = "fileAttributeName";
 	public static final String PARAM_SLEEP_TIME = "sleepTime";
 	public static final String PARAM_INITDELAY = "initDelay";
 	public static final String PARAM_ENCODING = "encoding";

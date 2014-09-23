@@ -87,6 +87,7 @@ The following example shows how to use the HDFSFileSink operator:
       <description></description>
       <parameter>
         <name>file</name>
+
         <description>
 This parameter specifies the name of the file that the operator writes to.           
 The **file** parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:
@@ -101,7 +102,7 @@ For example, if you specify a **file** parameter of `myFile%FILENUM%TIME.txt`, a
 the file names are `myFile020141130_132443.txt`, `myfile120141130_132443.txt`, and `myFile220141130_132443.txt`.
 
 **Important:** If the %FILENUM specification is not included, the file is overwritten every time a new file is created.</description>
-        <optional>false</optional>
+        <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
@@ -161,6 +162,13 @@ This parameter specifies whether the operator closes the current output file and
 The default value is `false`.</description>
         <optional>true</optional>
         <type>boolean</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>fileAttributeName</name>
+        <description>If set, this points to an attribute containing the filename.  The operator will close a file when value of this attribute changes.  If the string contains substitutions, the check for a change happens before substituations, and the filename contains the substitutions based on the first tuple.    </description>
+        <optional>true</optional>
+        <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
