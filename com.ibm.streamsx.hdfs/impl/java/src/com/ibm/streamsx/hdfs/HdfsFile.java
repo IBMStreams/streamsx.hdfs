@@ -67,12 +67,12 @@ public class HdfsFile {
 		}
 	}
 
-	public void writeTuple(Tuple tuple) throws Exception {
+	public void writeTuple(Tuple tuple,int index) throws Exception {
 		if (fWriter == null) {
 			initWriter();
 		}
 				
-		Object attrObj = tuple.getObject(0);
+		Object attrObj = tuple.getObject(index);
 		byte[] tupleBytes = null;
 		if (attrObj instanceof RString)
 		{
