@@ -116,7 +116,6 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		fileAttrName = name;
 	}
 
-	// Mandatory parameter file
 	@Parameter(optional = true)
 	public void setFile(String file) {
 		TRACE.log(TraceLevel.DEBUG, "setFile: " + file);
