@@ -32,7 +32,6 @@ public class AsyncBufferWriter extends Writer {
 	private int size;
 	private int position;
 	private boolean isClosed = false;
-	
 	private ExecutorService exService;
 	private LinkedBlockingQueue<byte[]> bufferQueue;
 	
@@ -170,9 +169,9 @@ public class AsyncBufferWriter extends Writer {
 			// store in buffer			
 			System.arraycopy(src, 0, buffer, position, src.length);
 			position += src.length;
-			
 			System.arraycopy(fNewline, 0, buffer, position, fNewline.length);
 			position+= fNewline.length;
+
 		}		
 	}
 }

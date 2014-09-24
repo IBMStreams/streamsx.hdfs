@@ -7,9 +7,11 @@ package com.ibm.streamsx.hdfs;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.Tuple;
+import com.ibm.streams.operator.Type.MetaType;
 import com.ibm.streams.operator.types.RString;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
@@ -67,15 +69,28 @@ public class HdfsFile {
 		}
 	}
 
-	public void writeTuple(Tuple tuple,int index) throws Exception {
+	public void writeTuple(Tuple tuple,int index,MetaType mType) throws Exception {
 		if (fWriter == null) {
-			initWriter();
+			if (MetaType.BLOB == mType) {
+				initWriter(true);
+			}
+			else {
+				initWriter(false);
+			}
 		}
-				
-		Object attrObj = tuple.getObject(index);
+		
 		byte[] tupleBytes = null;
-		if (attrObj instanceof RString)
-		{
+		
+		switch (mType) {
+		case BLOB: 
+			// TODO we can handle this better, with less copying,
+			// but it might involve more changes.
+			ByteBuffer buffer = tuple.getBlob(index).getByteBuffer();
+			tupleBytes = new byte[buffer.limit()];
+			buffer.get(tupleBytes);
+			break;
+		case RSTRING:
+			Object attrObj = tuple.getObject(index);
 			if (fEncoding.equals(UTF_8))
 			{
 				tupleBytes = ((RString)attrObj).getData();
@@ -85,10 +100,13 @@ public class HdfsFile {
 				tupleBytes = ((RString)attrObj).getData();
 				tupleBytes = new String(tupleBytes, UTF_8).getBytes(fEncoding);
 			}
-		}
-		else if (attrObj instanceof String)
-		{			
-			tupleBytes = ((String)attrObj).getBytes(fEncoding);
+			break;
+		case USTRING:
+			String attrString = tuple.getString(index);
+			tupleBytes = attrString.getBytes(fEncoding);
+			break;
+		default:
+			throw new Exception("Unsupported type "+mType);
 		}
 		
 		fWriter.write(tupleBytes);
@@ -138,14 +156,26 @@ public class HdfsFile {
 		return size;
 	}
 
-	private void initWriter() throws IOException, Exception {
+	/**
+	 * Init the writer. 
+	 * @param isBinary  If true, file is considered a binary file.  If not, it is assumed to be a text file, and a newline is added after each write.
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void initWriter(boolean isBinary) throws IOException, Exception {
 		OutputStream outStream = getHdfsClient().getOutputStream(fPath, false);
 
 		if (outStream == null) {
 			throw new Exception("Unable to open file for writing: " + fPath);
 		} 
-		
-		fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+		// The AsyncBufferWriter writes a newline after every tuple.  For binary files, this is bad.
+		// But, we just tell the AysncBufferWriter than the newline is an empty byte array, and we're good.
+		if (isBinary) {
+			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), new byte[0]);
+		}
+		else {
+			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+		}
 	}
 
 	public void close() throws Exception {
