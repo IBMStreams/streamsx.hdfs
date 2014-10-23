@@ -1,7 +1,7 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs;
 
@@ -62,6 +62,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 	private int dataIndex = 0;
 	private int fileIndex = -1;
 	private boolean dynamicFilename;
+	private MetaType dataType = null;
 
 	// Other variables
 	private int fileNum = 0;
@@ -181,6 +182,12 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		return encoding;
 	}
 
+	/**
+	 * This function checks only things that can be determined at compile time.
+	 * 
+	 * @param checker
+	 * @throws Exception
+	 */
 	@ContextCheck(compile = true)
 	public static void checkInputPortSchema(OperatorContextChecker checker)
 			throws Exception {
@@ -205,32 +212,39 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 					new Object[] {});
 		}
 
-		// check that the attribute type must be a rstring or ustring
-		if (MetaType.RSTRING != inputSchema.getAttribute(0).getType()
-				.getMetaType()
-				&& MetaType.USTRING != inputSchema.getAttribute(0).getType()
-						.getMetaType()) {
-			checker.setInvalidContext(
-					"Expected attribute of type rstring or ustring on input port, found attribute of type "
-							+ inputSchema.getAttribute(0).getType()
-									.getMetaType(), null);
-		}
-		// Note that I'm kinda cheating here--we don't, at this point, know
-		// which attribute is the
-		// filename and which is the data to write, but it actually doesn't
-		// matter at least for now.
-		// when it does, this check will have to move to a function that isn't
-		// run on compile.
-		if (hasDynamic) {
+		if (inputSchema.getAttributeCount() == 1) {
 			// check that the attribute type must be a rstring or ustring
-			if (MetaType.RSTRING != inputSchema.getAttribute(1).getType()
+			if (MetaType.RSTRING != inputSchema.getAttribute(0).getType()
 					.getMetaType()
-					&& MetaType.USTRING != inputSchema.getAttribute(1)
-							.getType().getMetaType()) {
+					&& MetaType.USTRING != inputSchema.getAttribute(0)
+							.getType().getMetaType()
+					&& MetaType.BLOB != inputSchema.getAttribute(0).getType().getMetaType()) {
 				checker.setInvalidContext(
-						"Expected attribute of type rstring or ustring on input port, found attribute of type "
-								+ inputSchema.getAttribute(1).getType()
+						"Expected attribute of type blob,rstring or ustring on input port, found attribute of type "
+								+ inputSchema.getAttribute(0).getType()
 										.getMetaType(), null);
+			}
+		}
+		if (inputSchema.getAttributeCount() == 2) {
+			int numString = 0;
+			int numBlob = 0;
+			for (int i = 0; i < 2; i++) {
+				MetaType t = inputSchema.getAttribute(i).getType().getMetaType();
+				if (MetaType.USTRING == t || MetaType.RSTRING == t) {
+					numString++;
+				}
+				else if (MetaType.BLOB == t) {
+					numString++;
+				}
+			}  // end for loop;
+			
+			if (numBlob  == 0 && numString == 2 ||  // data is a string
+					numBlob == 1 && numString == 1) {  // data is a blob
+				// we're golden.
+			}
+			else {
+				checker.setInvalidContext("Filename attribute must be of type ustring or rstring.  Data attribute must be of type blob, ustring, or rstring",null);
+				
 			}
 		}
 	}
@@ -322,6 +336,46 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 						null);
 			}
 		}
+
+		int dataAttribute = 0;
+		int fileAttribute = -1;
+		StreamSchema inputSchema = checker.getOperatorContext()
+				.getStreamingInputs().get(0).getStreamSchema();
+		if (checker.getOperatorContext().getParameterNames()
+				.contains(IHdfsConstants.PARAM_FILE_NAME_ATTR)) {
+			String fileNameAttr = checker.getOperatorContext()
+					.getParameterValues(IHdfsConstants.PARAM_FILE_NAME_ATTR)
+					.get(0);
+			fileAttribute = inputSchema.getAttribute(fileNameAttr).getIndex();
+			if (fileAttribute == 0) {
+				// default data attribute of 0 is not right, so need to fix
+				// that.
+				dataAttribute = 1;
+			}
+		}
+		// now, check the data attribute is an okay type.
+		MetaType dataType = inputSchema.getAttribute(dataAttribute).getType()
+				.getMetaType();
+		// check that the data type is okay.
+		if (dataType != MetaType.RSTRING && dataType != MetaType.USTRING
+				&& dataType != MetaType.BLOB) {
+			checker.setInvalidContext(
+					"The data attribute must have type ustring, rstring, or blob.  Found attribute of type "
+							+ dataType, null);
+		}
+		if (fileAttribute != -1) {
+			// If we have a filename attribute, let's check that it's the right
+			// type.
+			if (MetaType.RSTRING != inputSchema.getAttribute(1).getType()
+					.getMetaType()
+					&& MetaType.USTRING != inputSchema.getAttribute(1)
+							.getType().getMetaType()) {
+				checker.setInvalidContext(
+						"Expected attribute of type rstring or ustring on input port, found attribute of type "
+								+ inputSchema.getAttribute(1).getType()
+										.getMetaType(), null);
+			}
+		}
 	}
 
 	/**
@@ -340,7 +394,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 			// Nothing to check, because the parameter doesn't exist.
 			return;
 		}
-		
+
 		String fileAttrName = fileAttrNameList.get(0);
 		Attribute fileAttr = inputSchema.getAttribute(fileAttrName);
 		if (fileAttr == null) {
@@ -508,15 +562,27 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 					.getStreamSchema();
 			Attribute fileAttr = inputSchema.getAttribute(fileAttrName);
 			fileIndex = fileAttr.getIndex();
-			dataIndex = 1 - fileIndex; // Yeah, this is probably too clever, so
-										// shoot me.
+			if (fileIndex == 1)
+				dataIndex = 0;
+			else if (fileIndex == 0) {
+				dataIndex = 1;
+			} else {
+				throw new Exception(
+						"Attribute "
+								+ fileAttrName
+								+ " must be either attribute 0 or 1 on the input stream.");
+			}
 		}
-
+		StreamSchema inputSchema = context.getStreamingInputs().get(0)
+				.getStreamSchema();
+		// Save the data type for later use.
+		dataType = inputSchema.getAttribute(dataIndex).getType().getMetaType();
 		if (!dynamicFilename) {
 			refreshCurrentFileName(file);
 			createFile();
 		}
 		processThread = createProcessThread();
+
 	}
 
 	private void createFile() {
@@ -711,7 +777,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 				createFile();
 			}
 
-			fFileToWrite.writeTuple(tuple, dataIndex);
+			fFileToWrite.writeTuple(tuple, dataIndex, dataType);
 			// This will check bytesPerFile and tuplesPerFile expiration policy
 			if (fFileToWrite.isExpired()) {
 				// If Optional output port is present output the filename and
