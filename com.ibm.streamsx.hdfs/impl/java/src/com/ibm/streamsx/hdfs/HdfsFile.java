@@ -45,12 +45,26 @@ public class HdfsFile {
 	int numTuples = 0;
 	private byte[] fNewLine;
 
+	/// The metatype of the attribute we'll be working with.
+	private final MetaType attrType;
+	
+	/// The index of the attribute that matters.
+	private final int attrIndex;
 	
 	private OperatorContext fOpContext;
 	
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HdfsFile";
-	
-	public HdfsFile(OperatorContext context, String path, IHdfsClient client, String encoding) {
+
+	/**
+	 * Create an instance of HdfsFile
+	 * @param context	Operator context.
+	 * @param path		name of the file
+	 * @param client	hdfs connection
+	 * @param encoding	The file encoding; only matters for text files.
+	 * @param attrIndex	The index of the attribute we'll be writing.
+	 * @param attrType	The index of the attribute we'll be writing.
+	 */
+	public HdfsFile(OperatorContext context, String path, IHdfsClient client, String encoding,int attrIndex, MetaType attrType) {
 		fPath = path;
 		fHdfsClient = client;
 		fOpContext = context;
@@ -67,11 +81,13 @@ public class HdfsFile {
 		} catch (UnsupportedEncodingException e) {
 			fNewLine = System.getProperty("line.separator").getBytes();
 		}
+		this.attrIndex = attrIndex;
+		this.attrType = attrType;
 	}
 
-	public void writeTuple(Tuple tuple,int index,MetaType mType) throws Exception {
+	public void writeTuple(Tuple tuple) throws Exception {
 		if (fWriter == null) {
-			if (MetaType.BLOB == mType) {
+			if (MetaType.BLOB == attrType) {
 				initWriter(true);
 			}
 			else {
@@ -81,16 +97,14 @@ public class HdfsFile {
 		
 		byte[] tupleBytes = null;
 		
-		switch (mType) {
+		switch (attrType) {
 		case BLOB: 
-			// TODO we can handle this better, with less copying,
-			// but it might involve more changes.
-			ByteBuffer buffer = tuple.getBlob(index).getByteBuffer();
+			ByteBuffer buffer = tuple.getBlob(attrIndex).getByteBuffer();
 			tupleBytes = new byte[buffer.limit()];
 			buffer.get(tupleBytes);
 			break;
 		case RSTRING:
-			Object attrObj = tuple.getObject(index);
+			Object attrObj = tuple.getObject(attrIndex);
 			if (fEncoding.equals(UTF_8))
 			{
 				tupleBytes = ((RString)attrObj).getData();
@@ -102,11 +116,11 @@ public class HdfsFile {
 			}
 			break;
 		case USTRING:
-			String attrString = tuple.getString(index);
+			String attrString = tuple.getString(attrIndex);
 			tupleBytes = attrString.getBytes(fEncoding);
 			break;
 		default:
-			throw new Exception("Unsupported type "+mType);
+			throw new Exception("Unsupported type "+attrType);
 		}
 		
 		fWriter.write(tupleBytes);

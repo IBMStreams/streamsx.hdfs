@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
@@ -29,30 +28,30 @@ operator reads the files output by the HDFSDirectoryScan operator.
     * HDFSDirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
     * Overrides the URI in the fs.defaultFS option from core-site.xml file
     */
-    (stream&lt;rstring filename&gt; Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan(){
+    (stream&lt;rstring filename> Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan(){
   		param
-   			directory     : "/user/myuser/";
-   			hdfsUri:"hdfs : //hdfsServer:1883";
+   			directory     : &quot;/user/myuser/&quot;;
+   			hdfsUri:&quot;hdfs : //hdfsServer:1883&quot;;
    			sleepTime     : 2.0;
 	}
 	// HDFSFileSource operator reads from files discovered by HDFSDirectoryScan operator
-	(stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 =	HDFSFileSource(Files){
+	(stream&lt;rstring data> FileContent) as HDFSFileSource_2 =	HDFSFileSource(Files){
   		param
-    		hdfsUri:"hdfs://hdfsSever:1883"; 
+    		hdfsUri:&quot;hdfs://hdfsSever:1883&quot;; 
    	}
 
 The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
-    (stream&lt;rstring data&gt; FileContent) as HDFSFileSource_2 = HDFSFileSource(){
+    (stream&lt;rstring data> FileContent) as HDFSFileSource_2 = HDFSFileSource(){
   		param
-    		hdfsUri:"webhdfs://bigInsightSever:1883"; 
-   			file   :"/user/myser/myfile.txt"; 
+    		hdfsUri:&quot;webhdfs://bigInsightSever:1883&quot;; 
+   			file   :&quot;/user/myser/myfile.txt&quot;; 
    			
 
 </description>
       <iconUri size="32">HDFSFileSource_32.gif</iconUri>
-      <iconUri size="16">HDFSFileSource_16.gif</iconUri> 
-      <metrics> 
+      <iconUri size="16">HDFSFileSource_16.gif</iconUri>
+      <metrics>
         <metric>
           <name>nFilesOpened</name>
           <description sampleUri="">The number of files that are opened by the operator for reading data.</description>
@@ -205,6 +204,13 @@ configuration file. If this parameter is not specified, the operator searches th
         <description>This parameter specifies the encoding to use when reading files. The default value is `UTF-8`.</description>
         <optional>true</optional>
         <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>blockSize</name>
+        <description>The maximum number of bytes to read into a blob.  Only applicable if reading in binary mode.</description>
+        <optional>true</optional>
+        <type>int32</type>
         <cardinality>1</cardinality>
       </parameter>
     </parameters>

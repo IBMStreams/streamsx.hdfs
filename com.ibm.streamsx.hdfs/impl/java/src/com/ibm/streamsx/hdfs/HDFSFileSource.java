@@ -44,8 +44,8 @@ public class HDFSFileSource extends AbstractHdfsOperator {
 	private static Logger trace = Logger.getLogger(HDFSFileSource.class.getName());
 			 
 	// TODO check that name matches filesource change required
-	private final String FILES_OPENED_METRIC = "nFilesOpened";
-
+	private static final String FILES_OPENED_METRIC = "nFilesOpened";
+	private static final String BLOCKSIZE_PARAM = "blockSize";
 	private Metric nFilesOpened;
 
 	private String file;
@@ -53,10 +53,17 @@ public class HDFSFileSource extends AbstractHdfsOperator {
 
 	boolean isFirstTuple = true;
 	boolean binaryFile = false;
-	int blockSize = 1024 * 4;
+	private int blockSize = 1024 * 4;
 
 	private String encoding = "UTF-8";
 
+	/*
+	@Parameter(name=BLOCKSIZE_PARAM,description="The maximum number of bytes to read into a blob.   Defaults to 4096 bytes")
+	public void setBlockSize (int inBlockSize) {
+		blockSize = inBlockSize;
+	}
+	*/
+	
 	@Override
 	public synchronized void initialize(OperatorContext context)
 			throws Exception {
@@ -109,6 +116,14 @@ public class HDFSFileSource extends AbstractHdfsOperator {
 		
 		StreamSchema outputSchema =context.getStreamingOutputs().get(0).getStreamSchema();
 		MetaType outType = outputSchema.getAttribute(0).getType().getMetaType();
+		// If we ever switch to the generated xml files, we'll be able to delete this.
+		if (context.getParameterNames().contains(BLOCKSIZE_PARAM)) {
+			trace.fine("Blocksize parameter is supplied, setting blocksize based on that.");
+		    blockSize = Integer.parseInt(context.getParameterValues(BLOCKSIZE_PARAM).get(0));
+		}
+		else {
+			trace.fine("Blocksize parameter not supplied, using default "+blockSize);
+		}
 		if (MetaType.BLOB == outType) {
 			binaryFile = true;
 			trace.info("File will be read as a binary blobs of size "+blockSize);
@@ -187,6 +202,12 @@ public class HDFSFileSource extends AbstractHdfsOperator {
 					"Expected attribute of type rstring, ustring or blob found attribute of type "
 							+ outputSchema.getAttribute(0).getType()
 									.getMetaType(), null);
+		}
+		
+		if (MetaType.BLOB != outputSchema.getAttribute(0).getType().getMetaType() &&
+				checker.getOperatorContext().getParameterNames().contains(BLOCKSIZE_PARAM)) {
+			checker.setInvalidContext(
+					BLOCKSIZE_PARAM+" may only be used when the outstream an atribute of type blob",null);
 		}
 	}
 

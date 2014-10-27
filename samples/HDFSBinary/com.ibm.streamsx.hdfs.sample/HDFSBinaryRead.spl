@@ -6,6 +6,9 @@ use com.ibm.streamsx.hdfs::HDFSFileSource ;
  * Read a file in HDFS as a binary file.
  * 
  * This composite shows how to use HDFSFileSource to read a binary file.
+ * 
+ * First run HDFSBinaryWrite, which will create the write-remote.bin file.
+ * Then run this application.
  */
 composite CheckHDFSRead
 {
@@ -15,7 +18,7 @@ composite CheckHDFSRead
 		stream<blob contents> BinaryStream = HDFSFileSource()
 		{
 			param
-				file : "binarydata-write.bin" ;
+				file : "write_remote.bin" ;
 		}
 
 		// Exactly what we got from the read.
