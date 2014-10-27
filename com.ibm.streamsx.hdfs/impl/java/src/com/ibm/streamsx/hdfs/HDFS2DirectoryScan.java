@@ -32,7 +32,7 @@ import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.SharedLoader;
 
 @SharedLoader
-public class HDFSDirectoryScan extends AbstractHdfsOperator {
+public class HDFS2DirectoryScan extends AbstractHdfsOperator {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSDirectoryScan";
 
