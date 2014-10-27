@@ -5,7 +5,9 @@
 
 package com.ibm.streamsx.hdfs.client.auth;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -38,8 +40,14 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 	public BaseAuthenticationHelper(String configPath) {
 		fConfiguration = new Configuration();
 		
-		if(configPath != null && !configPath.isEmpty())
-			fConfiguration.addResource(configPath + "/core-site.xml");
+		if(configPath != null && !configPath.isEmpty()) {
+			try {
+				URL url = new URL("file", null, configPath + "/core-site.xml");
+				fConfiguration.addResource(url);
+			} catch (MalformedURLException e) {
+				logger.log(TraceLevel.ERROR, e.getMessage(), e);
+			}
+		}
 	}
 
 	@Override
