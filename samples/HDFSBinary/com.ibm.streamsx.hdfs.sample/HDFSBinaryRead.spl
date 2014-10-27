@@ -1,6 +1,6 @@
 namespace com.ibm.streamsx.hdfs.sample ;
 
-use com.ibm.streamsx.hdfs::HDFSFileSource ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 
 /**
  * Read a file in HDFS as a binary file.
@@ -12,7 +12,7 @@ composite CheckHDFSRead
 	graph
 
 	// Because the output stream has a blob, it reads the file as a binary file.
-		stream<blob contents> BinaryStream = HDFSFileSource()
+		stream<blob contents> BinaryStream = HDFS2FileSource()
 		{
 			param
 				file : "binarydata-write.bin" ;
