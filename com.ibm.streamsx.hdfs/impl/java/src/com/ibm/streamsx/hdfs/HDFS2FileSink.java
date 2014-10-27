@@ -587,7 +587,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 
 	private void createFile() {
 		fFileToWrite = new HdfsFile(getOperatorContext(), getCurrentFileName(),
-				getHdfsClient(), getEncoding());
+				getHdfsClient(), getEncoding(),dataIndex,dataType);
 		if (getTimePerFile() > 0) {
 			fFileToWrite.setExpPolicy(EnumFileExpirationPolicy.TIME);
 			// time in parameter specified in seconds, need to convert to
@@ -777,7 +777,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 				createFile();
 			}
 
-			fFileToWrite.writeTuple(tuple, dataIndex, dataType);
+			fFileToWrite.writeTuple(tuple);
 			// This will check bytesPerFile and tuplesPerFile expiration policy
 			if (fFileToWrite.isExpired()) {
 				// If Optional output port is present output the filename and
