@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>SPL Build Configuration: Standalone</comment>
+<comment>SPL Build Configuration: Standalone1</comment>
 <entry key="com.ibm.streams.studio.splproject:STATIC_LINKING">F</entry>
 <entry key="com.ibm.streams.studio.splproject:OPTIMIZED_CODE">F</entry>
 <entry key="com.ibm.streams.studio.splproject:FUSION_MODE">FDEF</entry>
-<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">hdfsexample::ScanAndRead</entry>
-<entry key="com.ibm.streams.studio.splproject:NAME">Standalone</entry>
+<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">hdfsexample::HDFS2FileSourceSampleTxtFormat</entry>
+<entry key="com.ibm.streams.studio.splproject:NAME">Standalone1</entry>
 <entry key="com.ibm.streams.studio.splproject:GCC_OPTS"/>
 <entry key="com.ibm.streams.studio.splproject:SC_OPTS"/>
 <entry key="com.ibm.streams.studio.splproject:ACTIVE">F</entry>
@@ -19,7 +19,7 @@
 <entry key="com.ibm.streams.studio.splproject:PROFILING"/>
 <entry key="com.ibm.streams.studio.splproject:SDB">F</entry>
 <entry key="com.ibm.streams.studio.splproject:DEFAULT_POOL_SIZE"/>
-<entry key="com.ibm.streams.studio.splproject:OUTPUT_DIR">Standalone</entry>
+<entry key="com.ibm.streams.studio.splproject:OUTPUT_DIR">Standalone1</entry>
 <entry key="com.ibm.streams.studio.splproject:SAMPLING_RATE"/>
 <entry key="com.ibm.streams.studio.splproject:STANDALONE">T</entry>
 </properties>

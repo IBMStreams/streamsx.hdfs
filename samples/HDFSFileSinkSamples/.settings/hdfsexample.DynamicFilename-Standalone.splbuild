@@ -5,7 +5,7 @@
 <entry key="com.ibm.streams.studio.splproject:STATIC_LINKING">F</entry>
 <entry key="com.ibm.streams.studio.splproject:OPTIMIZED_CODE">F</entry>
 <entry key="com.ibm.streams.studio.splproject:FUSION_MODE">FDEF</entry>
-<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">hdfsexample::ScanAndRead</entry>
+<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">hdfsexample::DynamicFilename</entry>
 <entry key="com.ibm.streams.studio.splproject:NAME">Standalone</entry>
 <entry key="com.ibm.streams.studio.splproject:GCC_OPTS"/>
 <entry key="com.ibm.streams.studio.splproject:SC_OPTS"/>

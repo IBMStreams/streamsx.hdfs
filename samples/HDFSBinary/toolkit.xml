@@ -8,7 +8,7 @@
       <uri index="1" value="com.ibm.streamsx.hdfs.sample/HDFSBinaryRead.spl"/>
     </uriTable>
     <namespace name="com.ibm.streamsx.hdfs.sample">
-      <compositeOp column="11" line="10" name="CheckHDFSRead" potentialMain="true" uriIndex="1"/>
+      <compositeOp column="11" line="13" name="CheckHDFSRead" potentialMain="true" uriIndex="1"/>
       <compositeOp column="11" line="17" name="HDFSBinaryWrite" potentialMain="true" uriIndex="2"/>
     </namespace>
     <dependency>

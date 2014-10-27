@@ -4,14 +4,14 @@
 *******************************************************************************/                          
 namespace hdfsexample ;
 
-use com.ibm.streamsx.hdfs::HDFS2FileSink;
+use com.ibm.streamsx.hdfs::HDFS2FileSource;
 
 /**
- * The [HDFS2FileSinkSampleTxtFormat] composite demonstrates how to use the HDFSFileSink
+ * The [HDFS2FileSourceSampleTxtFormat] composite demonstrates how to use the HDFSFileSink
  * operator to read a file from HDFS in "txt" format.
  *
- * Contrast from the HDFS2FileSink operator, HDFSFileSink operator only supports writing in "line" format.
- * If your existing application currently uses the HDFS2FileSink operator to read data in as "txt" format,
+ * Contrast from the HDFS2FileSource operator, HDFSFileSink operator only supports writing in "line" format.
+ * If your existing application currently uses the HDFS2FileSource operator to read data in as "txt" format,
  * you will need to modify your application in order to maintain reading data as "txt" format.
  * 
  * To continue reading in "txt" format, you can insert a "Custom" operator after the HDFSFileSink operator
@@ -44,18 +44,18 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink;
   *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
   *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
   *  1. Run the sample application.  
-  *   * To run the HDFS2FileSinkSampleTxtFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
-  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFS2FileSinkSampleTxtFormat/hdfsexample.HDFS2FileSinkSampleTxtFormat.adl
-  *   * To run the HDFS2FileSinkSampleTxtFormat sample application in standalone mode, issue the command:
-  *    * ./output/Standalone/hdfsexample::HDFS2FileSinkSampleTxtFormat/bin/standalone
+  *   * To run the HDFS2FileSourceSampleTxtFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
+  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFS2FileSourceSampleTxtFormat/hdfsexample.HDFS2FileSourceSampleTxtFormat.adl
+  *   * To run the HDFS2FileSourceSampleTxtFormat sample application in standalone mode, issue the command:
+  *    * ./output/Standalone/hdfsexample::HDFS2FileSourceSampleTxtFormat/bin/standalone
  */
-composite HDFS2FileSinkSampleTxtFormat {
+composite HDFS2FileSourceSampleTxtFormat {
 	type
 		PersonSchema = int32 id, rstring fname, rstring lname, int32 age,
 			rstring gender, float32 score, float64 total ;
 	graph
 		// read file "TxtFile.txt" from /user/<userid>/ on HDFS
-		stream<rstring lines> LineStream = HDFS2FileSink()
+		stream<rstring lines> LineStream = HDFS2FileSource()
 		{
 			param
 				file : "TxtFile.txt" ;
