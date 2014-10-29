@@ -1,7 +1,7 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs;
 
@@ -13,8 +13,10 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ibm.streams.operator.Attribute;
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.OperatorContext.ContextCheck;
 import com.ibm.streams.operator.OutputTuple;
@@ -32,7 +34,7 @@ import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.SharedLoader;
 
 @SharedLoader
-public class HDFSFileSink extends AbstractHdfsOperator {
+public class HDFS2FileSink extends AbstractHdfsOperator {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSink";
 
@@ -43,7 +45,8 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
-	private String file;
+	private String rawFileName = null;
+	private String file = null;
 	private String timeFormat = "yyyyMMdd_HHmmss";
 	private String currentFileName;
 
@@ -54,6 +57,12 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 	private double timePerFile = -1;
 	private boolean closeOnPunct = false;
 	private String encoding = null;
+	private String fileAttrName = null;
+	// this will be reset if the file index is 0.
+	private int dataIndex = 0;
+	private int fileIndex = -1;
+	private boolean dynamicFilename;
+	private MetaType dataType = null;
 
 	// Other variables
 	private int fileNum = 0;
@@ -103,8 +112,12 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		}
 	}
 
-	// Mandatory parameter file
-	@Parameter(optional = false)
+	@Parameter(name = IHdfsConstants.PARAM_FILE_NAME_ATTR, optional = true, description = "The name of the attribute containing the filename.")
+	public void setFilenameAttr(String name) {
+		fileAttrName = name;
+	}
+
+	@Parameter(optional = true)
 	public void setFile(String file) {
 		TRACE.log(TraceLevel.DEBUG, "setFile: " + file);
 		this.file = file;
@@ -169,39 +182,94 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		return encoding;
 	}
 
-	@ContextCheck
+	/**
+	 * This function checks only things that can be determined at compile time.
+	 * 
+	 * @param checker
+	 * @throws Exception
+	 */
+	@ContextCheck(compile = true)
 	public static void checkInputPortSchema(OperatorContextChecker checker)
 			throws Exception {
 		// rstring or ustring would need to be provided.
 		StreamSchema inputSchema = checker.getOperatorContext()
 				.getStreamingInputs().get(0).getStreamSchema();
-		if (inputSchema.getAttributeCount() != 1) {
-			checker.setInvalidContext("Input stream must have one attribute",
-					null);
+		boolean hasDynamic = checker.getOperatorContext().getParameterNames()
+				.contains(IHdfsConstants.PARAM_FILE_NAME_ATTR);
+		if (!hasDynamic && inputSchema.getAttributeCount() != 1) {
+			checker.setInvalidContext(
+					"Input stream must have one attribute unless "
+							+ IHdfsConstants.PARAM_FILE_NAME_ATTR
+							+ " is specified", new Object[] {});
 		}
 
-		// check that the attribute type must be a rstring or ustring
-		if (MetaType.RSTRING != inputSchema.getAttribute(0).getType()
-				.getMetaType()
-				&& MetaType.USTRING != inputSchema.getAttribute(0).getType()
-						.getMetaType()) {
+		if (hasDynamic && inputSchema.getAttributeCount() != 2) {
 			checker.setInvalidContext(
-					"Expected attribute of type rstring or ustring on input port, found attribute of type "
-							+ inputSchema.getAttribute(0).getType()
-									.getMetaType(), null);
+					"Input stream must have one attribute unless "
+							+ IHdfsConstants.PARAM_FILE_NAME_ATTR
+							+ ", and two attributes when "
+							+ IHdfsConstants.PARAM_FILE_NAME_ATTR + " is true",
+					new Object[] {});
+		}
+
+		if (inputSchema.getAttributeCount() == 1) {
+			// check that the attribute type must be a rstring or ustring
+			if (MetaType.RSTRING != inputSchema.getAttribute(0).getType()
+					.getMetaType()
+					&& MetaType.USTRING != inputSchema.getAttribute(0)
+							.getType().getMetaType()
+					&& MetaType.BLOB != inputSchema.getAttribute(0).getType().getMetaType()) {
+				checker.setInvalidContext(
+						"Expected attribute of type blob,rstring or ustring on input port, found attribute of type "
+								+ inputSchema.getAttribute(0).getType()
+										.getMetaType(), null);
+			}
+		}
+		if (inputSchema.getAttributeCount() == 2) {
+			int numString = 0;
+			int numBlob = 0;
+			for (int i = 0; i < 2; i++) {
+				MetaType t = inputSchema.getAttribute(i).getType().getMetaType();
+				if (MetaType.USTRING == t || MetaType.RSTRING == t) {
+					numString++;
+				}
+				else if (MetaType.BLOB == t) {
+					numString++;
+				}
+			}  // end for loop;
+			
+			if (numBlob  == 0 && numString == 2 ||  // data is a string
+					numBlob == 1 && numString == 1) {  // data is a blob
+				// we're golden.
+			}
+			else {
+				checker.setInvalidContext("Filename attribute must be of type ustring or rstring.  Data attribute must be of type blob, ustring, or rstring",null);
+				
+			}
 		}
 	}
 
 	@ContextCheck(compile = true)
 	public static void checkCompileParameters(OperatorContextChecker checker)
 			throws Exception {
+		checker.checkExcludedParameters("file",
+				IHdfsConstants.PARAM_FILE_NAME_ATTR);
+		checker.checkExcludedParameters(IHdfsConstants.PARAM_FILE_NAME_ATTR,
+				"file");
 		checker.checkExcludedParameters(IHdfsConstants.PARAM_BYTES_PER_FILE,
 				IHdfsConstants.PARAM_TIME_PER_FILE,
-				IHdfsConstants.PARAM_TUPLES_PER_FILE);
+				IHdfsConstants.PARAM_TUPLES_PER_FILE,
+				IHdfsConstants.PARAM_FILE_NAME_ATTR);
 		checker.checkExcludedParameters(IHdfsConstants.PARAM_TIME_PER_FILE,
 				IHdfsConstants.PARAM_BYTES_PER_FILE,
-				IHdfsConstants.PARAM_TUPLES_PER_FILE);
+				IHdfsConstants.PARAM_TUPLES_PER_FILE,
+				IHdfsConstants.PARAM_FILE_NAME_ATTR);
 		checker.checkExcludedParameters(IHdfsConstants.PARAM_TUPLES_PER_FILE,
+				IHdfsConstants.PARAM_BYTES_PER_FILE,
+				IHdfsConstants.PARAM_TIME_PER_FILE,
+				IHdfsConstants.PARAM_FILE_NAME_ATTR);
+		checker.checkExcludedParameters(IHdfsConstants.PARAM_FILE_NAME_ATTR,
+				IHdfsConstants.PARAM_TUPLES_PER_FILE,
 				IHdfsConstants.PARAM_BYTES_PER_FILE,
 				IHdfsConstants.PARAM_TIME_PER_FILE);
 
@@ -246,7 +314,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 
 		// checks for negative values
 		if (!bytesPerFileVal.isEmpty()) {
-			if (Integer.valueOf(bytesPerFileVal.get(0)) < 0) {
+			if (Long.valueOf(bytesPerFileVal.get(0)) < 0) {
 				checker.setInvalidContext(
 						"Operator parameter bytesPerFile value should not be less than 0.",
 						null);
@@ -254,7 +322,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		}
 
 		if (!tuplesPerFileVal.isEmpty()) {
-			if (Integer.valueOf(tuplesPerFileVal.get(0)) < 0) {
+			if (Long.valueOf(tuplesPerFileVal.get(0)) < 0) {
 				checker.setInvalidContext(
 						"Operator parameter tuplesPerFile value should not be less than 0.",
 						null);
@@ -268,65 +336,153 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 						null);
 			}
 		}
+
+		int dataAttribute = 0;
+		int fileAttribute = -1;
+		StreamSchema inputSchema = checker.getOperatorContext()
+				.getStreamingInputs().get(0).getStreamSchema();
+		if (checker.getOperatorContext().getParameterNames()
+				.contains(IHdfsConstants.PARAM_FILE_NAME_ATTR)) {
+			String fileNameAttr = checker.getOperatorContext()
+					.getParameterValues(IHdfsConstants.PARAM_FILE_NAME_ATTR)
+					.get(0);
+			fileAttribute = inputSchema.getAttribute(fileNameAttr).getIndex();
+			if (fileAttribute == 0) {
+				// default data attribute of 0 is not right, so need to fix
+				// that.
+				dataAttribute = 1;
+			}
+		}
+		// now, check the data attribute is an okay type.
+		MetaType dataType = inputSchema.getAttribute(dataAttribute).getType()
+				.getMetaType();
+		// check that the data type is okay.
+		if (dataType != MetaType.RSTRING && dataType != MetaType.USTRING
+				&& dataType != MetaType.BLOB) {
+			checker.setInvalidContext(
+					"The data attribute must have type ustring, rstring, or blob.  Found attribute of type "
+							+ dataType, null);
+		}
+		if (fileAttribute != -1) {
+			// If we have a filename attribute, let's check that it's the right
+			// type.
+			if (MetaType.RSTRING != inputSchema.getAttribute(1).getType()
+					.getMetaType()
+					&& MetaType.USTRING != inputSchema.getAttribute(1)
+							.getType().getMetaType()) {
+				checker.setInvalidContext(
+						"Expected attribute of type rstring or ustring on input port, found attribute of type "
+								+ inputSchema.getAttribute(1).getType()
+										.getMetaType(), null);
+			}
+		}
 	}
 
-	@ContextCheck(compile=false)
-	public static void checkUriMatch(OperatorContextChecker checker) throws Exception {
-		List<String> hdfsUriParamValues = checker.getOperatorContext().getParameterValues("hdfsUri");
-		List<String> fileParamValues = checker.getOperatorContext().getParameterValues("file");
-		
+	/**
+	 * Check that the fileAttributeName parameter is an attribute of the right
+	 * type.
+	 * 
+	 * @param checker
+	 */
+	@ContextCheck(compile = false)
+	public static void checkFileAttributeName(OperatorContextChecker checker) {
+		StreamSchema inputSchema = checker.getOperatorContext()
+				.getStreamingInputs().get(0).getStreamSchema();
+		List<String> fileAttrNameList = checker.getOperatorContext()
+				.getParameterValues(IHdfsConstants.PARAM_FILE_NAME_ATTR);
+		if (fileAttrNameList == null || fileAttrNameList.size() == 0) {
+			// Nothing to check, because the parameter doesn't exist.
+			return;
+		}
+
+		String fileAttrName = fileAttrNameList.get(0);
+		Attribute fileAttr = inputSchema.getAttribute(fileAttrName);
+		if (fileAttr == null) {
+			checker.setInvalidContext("No attribute {0} in input stream",
+					new Object[] { fileAttrName });
+		}
+		if (MetaType.RSTRING != fileAttr.getType().getMetaType()
+				&& MetaType.USTRING != fileAttr.getType().getMetaType()) {
+			checker.setInvalidContext(
+					"Filename attribute must be of type rstring or ustring",
+					new Object[] {});
+		}
+	}
+
+	@ContextCheck(compile = false)
+	public static void checkUriMatch(OperatorContextChecker checker)
+			throws Exception {
+		List<String> hdfsUriParamValues = checker.getOperatorContext()
+				.getParameterValues("hdfsUri");
+		List<String> fileParamValues = checker.getOperatorContext()
+				.getParameterValues("file");
+
 		String hdfsUriValue = null;
-		if(hdfsUriParamValues.size() == 1)
+		if (hdfsUriParamValues.size() == 1)
 			hdfsUriValue = hdfsUriParamValues.get(0);
-		
+
 		String fileValue = null;
-		if(fileParamValues.size() == 1)
+		if (fileParamValues.size() == 1) {
 			fileValue = fileParamValues.get(0);
-		
-		// replace % with _
-		fileValue = fileValue.replace("%", "_");
-		
-		// only need to perform this check if both 'hdfsUri' and 'file' params are set
-		if(hdfsUriValue != null && fileValue != null) {
-			
+			// replace % with _
+			fileValue = fileValue.replace("%", "_");
+		}
+		// only need to perform this check if both 'hdfsUri' and 'file' params
+		// are set
+		if (hdfsUriValue != null && fileValue != null) {
+
 			// log error message for individual params if invalid URI
 			URI hdfsUri;
 			URI fileUri;
 			try {
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
-				TRACE.log(TraceLevel.ERROR, "'hdfsUri' parameter contains an invalid URI: " + hdfsUriValue);
+				TRACE.log(TraceLevel.ERROR,
+						"'hdfsUri' parameter contains an invalid URI: "
+								+ hdfsUriValue);
 				throw e;
 			}
-			
+
 			try {
 				fileUri = new URI(fileValue);
 			} catch (URISyntaxException e) {
-				TRACE.log(TraceLevel.ERROR, "'file' parameter contains an invalid URI: " + fileValue);
+				TRACE.log(TraceLevel.ERROR,
+						"'file' parameter contains an invalid URI: "
+								+ fileValue);
 				throw e;
 			}
-			
-			if(fileUri.getScheme() != null) {
+
+			if (fileUri.getScheme() != null) {
 				// must have the same scheme
-				if(!hdfsUri.getScheme().equals(fileUri.getScheme())) {
-					checker.setInvalidContext("The 'file' scheme (" + fileUri.getScheme() + ") must match the 'hdfsUri' scheme (" + hdfsUri.getScheme() + ")", null);
+				if (!hdfsUri.getScheme().equals(fileUri.getScheme())) {
+					checker.setInvalidContext(
+							"The 'file' scheme (" + fileUri.getScheme()
+									+ ") must match the 'hdfsUri' scheme ("
+									+ hdfsUri.getScheme() + ")", null);
 					return;
 				}
-				
+
 				// must have the same authority
-				if((hdfsUri.getAuthority() == null && fileUri.getAuthority() != null) ||
-				   (hdfsUri.getAuthority() != null && fileUri.getAuthority() == null) ||
-				   (hdfsUri.getAuthority() != null && fileUri.getAuthority() != null 
-				   	&& !hdfsUri.getAuthority().equals(fileUri.getAuthority()))) {
-					checker.setInvalidContext("The host and port specified by the 'file' parameter (" + fileUri.getAuthority() + ") must match the host and port specified by the 'hdfsUri' parameter (" + hdfsUri.getAuthority() + ")", null);
+				if ((hdfsUri.getAuthority() == null && fileUri.getAuthority() != null)
+						|| (hdfsUri.getAuthority() != null && fileUri
+								.getAuthority() == null)
+						|| (hdfsUri.getAuthority() != null
+								&& fileUri.getAuthority() != null && !hdfsUri
+								.getAuthority().equals(fileUri.getAuthority()))) {
+					checker.setInvalidContext(
+							"The host and port specified by the 'file' parameter ("
+									+ fileUri.getAuthority()
+									+ ") must match the host and port specified by the 'hdfsUri' parameter ("
+									+ hdfsUri.getAuthority() + ")", null);
 					return;
-				}	
+				}
 			}
-		}		
+		}
 	}
 
 	@Override
 	public void initialize(OperatorContext context) throws Exception {
+
 		try {
 
 			// if the file contains variable, it will result in an
@@ -344,37 +500,42 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 				outputPort = context.getStreamingOutputs().get(0);
 
 			}
-			String fileparam = file;
-			fileparam = fileparam.replace("%", "_");
+			if (file != null) {
+				String fileparam = file;
+				fileparam = fileparam.replace("%", "_");
 
-			URI uri = new URI(fileparam);
+				URI uri = new URI(fileparam);
 
-			TRACE.log(TraceLevel.DEBUG, "uri: " + uri.toString());
+				TRACE.log(TraceLevel.DEBUG, "uri: " + uri.toString());
 
-			String scheme = uri.getScheme();
-			if (scheme != null) {
-				String fs;
-				if(uri.getAuthority() != null)
-					fs = scheme + "://" + uri.getAuthority();
-				else
-					fs = scheme + ":///";
+				String scheme = uri.getScheme();
+				if (scheme != null) {
+					String fs;
+					if (uri.getAuthority() != null)
+						fs = scheme + "://" + uri.getAuthority();
+					else
+						fs = scheme + ":///";
 
-				// only use the authority from the 'file' parameter if the
-				// 'hdfsUri' param is not specified
-				if (getHdfsUri() == null)
-					setHdfsUri(fs);
+					// only use the authority from the 'file' parameter if the
+					// 'hdfsUri' param is not specified
+					if (getHdfsUri() == null)
+						setHdfsUri(fs);
 
-				TRACE.log(TraceLevel.DEBUG, "fileSystemUri: " + getHdfsUri());
+					TRACE.log(TraceLevel.DEBUG, "fileSystemUri: "
+							+ getHdfsUri());
 
-				// must use original parameter value to preserve the variable
-				String path = file.substring(fs.length());
-				
-				// since the file contains a scheme, the path is absolute and we
-				// need to ensure it starts a "/"
-				if(!path.startsWith("/"))
-					path = "/" + path;
-				
-				setFile(path);
+					// must use original parameter value to preserve the
+					// variable
+					String path = file.substring(fs.length());
+
+					// since the file contains a scheme, the path is absolute
+					// and we
+					// need to ensure it starts a "/"
+					if (!path.startsWith("/"))
+						path = "/" + path;
+
+					setFile(path);
+				}
 			}
 		} catch (URISyntaxException e) {
 
@@ -385,15 +546,48 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		}
 
 		super.initialize(context);
+		if (fileAttrName != null) {
+			// We are in dynamic filename mode.
+			dynamicFilename = true;
 
-		refreshCurrentFileName();
-		createFile();
+			// We have already verified that we aren't using file in a context
+			// check.
+			// We have also already verified that the input schema has two
+			// attributes.
+
+			// We have also verified that it's in the input scheme and that it's
+			// type is okay.
+			// What we need to do here is get its index.
+			StreamSchema inputSchema = context.getStreamingInputs().get(0)
+					.getStreamSchema();
+			Attribute fileAttr = inputSchema.getAttribute(fileAttrName);
+			fileIndex = fileAttr.getIndex();
+			if (fileIndex == 1)
+				dataIndex = 0;
+			else if (fileIndex == 0) {
+				dataIndex = 1;
+			} else {
+				throw new Exception(
+						"Attribute "
+								+ fileAttrName
+								+ " must be either attribute 0 or 1 on the input stream.");
+			}
+		}
+		StreamSchema inputSchema = context.getStreamingInputs().get(0)
+				.getStreamSchema();
+		// Save the data type for later use.
+		dataType = inputSchema.getAttribute(dataIndex).getType().getMetaType();
+		if (!dynamicFilename) {
+			refreshCurrentFileName(file);
+			createFile();
+		}
 		processThread = createProcessThread();
+
 	}
 
 	private void createFile() {
 		fFileToWrite = new HdfsFile(getOperatorContext(), getCurrentFileName(),
-				getHdfsClient(), getEncoding());
+				getHdfsClient(), getEncoding(),dataIndex,dataType);
 		if (getTimePerFile() > 0) {
 			fFileToWrite.setExpPolicy(EnumFileExpirationPolicy.TIME);
 			// time in parameter specified in seconds, need to convert to
@@ -437,13 +631,14 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		fFileTimerThread.start();
 	}
 
-	private void refreshCurrentFileName() throws UnknownHostException {
+	private void refreshCurrentFileName(String baseName)
+			throws UnknownHostException {
 
 		// We must preserve the file parameter in order for us
 		// to support multi-file in the operator
 
 		// Check if % specification mentioned are valid or not
-		currentFileName = file;
+		currentFileName = baseName;
 		if (currentFileName.contains(IHdfsConstants.FILE_VAR_PREFIX)) {
 			// Replace % specifications with relevant values.
 			currentFileName = currentFileName.replace(
@@ -546,12 +741,39 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 	synchronized public void process(StreamingInput<Tuple> stream, Tuple tuple)
 			throws Exception {
 
+		if (dynamicFilename) {
+			String filenameString = tuple.getString(fileIndex);
+			if (rawFileName == null) {
+				// the first tuple. No raw file name is set.
+				rawFileName = filenameString;
+				refreshCurrentFileName(rawFileName);
+				createFile();
+				if (TRACE.isLoggable(Level.INFO))
+					TRACE.info("Created first file " + currentFileName
+							+ " from raw " + rawFileName);
+			}
+
+			if (!rawFileName.equals(filenameString)) {
+				// the filename has changed. Notice this cannot happen on the
+				// first tuple.
+				closeFile();
+				rawFileName = filenameString;
+				refreshCurrentFileName(rawFileName);
+				if (TRACE.isLoggable(Level.INFO))
+					TRACE.info("Updating filename -- new name is "
+							+ currentFileName + " from raw " + rawFileName);
+				createFile();
+			}
+			// When we leave this block, we know the file is ready to be written
+			// to.
+		}
+
 		if (fFileToWrite != null) {
 
 			if (fFileToWrite.isExpired()) {
 				// if the file is expired, , the file would have been closed
 				// create a new file and start writing from that instead
-				refreshCurrentFileName();
+				refreshCurrentFileName(file);
 				createFile();
 			}
 

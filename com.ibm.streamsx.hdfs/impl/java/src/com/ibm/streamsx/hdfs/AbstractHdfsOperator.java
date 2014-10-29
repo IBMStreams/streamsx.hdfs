@@ -53,7 +53,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		super.initialize(context);
 
 		fHdfsClient = createHdfsClient();
-		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getConfigPath());
+		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		if(p.isAbsolute()) {
 			return filePath;
 		} else {
-			File f = new File (getOperatorContext().getPE().getDataDirectory(), filePath);
+			File f = new File (getOperatorContext().getPE().getApplicationDirectory(), filePath);
 			return f.getAbsolutePath();
 		}
 	}

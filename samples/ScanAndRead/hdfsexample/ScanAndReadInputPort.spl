@@ -4,18 +4,18 @@
 *******************************************************************************/                                
 namespace hdfsexample ;
 
-use com.ibm.streamsx.hdfs::HDFSDirectoryScan ;
-use com.ibm.streamsx.hdfs::HDFSFileSource ;
+use com.ibm.streamsx.hdfs::HDFS2DirectoryScan ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 
 /**
  * The [ScanAndReadWithInputPort] composite demonstrates how you can make use of the 
- * optional input port from HDFSDirectoryScan to dynamically modify the directory to scan at runtime.
+ * optional input port from HDFS2DirectoryScan to dynamically modify the directory to scan at runtime.
  *
  * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
  * * export HADOOP_HOME=<Hadoop installation>
  * 
  * Setup:
- * You will need to create 2 new directories for the HDFSDirectoryScan operator to scan.
+ * You will need to create 2 new directories for the HDFS2DirectoryScan operator to scan.
  * 1. Create a new directory in HDFS by running this command at the command line:
  *  * <HADOOP_HOME>/bin/hadoop fs -mkdir /user/<userid>/testDirectory
  * 1. Copy a few files from local file system to the testDirectory on HDFS:
@@ -53,7 +53,7 @@ composite ScanAndReadWithInputPort
 {
 	graph
 
-		//Custom operator that sends a control signal to HDFSDirectoryScan operator
+		//Custom operator that sends a control signal to HDFS2DirectoryScan operator
 		stream<rstring newDir> ControlSignalStream = Custom()
 		{
 			logic
@@ -79,14 +79,14 @@ composite ScanAndReadWithInputPort
 		// When the custom operator sends in the control signal, the directory
 		// scan will start scanning /user/<userid>/newDirectory.
 		stream<rstring fileNames> FileNameStream1 =
-			HDFSDirectoryScan(ControlSignalStream)
+			HDFS2DirectoryScan(ControlSignalStream)
 		{
 			param
 				directory : "TestDirectory" ;
 		}
 		
 		// read file discovered by directory scan
-		stream<rstring lines> LineStream = HDFSFileSource(FileNameStream1)
+		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
 		}
 

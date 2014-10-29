@@ -1,0 +1,47 @@
+namespace com.ibm.streamsx.hdfs.sample ;
+
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
+
+/**
+ * Read a file in HDFS as a binary file.
+ * 
+ * This composite shows how to use HDFSFileSource to read a binary file.
+ * 
+ * First run HDFSBinaryWrite, which will create the write-remote.bin file.
+ * Then run this application.
+ */
+composite CheckHDFSRead
+{
+	graph
+
+	// Because the output stream has a blob, it reads the file as a binary file.
+		stream<blob contents> BinaryStream = HDFS2FileSource()
+		{
+			param
+				file : "write_remote.bin" ;
+		}
+
+		// Exactly what we got from the read.
+		() as localWrite = FileSink(BinaryStream)
+		{
+			param
+				file : "read_raw.bin" ;
+				format : block ;
+		}
+
+		// Parse the file back into tuples.
+		stream<rstring message, float32 aFloat, int32 anInt> Tuples =
+			Parse(BinaryStream)
+		{
+			param
+				format : bin ;
+		}
+
+		// The read as converted back to text format.
+		() as localTupleWrite = FileSink(Tuples)
+		{
+			param
+				file : "read_local.txt" ;
+		}
+
+}

@@ -4,24 +4,24 @@
 *******************************************************************************/                      
 namespace hdfsexample ;
 
-use com.ibm.streamsx.hdfs::HDFSDirectoryScan ;
-use com.ibm.streamsx.hdfs::HDFSFileSource ;
+use com.ibm.streamsx.hdfs::HDFS2DirectoryScan ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 
 /**
- * The [ScanAndRead] composite demonstrates how you can use the HDFSDirectoryScan operator
- * to scan for new files from a directory in HDFS.  The HDFSDirectoryScan can be used in conjunction
- * with the HDFSFileSource operator, where you can read new files from HDFS as they are created in 
+ * The [ScanAndRead] composite demonstrates how you can use the HDFS2DirectoryScan operator
+ * to scan for new files from a directory in HDFS.  The HDFS2DirectoryScan can be used in conjunction
+ * with the HDFS2FileSource operator, where you can read new files from HDFS as they are created in 
  * a directory.
  * 
- * To see the effect of HDFSDirectoryScan, let the application run for a few minutes, and then copy more
+ * To see the effect of HDFS2DirectoryScan, let the application run for a few minutes, and then copy more
  * files to the testDirectory.  You should see that the directory scan will discover the new files for the
- * HDFSFileSource operator to read.
+ * HDFS2FileSource operator to read.
  *
  * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
  * * export HADOOP_HOME=<Hadoop installation>
  * 
  * Setup:
- * You will need to create new directory for the HDFSDirectoryScan operator to scan.
+ * You will need to create new directory for the HDFS2DirectoryScan operator to scan.
  * 1. Create a new directory in HDFS by running this command at the command line:
  *  * <HADOOP_HOME>/bin/hadoop fs -mkdir /user/<userid>/testDirectory
  * 1. Copy a few files from local file system to the testDirectory on HDFS:
@@ -58,14 +58,14 @@ composite ScanAndRead
 	graph
 
 		// scan /user/<userid>/testDirectory from HDFS
-		stream<rstring fileNames> FileNameStream1 = HDFSDirectoryScan()
+		stream<rstring fileNames> FileNameStream1 = HDFS2DirectoryScan()
 		{
 			param
 				directory : "testDirectory" ;
 		}
 
 		// use the file name from directory scan to read the file
-		stream<rstring lines> LineStream = HDFSFileSource(FileNameStream1)
+		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
 		} 
 

@@ -32,7 +32,6 @@ public class AsyncBufferWriter extends Writer {
 	private int size;
 	private int position;
 	private boolean isClosed = false;
-	
 	private ExecutorService exService;
 	private LinkedBlockingQueue<byte[]> bufferQueue;
 	
@@ -51,8 +50,7 @@ public class AsyncBufferWriter extends Writer {
 		@Override
 		public void run() {
 			try {
-				out.write(flushBuffer, 0, bufferPosition);	
-	
+				out.write(flushBuffer, 0, bufferPosition);				
 			} catch (IOException e) {
 				LOGGER.log(LogLevel.ERROR, "Unable to write to HDFS output stream.", e);
 			}		
@@ -98,13 +96,18 @@ public class AsyncBufferWriter extends Writer {
 		if (!isClosed)
 		{
 			isClosed = true;
-			flush();			
+			
+			// shut down the execution service, so no other flush runnable can be scheduled 
+			// and wait for any flush job currently scheduled or running to finish
 			exService.shutdown();
 			try {
-				exService.awaitTermination(10000, TimeUnit.MILLISECONDS);
+				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.WARN, "Execution Service shutdown is interrupted.", e);
 			}finally {
+				
+				// do final flushing of buffer
+				flushNow();
 				out.close();
 				bufferQueue.clear();
 			}
@@ -125,10 +128,18 @@ public class AsyncBufferWriter extends Writer {
 				position = 0;
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.ERROR, "Unable to retrieve buffer from buffer queue.", e);
-			}
-			
+			}			
 		}
 	}
+	
+	protected void flushNow() throws IOException {
+		if (buffer.length > 0)
+		{
+			FlushRunnable runnable = new FlushRunnable(buffer, false, position);
+			runnable.run();
+		}
+	}
+	
 
 	@Override
 	public void write(char[] src, int offset, int len) throws IOException {		
@@ -158,9 +169,9 @@ public class AsyncBufferWriter extends Writer {
 			// store in buffer			
 			System.arraycopy(src, 0, buffer, position, src.length);
 			position += src.length;
-			
 			System.arraycopy(fNewline, 0, buffer, position, fNewline.length);
 			position+= fNewline.length;
+
 		}		
 	}
 }

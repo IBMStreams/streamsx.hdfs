@@ -4,17 +4,17 @@
 *******************************************************************************/                              
 namespace hdfsexample ;
 
-use com.ibm.streamsx.hdfs::HDFSFileSink ;
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
 
 /**
- * The [HDFSFileSinkSampleTxtFormat] composite demonstrates how to use the HDFSFileSink operator
+ * The [HDFS2FileSinkSampleTxtFormat] composite demonstrates how to use the HDFS2FileSink operator
  * to write to a file in "txt" format.
  *
- * Contrast from the HDFSFileSink operator, HDFSFileSink operator only supports writing in "line" format.
- * If your existing application currently uses the HDFSFileSink operator to write data out as "txt" format,
+ * Contrast from the HDFS2FileSink operator, HDFS2FileSink operator only supports writing in "line" format.
+ * If your existing application currently uses the HDFS2FileSink operator to write data out as "txt" format,
  * you will need to modify your application in order to maintain the output format.
  * 
- * To continue writing in "txt" format, you can insert a "Functor" operator before the HDFSFileSink operator
+ * To continue writing in "txt" format, you can insert a "Functor" operator before the HDFS2FileSink operator
  * to convert a tuple to a rstring.  The string can then be written out to a file on HDFS as is.
  *
  * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
@@ -37,12 +37,12 @@ use com.ibm.streamsx.hdfs::HDFSFileSink ;
  *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
  *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
  *  1. Run the sample application. 
- *   * To run the HDFSFileSinkSampleTxtFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
- *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFSFileSinkSampleTxtFormat/hdfsexample.HDFSFileSinkSampleTxtFormat.adl
- *   * To run the HDFSFileSinkSampleTxtFormat sample application in standalone mode, issue the command:
- *    * ./output/Standalone/hdfsexample::HDFSFileSinkSampleTxtFormat/bin/standalone
+ *   * To run the HDFS2FileSinkSampleTxtFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
+ *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFS2FileSinkSampleTxtFormat/hdfsexample.HDFS2FileSinkSampleTxtFormat.adl
+ *   * To run the HDFS2FileSinkSampleTxtFormat sample application in standalone mode, issue the command:
+ *    * ./output/Standalone/hdfsexample::HDFS2FileSinkSampleTxtFormat/bin/standalone
  */
-composite HDFSFileSinkSampleTxtFormat
+composite HDFS2FileSinkSampleTxtFormat
 {
 	type
 		PersonSchema = int32 id, rstring fname, rstring lname, int32 age,
@@ -64,7 +64,7 @@ composite HDFSFileSinkSampleTxtFormat
 		}
 
 		// write out converted string to file
-		() as txtSink = HDFSFileSink(SingleStringIn)
+		() as txtSink = HDFS2FileSink(SingleStringIn)
 		{
 			param
 				file : "txtFile.txt" ;

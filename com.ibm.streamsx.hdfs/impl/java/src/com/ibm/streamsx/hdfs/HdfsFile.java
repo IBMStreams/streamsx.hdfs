@@ -7,9 +7,11 @@ package com.ibm.streamsx.hdfs;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.Tuple;
+import com.ibm.streams.operator.Type.MetaType;
 import com.ibm.streams.operator.types.RString;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
@@ -43,12 +45,26 @@ public class HdfsFile {
 	int numTuples = 0;
 	private byte[] fNewLine;
 
+	/// The metatype of the attribute we'll be working with.
+	private final MetaType attrType;
+	
+	/// The index of the attribute that matters.
+	private final int attrIndex;
 	
 	private OperatorContext fOpContext;
 	
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HdfsFile";
-	
-	public HdfsFile(OperatorContext context, String path, IHdfsClient client, String encoding) {
+
+	/**
+	 * Create an instance of HdfsFile
+	 * @param context	Operator context.
+	 * @param path		name of the file
+	 * @param client	hdfs connection
+	 * @param encoding	The file encoding; only matters for text files.
+	 * @param attrIndex	The index of the attribute we'll be writing.
+	 * @param attrType	The index of the attribute we'll be writing.
+	 */
+	public HdfsFile(OperatorContext context, String path, IHdfsClient client, String encoding,int attrIndex, MetaType attrType) {
 		fPath = path;
 		fHdfsClient = client;
 		fOpContext = context;
@@ -65,17 +81,30 @@ public class HdfsFile {
 		} catch (UnsupportedEncodingException e) {
 			fNewLine = System.getProperty("line.separator").getBytes();
 		}
+		this.attrIndex = attrIndex;
+		this.attrType = attrType;
 	}
 
 	public void writeTuple(Tuple tuple) throws Exception {
 		if (fWriter == null) {
-			initWriter();
+			if (MetaType.BLOB == attrType) {
+				initWriter(true);
+			}
+			else {
+				initWriter(false);
+			}
 		}
-				
-		Object attrObj = tuple.getObject(0);
+		
 		byte[] tupleBytes = null;
-		if (attrObj instanceof RString)
-		{
+		
+		switch (attrType) {
+		case BLOB: 
+			ByteBuffer buffer = tuple.getBlob(attrIndex).getByteBuffer();
+			tupleBytes = new byte[buffer.limit()];
+			buffer.get(tupleBytes);
+			break;
+		case RSTRING:
+			Object attrObj = tuple.getObject(attrIndex);
 			if (fEncoding.equals(UTF_8))
 			{
 				tupleBytes = ((RString)attrObj).getData();
@@ -85,10 +114,13 @@ public class HdfsFile {
 				tupleBytes = ((RString)attrObj).getData();
 				tupleBytes = new String(tupleBytes, UTF_8).getBytes(fEncoding);
 			}
-		}
-		else if (attrObj instanceof String)
-		{			
-			tupleBytes = ((String)attrObj).getBytes(fEncoding);
+			break;
+		case USTRING:
+			String attrString = tuple.getString(attrIndex);
+			tupleBytes = attrString.getBytes(fEncoding);
+			break;
+		default:
+			throw new Exception("Unsupported type "+attrType);
 		}
 		
 		fWriter.write(tupleBytes);
@@ -138,14 +170,26 @@ public class HdfsFile {
 		return size;
 	}
 
-	private void initWriter() throws IOException, Exception {
+	/**
+	 * Init the writer. 
+	 * @param isBinary  If true, file is considered a binary file.  If not, it is assumed to be a text file, and a newline is added after each write.
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void initWriter(boolean isBinary) throws IOException, Exception {
 		OutputStream outStream = getHdfsClient().getOutputStream(fPath, false);
 
 		if (outStream == null) {
 			throw new Exception("Unable to open file for writing: " + fPath);
 		} 
-		
-		fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+		// The AsyncBufferWriter writes a newline after every tuple.  For binary files, this is bad.
+		// But, we just tell the AysncBufferWriter than the newline is an empty byte array, and we're good.
+		if (isBinary) {
+			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), new byte[0]);
+		}
+		else {
+			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+		}
 	}
 
 	public void close() throws Exception {
