@@ -3,7 +3,8 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>The HDFS2FileSource operator reads files from a Hadoop Distributed File System (HDFS).
+      <description>
+The `HDFS2FileSource` operator reads files from a Hadoop Distributed File System (HDFS).
 
 The operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
 
@@ -13,41 +14,41 @@ named by the attribute in the tuples that arrive on its input port and places a 
 
 **Exceptions**
 
-The HDFS2FileSource operator terminates in the following cases:
+The `HDFS2FileSource` operator terminates in the following cases:
  * The operator cannot connect to HDFS.
  * The file cannot be opened.
  * The file does not exist.
  * The file becomes unreadable.
  * A tuple cannot be created from the file contents (such as a problem with the file format).
 
-**Examples**
++ Examples
 
-In the following example, the HDFS2DirectoryScan operator scans the HDFS directory every two seconds and the HDFS2FileSource
-operator reads the files output by the HDFS2DirectoryScan operator.
+This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory every two seconds and the `HDFS2FileSource`
+operator to read the files that are output by the `HDFS2DirectoryScan` operator.
    
 	/*
     * HDFS2DirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
     * Overrides the URI in the fs.defaultFS option from core-site.xml file
     */
     (stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){
-  		param
-   			directory     : "/user/myuser/";
-   			hdfsUri:"hdfs : //hdfsServer:1883";
-   			sleepTime     : 2.0;
-	}
+      param
+        directory     : "/user/myuser/";
+        hdfsUri:"hdfs : //hdfsServer:1883";
+        sleepTime     : 2.0;
+    }
 	// HDFS2FileSource operator reads from files discovered by HDFS2DirectoryScan operator
 	(stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 =	HDFS2FileSource(Files){
-  		param
-    		hdfsUri:"hdfs://hdfsSever:1883"; 
-   	}
+	  param
+	    hdfsUri:"hdfs://hdfsSever:1883";
+	 }
 
 The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
     (stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
-  		param
-    		hdfsUri:"webhdfs://bigInsightSever:1883"; 
-   			file   :"/user/myser/myfile.txt"; 
-   			
+      param
+        hdfsUri:"webhdfs://bigInsightSever:1883"; 
+        file   :"/user/myser/myfile.txt"; 
+    }
 
 </description>
       <iconUri size="32">HDFS2FileSource_32.gif</iconUri>
@@ -211,7 +212,7 @@ configuration file. If this parameter is not specified, the operator searches th
     <inputPorts>
       <inputPortSet>
         <description>
-The HDFS2FileSource operator has one optional input port. If an input port is specified, the operator expects
+The `HDFS2FileSource` operator has one optional input port. If an input port is specified, the operator expects
 an input tuple with a single attribute of type rstring. The input tuples contain the file names that the operator opens for reading.
 The input port is non-mutating.</description>
         <windowingDescription></windowingDescription>
@@ -224,7 +225,7 @@ The input port is non-mutating.</description>
     <outputPorts>
       <outputPortSet>
         <description>
-The HDFS2FileSource operator has one output port.  The tuples on the output port contain the data that is read from the files.
+The `HDFS2FileSource` operator has one output port.  The tuples on the output port contain the data that is read from the files.
 The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.</description>
         <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>
