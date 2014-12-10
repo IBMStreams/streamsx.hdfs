@@ -727,12 +727,15 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		// size
 
 		synchronized (this) {
+			
+			fFileToWrite.setExpired();
+			fFileToWrite.close();
+			
+			// signal must be fired AFTER the file is closed so downstream
+			// operators can perform additional 
 			if (hasOutputPort && !fFileToWrite.isExpired()) {
 				submitOnOutputPort(getCurrentFileName(), fFileToWrite.getSize());
 			}
-			fFileToWrite.setExpired();
-
-			fFileToWrite.close();
 		}
 
 	}
