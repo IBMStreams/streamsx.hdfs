@@ -783,13 +783,15 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			fFileToWrite.writeTuple(tuple);
 			// This will check bytesPerFile and tuplesPerFile expiration policy
 			if (fFileToWrite.isExpired()) {
+				
+				fFileToWrite.close();
+				
 				// If Optional output port is present output the filename and
 				// file size
 				if (hasOutputPort) {
 					submitOnOutputPort(getCurrentFileName(),
 							fFileToWrite.getSize());
 				}
-				fFileToWrite.close();
 			}
 
 		}
