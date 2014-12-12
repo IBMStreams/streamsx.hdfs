@@ -3,35 +3,38 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>The HDFS2FileSink operator writes files to a Hadoop Distributed File System. 
+      <description>
+The `HDFS2FileSink` operator writes files to a Hadoop Distributed File System. 
 
-The HDFS2FileSink operator is similar to the FileSink operator.  This operator writes tuples that arrive on its input port to the output file that is named by the **file** parameter.  
-You can optionally control whether the operator closes the current output file and creates a new file for writing based on the size of the file in bytes, the number of tuples that are written to the file,
-or the time in seconds that the file is open for writing, or when the operator receives a punctuation marker.
+The `HDFS2FileSink` operator is similar to the `FileSink` operator.  
+This operator writes tuples that arrive on its input port to the output file that is named by the **file** parameter.  
+You can optionally control whether the operator closes the current output file and creates a new file for writing based on the size 
+of the file in bytes, the number of tuples that are written to the file, or the time in seconds that the file is open for writing, 
+or when the operator receives a punctuation marker.
 
 **Exceptions**
 
-The HDFS2FileSink operator terminates in the following cases:
+The `HDFS2FileSink` operator terminates in the following cases:
  * The operator cannot connect to HDFS.
  * The file cannot be written.     
 
-**Examples**
++ Examples
 
-The following example shows how to use the HDFS2FileSink operator:
+This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`:
 
-      stream&lt;PersonSchema&gt; In = FileSource(){
-  			param
-    			file : "Input.txt" ;
-		}
-		stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
-  			output
-    			SingleStringIn : PersonSchemString =(rstring) In ;
-		}
-		() as txtSink = HDFS2FileSink(SingleStringIn){
-  			param
-    			file : "output%FILENUM.txt" ;
-    			bytesPerFile: (int64)(16*1024);
-    	}
+    stream&lt;PersonSchema&gt; In = FileSource(){
+      param
+        file : "Input.txt" ;
+    }
+    stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
+      output
+        SingleStringIn : PersonSchemString =(rstring) In ;
+    }
+    () as txtSink = HDFS2FileSink(SingleStringIn){
+      param
+        file : "output%FILENUM.txt" ;
+        bytesPerFile: (int64)(16*1024);
+    }
 </description>
       <iconUri size="32">HDFS2FileSink_32.gif</iconUri>
       <iconUri size="16">HDFS2FileSink_16.gif</iconUri>
@@ -247,7 +250,7 @@ If this parameter is not specified, the operator searches the default location f
     <inputPorts>
       <inputPortSet>
         <description docHref="" sampleUri="">
-The HDFS2FileSink operator has one input port, which writes the contents of the input stream to the file that you specified.
+The `HDFS2FileSink` operator has one input port, which writes the contents of the input stream to the file that you specified.
 The input port is non-mutating, and its punctuation mode is `Oblivious`.
 The schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>, which specifies a single rstring or ustring attribute that represents 
 a line to be written to the file.</description>
@@ -261,7 +264,7 @@ a line to be written to the file.</description>
     <outputPorts>
       <outputPortSet>
         <description>
-The HDFS2FileSink operator is configurable with an optional output port.  
+The `HDFS2FileSink` operator is configurable with an optional output port.  
 The output port is non-mutating and its punctuation mode is `Free`.
 The schema of the output port is &lt;string fileName, uint64 fileSize&gt;, which specifies the name and size of files that are written to HDFS.</description>
         <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
