@@ -53,7 +53,8 @@ public class HdfsFile {
 	
 	private OperatorContext fOpContext;
 	
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HdfsFile";
+	private boolean fIsBinary;
+	
 
 	/**
 	 * Create an instance of HdfsFile
@@ -171,24 +172,30 @@ public class HdfsFile {
 	}
 
 	/**
-	 * Init the writer. 
+	 * Init the writer.
+	 * Only one thread can create a new writer.  Write can be created by init, write or flush.  The synchronized keyword prevents
+	 * write and flush to create writer at the same time. 
 	 * @param isBinary  If true, file is considered a binary file.  If not, it is assumed to be a text file, and a newline is added after each write.
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	private void initWriter(boolean isBinary) throws IOException, Exception {
-		OutputStream outStream = getHdfsClient().getOutputStream(fPath, false);
-
-		if (outStream == null) {
-			throw new Exception("Unable to open file for writing: " + fPath);
-		} 
-		// The AsyncBufferWriter writes a newline after every tuple.  For binary files, this is bad.
-		// But, we just tell the AysncBufferWriter than the newline is an empty byte array, and we're good.
-		if (isBinary) {
-			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), new byte[0]);
-		}
-		else {
-			fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+	synchronized private void initWriter(boolean isBinary) throws IOException, Exception {
+		
+		if (fWriter == null)
+		{
+			OutputStream outStream = getHdfsClient().getOutputStream(fPath, false);
+	
+			if (outStream == null) {
+				throw new Exception("Unable to open file for writing: " + fPath);
+			} 
+			// The AsyncBufferWriter writes a newline after every tuple.  For binary files, this is bad.
+			// But, we just tell the AysncBufferWriter than the newline is an empty byte array, and we're good.
+			if (isBinary) {
+				fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), new byte[0]);
+			}
+			else {
+				fWriter = new AsyncBufferWriter(outStream, 1024*1024*16, fOpContext.getThreadFactory(), fNewLine);
+			}
 		}
 	}
 
@@ -225,5 +232,16 @@ public class HdfsFile {
 
 	public void setTuplesPerFile(long tuplesPerFile) {
 		this.tuplesPerFile = tuplesPerFile;
+	}
+	
+	// called by drain method for consistent region
+	public void flush() throws Exception {
+		// close the current writer and recreate
+		
+		if (fWriter != null)
+		{
+			fWriter.flushAll();
+		}
+		
 	}
 }

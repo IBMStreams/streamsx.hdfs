@@ -36,7 +36,7 @@ import com.ibm.streams.operator.model.SharedLoader;
 @SharedLoader
 public class HDFS2FileSink extends AbstractHdfsOperator {
 
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSink";
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFS2FileSink";
 
 	/**
 	 * Create a logger specific to this class
