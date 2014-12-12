@@ -4,9 +4,9 @@
   <javaOperatorModel>
     <context>
       <description>
-The HDFSDirectoryScan operator scans a Hadoop Distributed File System directory for new or modified files.
+The HDFS2DirectoryScan operator scans a Hadoop Distributed File System directory for new or modified files.
 
-The HDFSDirectoryScan is similar to the DirectoryScan operator. The HDFSDirectoryScan operator repeatedly scans an HDFS directory and writes the names of new or modified files that are found in the directory to the output port. The operator sleeps between scans.
+The HDFS2DirectoryScan is similar to the DirectoryScan operator. The HDFS2DirectoryScan operator repeatedly scans an HDFS directory and writes the names of new or modified files that are found in the directory to the output port. The operator sleeps between scans.
 
 **Exceptions** 
 
@@ -19,10 +19,10 @@ The operator terminates in the following cases:
 
 **Examples**
 
-In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
+In the following example, the HDFS2DirectoryScan operator scans the HDFS directory every two seconds. The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
 
 	
-	(stream&lt;rstring filename&gt; Files) as HDFSDirectoryScan_1 = HDFSDirectoryScan()
+	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
 	{
 		param
 			directory :"/user/myuser/";
@@ -31,8 +31,8 @@ In the following example, the HDFSDirectoryScan operator scans the HDFS director
 	}
 	
  </description>
-      <iconUri size="32">HDFSDirectoryScan_32.gif</iconUri>
-      <iconUri size="16">HDFSDirectoryScan_16.gif</iconUri>
+      <iconUri size="32">HDFS2DirectoryScan_32.gif</iconUri>
+      <iconUri size="16">HDFS2DirectoryScan_16.gif</iconUri>
       <metrics>
         <metric>
           <name>nScans</name>
@@ -41,7 +41,7 @@ In the following example, the HDFSDirectoryScan operator scans the HDFS director
         </metric>
       </metrics>
       <executionSettings>
-        <className>com.ibm.streamsx.hdfs.HDFSDirectoryScan</className>
+        <className>com.ibm.streamsx.hdfs.HDFS2DirectoryScan</className>
         <vmArgs/>
       </executionSettings>
       <libraryDependencies>
@@ -70,30 +70,30 @@ In the following example, the HDFSDirectoryScan operator scans the HDFS director
         </library>
       </libraryDependencies>
       <codeTemplates>
-        <codeTemplate name="HDFSDirectoryScan">
+        <codeTemplate name="HDFS2DirectoryScan">
           <description>Basic use of HDFS Directory Scan</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
                 directory: &quot;${directoryToScan}&quot;;
         } </template>
         </codeTemplate>
-        <codeTemplate name="HDFSDirectoryScan with hdfsUser and hdfsUri">
-          <description>HDFSDirectoryScan template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+        <codeTemplate name="HDFS2DirectoryScan with hdfsUser and hdfsUri">
+          <description>HDFS2DirectoryScan template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
                 directory: &quot;${directoryToScan}&quot;
                 hdfsUser: &quot;${hdfsUser}&quot;;
                 hdfsUri: &quot;${hdfsUri}&quot;;
         } </template>
         </codeTemplate>
-        <codeTemplate name="HDFSDirectoryScan with HDFSFileSource">
+        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource">
           <description>Read all the files in an HDFS directory</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFSDirectoryScan()   {
+          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
                 directory: &quot;${directoryToScan}&quot;;
         }
         
-        stream&lt;${schema}> ${fileSourceStream} = HDFSFileSource(${outputStream})   {
+        stream&lt;${schema}> ${fileSourceStream} = HDFS2FileSource(${outputStream})   {
         }</template>
         </codeTemplate>
       </codeTemplates>
@@ -123,7 +123,7 @@ In the following example, the HDFSDirectoryScan operator scans the HDFS director
       </parameter>
       <parameter>
         <name>pattern</name>
-        <description sampleUri="">This optional parameter limits the file names that are listed to the names that match the specified regular expression. The HDFSDirectoryScan operator ignores file names that do not match the specified regular expression. </description>
+        <description sampleUri="">This optional parameter limits the file names that are listed to the names that match the specified regular expression. The HDFS2DirectoryScan operator ignores file names that do not match the specified regular expression. </description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -209,7 +209,7 @@ Note: When using Kerberos authentication, to perform operations as the user spec
     <inputPorts>
       <inputPortSet>
         <description>
-The HDFSDirectoryScan operator has an optional control input port. You can use this port to change the directory that the operator scans at run time without restarting or recompiling the application.  The expected schema for the input port is of tuple&lt;rstring directory&gt;, a schema containing a single attribute of type rstring.  If a directory scan is in progress when a tuple is received, the scan completes and a new scan starts immediately after and uses the new directory that was specified.  If the operator is sleeping, the operator starts scanning the new directory immediately after it receives an input tuple.</description>
+The HDFS2DirectoryScan operator has an optional control input port. You can use this port to change the directory that the operator scans at run time without restarting or recompiling the application.  The expected schema for the input port is of tuple&lt;rstring directory&gt;, a schema containing a single attribute of type rstring.  If a directory scan is in progress when a tuple is received, the scan completes and a new scan starts immediately after and uses the new directory that was specified.  If the operator is sleeping, the operator starts scanning the new directory immediately after it receives an input tuple.</description>
         <windowingDescription>This operator does not support any window configurations.</windowingDescription>
         <windowingMode>NonWindowed</windowingMode>
         <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
@@ -220,7 +220,7 @@ The HDFSDirectoryScan operator has an optional control input port. You can use t
     </inputPorts>
     <outputPorts>
       <outputPortSet>
-        <description>The HDFSDirectoryScan operator has one output port. This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order. The port is non-mutating and punctuation free.</description>
+        <description>The HDFS2DirectoryScan operator has one output port. This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order. The port is non-mutating and punctuation free.</description>
         <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>
         <cardinality>1</cardinality>

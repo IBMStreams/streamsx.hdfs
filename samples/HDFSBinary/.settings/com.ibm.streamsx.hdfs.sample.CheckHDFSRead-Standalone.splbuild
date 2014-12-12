@@ -7,7 +7,7 @@
 <entry key="com.ibm.streams.studio.splproject:PROFILING"></entry>
 <entry key="com.ibm.streams.studio.splproject:FUSION_MODE">FDEF</entry>
 <entry key="com.ibm.streams.studio.splproject:USE_PROJECT_DATA_DIR">T</entry>
-<entry key="com.ibm.streams.studio.splproject:ACTIVE">T</entry>
+<entry key="com.ibm.streams.studio.splproject:ACTIVE">F</entry>
 <entry key="com.ibm.streams.studio.splproject:DEFAULT_POOL_SIZE"></entry>
 <entry key="com.ibm.streams.studio.splproject:GCC_OPTS"></entry>
 <entry key="com.ibm.streams.studio.splproject:STATIC_LINKING">F</entry>

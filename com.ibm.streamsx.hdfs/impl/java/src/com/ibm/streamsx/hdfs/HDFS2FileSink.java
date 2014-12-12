@@ -34,7 +34,7 @@ import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.SharedLoader;
 
 @SharedLoader
-public class HDFSFileSink extends AbstractHdfsOperator {
+public class HDFS2FileSink extends AbstractHdfsOperator {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSink";
 
@@ -587,7 +587,7 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 
 	private void createFile() {
 		fFileToWrite = new HdfsFile(getOperatorContext(), getCurrentFileName(),
-				getHdfsClient(), getEncoding());
+				getHdfsClient(), getEncoding(),dataIndex,dataType);
 		if (getTimePerFile() > 0) {
 			fFileToWrite.setExpPolicy(EnumFileExpirationPolicy.TIME);
 			// time in parameter specified in seconds, need to convert to
@@ -727,12 +727,15 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 		// size
 
 		synchronized (this) {
+			
+			fFileToWrite.setExpired();
+			fFileToWrite.close();
+			
+			// signal must be fired AFTER the file is closed so downstream
+			// operators can perform additional 
 			if (hasOutputPort && !fFileToWrite.isExpired()) {
 				submitOnOutputPort(getCurrentFileName(), fFileToWrite.getSize());
 			}
-			fFileToWrite.setExpired();
-
-			fFileToWrite.close();
 		}
 
 	}
@@ -777,16 +780,18 @@ public class HDFSFileSink extends AbstractHdfsOperator {
 				createFile();
 			}
 
-			fFileToWrite.writeTuple(tuple, dataIndex, dataType);
+			fFileToWrite.writeTuple(tuple);
 			// This will check bytesPerFile and tuplesPerFile expiration policy
 			if (fFileToWrite.isExpired()) {
+				
+				fFileToWrite.close();
+				
 				// If Optional output port is present output the filename and
 				// file size
 				if (hasOutputPort) {
 					submitOnOutputPort(getCurrentFileName(),
 							fFileToWrite.getSize());
 				}
-				fFileToWrite.close();
 			}
 
 		}

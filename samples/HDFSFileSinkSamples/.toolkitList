@@ -1,5 +1,6 @@
 HDFSFileSinkSamples/1.0.0
 spl/1.1.0
+HDFSBinary/1.0.0
 HDFSFileSourceSamples/1.0.0
 ScanAndRead/1.0.0
-com.ibm.streamsx.hdfs/1.0.0
+com.ibm.streamsx.hdfs/1.1.0

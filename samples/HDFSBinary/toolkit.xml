@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<toolkitModel xmlns="http://www.ibm.com/xmlns/prod/streams/spl/toolkit" productVersion="3.2.2.0" xmlns:common="http://www.ibm.com/xmlns/prod/streams/spl/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <toolkit name="HDFSBinary" requiredProductVersion="3.2.1.0" version="1.0.0">
+    <description/>
+    <uriTable>
+      <uri index="2" value="com.ibm.streamsx.hdfs.sample/HDFSBinaryWrite.spl"/>
+      <uri index="1" value="com.ibm.streamsx.hdfs.sample/HDFSBinaryRead.spl"/>
+    </uriTable>
+    <namespace name="com.ibm.streamsx.hdfs.sample">
+      <compositeOp column="11" line="13" name="CheckHDFSRead" potentialMain="true" uriIndex="1"/>
+      <compositeOp column="11" line="17" name="HDFSBinaryWrite" potentialMain="true" uriIndex="2"/>
+    </namespace>
+    <dependency>
+      <common:name>com.ibm.streamsx.hdfs</common:name>
+      <common:version>[1.1.0,2.0.0)</common:version>
+    </dependency>
+  </toolkit>
+
+</toolkitModel>
