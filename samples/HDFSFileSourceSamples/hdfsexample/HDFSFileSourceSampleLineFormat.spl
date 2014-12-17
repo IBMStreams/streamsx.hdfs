@@ -5,9 +5,9 @@
 
 namespace hdfsexample ;
 
-use com.ibm.streamsx.hdfs::HDFSFileSource ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 /**
-  * The [HDFSFileSourceSampleLineFormat] demonstrates how you can use the HDFSFileSink operator
+  * The [HDFS2FileSourceSampleLineFormat] demonstrates how you can use the HDFSFileSink operator
   * to read a file from the Hadoop file system.
   *
   * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
@@ -37,22 +37,22 @@ use com.ibm.streamsx.hdfs::HDFSFileSource ;
   *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
   *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
   *  1. Run the sample application. 
-  *   * To run the HDFSFileSourceSampleLineFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
-  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFSFileSourceSampleLineFormat/hdfsexample.HDFSFileSourceSampleLineFormat.adl -P hdfsUri="hdfs://<machine_name>:<port>" -P hdfsUser="<user_name>" 
-  *   * To run the HDFSFileSourceSampleLineFormat sample application in standalone mode, issue the command:
-  *    * ./output/Standalone/hdfsexample::HDFSFileSourceSampleLineFormat/bin/standalone hdfsUri="hdfs://<machine_name>:<port>" hdfsUser="<user_name>" 
+  *   * To run the HDFS2FileSourceSampleLineFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
+  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFS2FileSourceSampleLineFormat/hdfsexample.HDFS2FileSourceSampleLineFormat.adl -P hdfsUri="hdfs://<machine_name>:<port>" -P hdfsUser="<user_name>" 
+  *   * To run the HDFS2FileSourceSampleLineFormat sample application in standalone mode, issue the command:
+  *    * ./output/Standalone/hdfsexample::HDFS2FileSourceSampleLineFormat/bin/standalone hdfsUri="hdfs://<machine_name>:<port>" hdfsUser="<user_name>" 
   *
   * @param hdfsUri URI to HDFS.  If unspecified, the operator expects that the HDFS URI is specified as the fs.defaultFS or fs.default.name property in core-site.xml.
   * @param hdfsUser User to connect to HDFS.  If unspecified the instance owner running the application will be used as the user
   * to log onto the HDFS. Example value: "streamsadmin"
   */
-composite HDFSFileSourceSampleLineFormat
+composite HDFS2FileSourceSampleLineFormat
 {
 	graph
-		stream<rstring lines> LineStream = HDFSFileSource()
+		stream<rstring lines> LineStream = HDFS2FileSource()
 		{
 			param
-				file : "lineFile.txt" ;
+				file : "LineFile.txt" ;
 		} 
 
 		() as MySink = FileSink(LineStream)

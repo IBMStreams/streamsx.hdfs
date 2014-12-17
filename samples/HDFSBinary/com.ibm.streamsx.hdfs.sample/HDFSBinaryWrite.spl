@@ -1,9 +1,9 @@
 namespace com.ibm.streamsx.hdfs.sample;
 
-use com.ibm.streamsx.hdfs::HDFSFileSink ;
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
 
 /**
- * Demonstrate how to use HDFSFileSink to write a binary file.
+ * Demonstrate how to use HDFS2FileSink to write a binary file.
  * 
  * This composite generates tuples, and then writes them out in three ways:
  * * to the local file system in csv format
@@ -42,9 +42,10 @@ composite HDFSBinaryWrite
 		{
 			param
 				file : "write_local.bin" ;
+				format: block;
 		}
 
-		() as remoteSink = HDFSFileSink(BinaryTuples)
+		() as remoteSink = HDFS2FileSink(BinaryTuples)
 		{
 			param
 				file : "write_remote.bin" ;

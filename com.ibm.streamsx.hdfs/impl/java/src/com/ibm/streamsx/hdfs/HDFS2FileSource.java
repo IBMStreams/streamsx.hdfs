@@ -34,14 +34,14 @@ import com.ibm.streams.operator.types.ValueFactory;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
 @SharedLoader
-public class HDFSFileSource extends AbstractHdfsOperator {
+public class HDFS2FileSource extends AbstractHdfsOperator {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource";
 
 	private static Logger logger = Logger.getLogger(LoggerNames.LOG_FACILITY
 			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
 	
-	private static Logger trace = Logger.getLogger(HDFSFileSource.class.getName());
+	private static Logger trace = Logger.getLogger(HDFS2FileSource.class.getName());
 			 
 	// TODO check that name matches filesource change required
 	private static final String FILES_OPENED_METRIC = "nFilesOpened";

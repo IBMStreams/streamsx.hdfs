@@ -18,5 +18,5 @@
 <entry key="com.ibm.streams.studio.splproject:STANDALONE">F</entry>
 <entry key="com.ibm.streams.studio.splproject:OPTIMIZED_CODE">F</entry>
 <entry key="com.ibm.streams.studio.splproject:DATA_DIR"/>
-<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">com.ibm.streamsx.hdfs.sample::HDFSBinaryWrite</entry>
+<entry key="com.ibm.streams.studio.splproject:MAIN_COMPOSITE">com.ibm.streamsx.hdfs.sample::Read</entry>
 </properties>

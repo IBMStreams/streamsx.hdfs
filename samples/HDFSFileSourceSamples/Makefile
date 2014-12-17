@@ -10,8 +10,8 @@ SPLC_FLAGS = -a -z -t $(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.bigdata
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
 SPL_CMD_ARGS ?=
-SPL_MAIN_COMPOSITE1 = hdfsexample::HDFSFileSourceSampleLineFormat
-SPL_MAIN_COMPOSITE2 = hdfsexample::HDFSFileSourceSampleTxtFormat
+SPL_MAIN_COMPOSITE1 = hdfsexample::HDFS2FileSourceSampleLineFormat
+SPL_MAIN_COMPOSITE2 = hdfsexample::HDFS2FileSourceSampleTxtFormat
 STANDALONE_OUTPUT_DIR = output/Standalone
 DISTRIBUTED_OUTPUT_DIR = output/Distributed
 

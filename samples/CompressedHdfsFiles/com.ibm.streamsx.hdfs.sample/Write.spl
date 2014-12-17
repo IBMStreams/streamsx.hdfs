@@ -1,5 +1,5 @@
 namespace com.ibm.streamsx.hdfs.sample;
-use com.ibm.streamsx.hdfs::HDFSFileSink ;
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
 use com.ibm.streamsx.hdfs::* ;
 
 /**
@@ -9,7 +9,7 @@ use com.ibm.streamsx.hdfs::* ;
  * * We generate synthetic data Beacon operator,
  * * Use the Format operator to put the tuples in csv format
  * * Compress the data with the Compress operator
- * * Write the compressed data to HDFS with HDFSFileSink.
+ * * Write the compressed data to HDFS with HDFS2FileSink.
  * 
  * To run, you need to supply an hdfsUri
  */
@@ -50,7 +50,7 @@ composite Write
 				compression : gzip ;
 		}
 
-		() as hdfsSink = HDFSFileSink(CompressedStream)
+		() as hdfsSink = HDFS2FileSink(CompressedStream)
 		{
 			param
 				file : "testCompress.gz" ;

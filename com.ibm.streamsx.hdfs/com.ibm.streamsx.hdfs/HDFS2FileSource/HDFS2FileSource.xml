@@ -2,7 +2,7 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>The HDFSFileSource operator reads files from a Hadoop Distributed File System (HDFS).
+      <description>The HDFS2FileSource operator reads files from a Hadoop Distributed File System (HDFS).
 
 The operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
 
@@ -12,7 +12,7 @@ named by the attribute in the tuples that arrive on its input port and places a 
 
 **Exceptions**
 
-The HDFSFileSource operator terminates in the following cases:
+The HDFS2FileSource operator terminates in the following cases:
  * The operator cannot connect to HDFS.
  * The file cannot be opened.
  * The file does not exist.
@@ -21,7 +21,7 @@ The HDFSFileSource operator terminates in the following cases:
 
 **Examples**
 
-In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds and the HDFSFileSource
+In the following example, the HDFSDirectoryScan operator scans the HDFS directory every two seconds and the HDFS2FileSource
 operator reads the files output by the HDFSDirectoryScan operator.
    
 	/*
@@ -34,23 +34,23 @@ operator reads the files output by the HDFSDirectoryScan operator.
    			hdfsUri:&quot;hdfs : //hdfsServer:1883&quot;;
    			sleepTime     : 2.0;
 	}
-	// HDFSFileSource operator reads from files discovered by HDFSDirectoryScan operator
-	(stream&lt;rstring data> FileContent) as HDFSFileSource_2 =	HDFSFileSource(Files){
+	// HDFS2FileSource operator reads from files discovered by HDFSDirectoryScan operator
+	(stream&lt;rstring data> FileContent) as HDFS2FileSource_2 =	HDFS2FileSource(Files){
   		param
     		hdfsUri:&quot;hdfs://hdfsSever:1883&quot;; 
    	}
 
 The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
-    (stream&lt;rstring data> FileContent) as HDFSFileSource_2 = HDFSFileSource(){
+    (stream&lt;rstring data> FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
   		param
     		hdfsUri:&quot;webhdfs://bigInsightSever:1883&quot;; 
    			file   :&quot;/user/myser/myfile.txt&quot;; 
    			
 
 </description>
-      <iconUri size="32">HDFSFileSource_32.gif</iconUri>
-      <iconUri size="16">HDFSFileSource_16.gif</iconUri>
+      <iconUri size="32">HDFS2FileSource_32.gif</iconUri>
+      <iconUri size="16">HDFS2FileSource_16.gif</iconUri>
       <metrics>
         <metric>
           <name>nFilesOpened</name>
@@ -59,7 +59,7 @@ The following example shows how the operator accesses GPFS remotely and reads a 
         </metric>
       </metrics>
       <executionSettings>
-        <className>com.ibm.streamsx.hdfs.HDFSFileSource</className>
+        <className>com.ibm.streamsx.hdfs.HDFS2FileSource</className>
         <vmArgs/>
       </executionSettings>
       <libraryDependencies>
@@ -88,16 +88,16 @@ The following example shows how the operator accesses GPFS remotely and reads a 
         </library>
       </libraryDependencies>
       <codeTemplates>
-        <codeTemplate name="HDFSFileSource">
-          <description sampleUri="">HDFSFileSource basic template</description>
-          <template>stream&lt;${streamType}> ${streamName} = HDFSFileSource() {
+        <codeTemplate name="HDFS2FileSource">
+          <description sampleUri="">HDFS2FileSource basic template</description>
+          <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
                 file : &quot;${filename}&quot;;
                 }</template>
         </codeTemplate>
-        <codeTemplate name="HDFSFileSource with hdfsUser and hdfsUri">
-          <description sampleUri="">HDFSFileSource template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
-          <template>stream&lt;${streamType}> ${streamName} = HDFSFileSource() {
+        <codeTemplate name="HDFS2FileSource with hdfsUser and hdfsUri">
+          <description sampleUri="">HDFS2FileSource template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+          <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
                 file: &quot;${filename}&quot;;
                 hdfsUser: &quot;${hdfsUser}&quot;;
@@ -217,7 +217,7 @@ configuration file. If this parameter is not specified, the operator searches th
     <inputPorts>
       <inputPortSet>
         <description>
-The HDFSFileSource operator has one optional input port. If an input port is specified, the operator expects
+The HDFS2FileSource operator has one optional input port. If an input port is specified, the operator expects
 an input tuple with a single attribute of type rstring. The input tuples contain the file names that the operator opens for reading.
 The input port is non-mutating.</description>
         <windowingDescription></windowingDescription>
@@ -230,7 +230,7 @@ The input port is non-mutating.</description>
     <outputPorts>
       <outputPortSet>
         <description>
-The HDFSFileSource operator has one output port.  The tuples on the output port contain the data that is read from the files.
+The HDFS2FileSource operator has one output port.  The tuples on the output port contain the data that is read from the files.
 The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.</description>
         <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>
