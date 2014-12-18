@@ -25,7 +25,7 @@ For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators 
 
 Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2.	
     </description>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <requiredProductVersion>3.2.1</requiredProductVersion>
   </identity>
   <dependencies/>
