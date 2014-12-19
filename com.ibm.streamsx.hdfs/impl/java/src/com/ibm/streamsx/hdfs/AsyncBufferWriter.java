@@ -40,17 +40,22 @@ public class AsyncBufferWriter extends Writer {
 		protected byte[] flushBuffer;
 		private boolean isAddBuffer;
 		private int bufferPosition;
+		private boolean newline;
 		
-		public FlushRunnable(byte[] buffer, boolean addBuffer, int position) {
+		public FlushRunnable(byte[] buffer, boolean addBuffer, int position, boolean newline) {
 			flushBuffer = buffer;		
 			isAddBuffer = addBuffer;
 			bufferPosition = position;
+			this.newline = newline;
 		}
 
 		@Override
 		public void run() {
 			try {
-				out.write(flushBuffer, 0, bufferPosition);				
+				out.write(flushBuffer, 0, bufferPosition);	
+				
+				if (newline && fNewline.length > 0)
+					out.write(fNewline, 0, fNewline.length);
 			} catch (IOException e) {
 				LOGGER.log(LogLevel.ERROR, "Unable to write to HDFS output stream.", e);
 			}		
@@ -119,7 +124,7 @@ public class AsyncBufferWriter extends Writer {
 		
 		if (buffer.length > 0)
 		{
-			FlushRunnable runnable = new FlushRunnable(buffer, true, position);
+			FlushRunnable runnable = new FlushRunnable(buffer, true, position, false);
 			exService.execute(runnable);
 			
 			try {
@@ -135,7 +140,7 @@ public class AsyncBufferWriter extends Writer {
 	protected void flushNow() throws IOException {
 		if (buffer.length > 0)
 		{
-			FlushRunnable runnable = new FlushRunnable(buffer, false, position);
+			FlushRunnable runnable = new FlushRunnable(buffer, false, position, false);
 			runnable.run();
 		}
 	}
@@ -160,8 +165,8 @@ public class AsyncBufferWriter extends Writer {
 			// flush the buffer
 			flush();
 			
-			// write new content
-			FlushRunnable runnable = new FlushRunnable(src, false, src.length);
+			// write new content			
+			FlushRunnable runnable = new FlushRunnable(src, false, src.length, true);
 			exService.execute(runnable);
 			
 		}
