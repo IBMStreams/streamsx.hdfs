@@ -100,22 +100,22 @@ public class AsyncBufferWriter extends Writer {
 	}
 
 	private void initExServiceAndBuffer(int size, ThreadFactory threadFactory) {
-		
-		synchronized(exServiceLock) {
-		exService = Executors.newSingleThreadExecutor(threadFactory);
-		bufferQueue = new LinkedBlockingQueue<byte[]>(BUFFER_QUEUE_SIZE);
-		try {
-			for (int i=0; i<BUFFER_QUEUE_SIZE; i++)
-			{
-				bufferQueue.put(new byte[size]);	
+
+		synchronized (exServiceLock) {
+			exService = Executors.newSingleThreadExecutor(threadFactory);
+			bufferQueue = new LinkedBlockingQueue<byte[]>(BUFFER_QUEUE_SIZE);
+			try {
+				for (int i = 0; i < BUFFER_QUEUE_SIZE; i++) {
+					bufferQueue.put(new byte[size]);
+				}
+
+				// take one buffer, two left in the queue
+				buffer = bufferQueue.take();
+			} catch (InterruptedException e) {
+				LOGGER.log(LogLevel.ERROR,
+						"Error setting up the buffer queue.", e);
 			}
-			
-			// take one buffer, two left in the queue
-			buffer = bufferQueue.take();
-		} catch (InterruptedException e) {
-			LOGGER.log(LogLevel.ERROR, "Error setting up the buffer queue.", e);
 		}
-	}
 	}
 
 	@Override
@@ -145,22 +145,23 @@ public class AsyncBufferWriter extends Writer {
 
 	@Override
 	public void flush() throws IOException {
-		
-		if (buffer.length > 0)
-		{
-			synchronized(exServiceLock) {
-			FlushRunnable runnable = new FlushRunnable(buffer, true, position, false);
-			exService.execute(runnable);
-			
-			try {
-				if (!isClosed)
-					buffer = bufferQueue.take();
-				position = 0;
-			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.ERROR, "Unable to retrieve buffer from buffer queue.", e);
-			}			
+
+		if (buffer.length > 0) {
+			synchronized (exServiceLock) {
+				FlushRunnable runnable = new FlushRunnable(buffer, true,
+						position, false);
+				exService.execute(runnable);
+
+				try {
+					if (!isClosed)
+						buffer = bufferQueue.take();
+					position = 0;
+				} catch (InterruptedException e) {
+					LOGGER.log(LogLevel.ERROR,
+							"Unable to retrieve buffer from buffer queue.", e);
+				}
+			}
 		}
-	}
 	}
 	
 	protected void flushNow() throws IOException {
@@ -214,9 +215,10 @@ public class AsyncBufferWriter extends Writer {
 			flush();
 			
 			// write new content			
-			synchronized(exServiceLock) {
-			FlushRunnable runnable = new FlushRunnable(src, false, src.length, true);
-			exService.execute(runnable);
+			synchronized (exServiceLock) {
+				FlushRunnable runnable = new FlushRunnable(src, false,
+						src.length, true);
+				exService.execute(runnable);
 			}
 			
 		}
@@ -228,5 +230,9 @@ public class AsyncBufferWriter extends Writer {
 			position+= fNewline.length;
 
 		}		
+	}
+	
+	public boolean isClosed() {
+		return isClosed;
 	}
 }

@@ -5,6 +5,7 @@
 
 package com.ibm.streamsx.hdfs;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,11 +34,15 @@ import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.SharedLoader;
+import com.ibm.streams.operator.state.Checkpoint;
+import com.ibm.streams.operator.state.ConsistentRegionContext;
+import com.ibm.streams.operator.state.StateHandler;
 
 @SharedLoader
-public class HDFS2FileSink extends AbstractHdfsOperator {
+public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFS2FileSink";
+	private static final String CONSISTEN_ASPECT = "com.ibm.streamsx.hdfs.HDFS2FileSink.consistent";
 
 	/**
 	 * Create a logger specific to this class
@@ -45,7 +51,9 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
-	private String rawFileName = null;
+	// do not set as null as it can cause complication for checkpoing
+	// use empty string
+	private String rawFileName = "";
 	private String file = null;
 	private String timeFormat = "yyyyMMdd_HHmmss";
 	private String currentFileName;
@@ -64,7 +72,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 	private boolean dynamicFilename;
 	private MetaType dataType = null;
 
-	// Other variables
+	// file num for generating FILENUM variable in filename
 	private int fileNum = 0;
 
 	// Variables required by the optional output port
@@ -74,8 +82,31 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 
 	private boolean hasOutputPort = false;
 	private StreamingOutput<OutputTuple> outputPort;
+	
+	private LinkedBlockingQueue<OutputTuple> outputPortQueue;
+	private Thread outputPortThread;
 
 	private Thread fFileTimerThread;
+	private InitialState initState;
+	private boolean isRestarting;
+	private ConsistentRegionContext crContext;
+
+	
+	
+	private class InitialState {
+		String path; 
+		String rawFilename; 
+		
+		private InitialState() {
+			
+			if (fFileToWrite != null)
+			{
+				path = fFileToWrite.getPath();
+			}
+			
+			rawFileName = HDFS2FileSink.this.rawFileName;
+		}
+	}	
 
 	/*
 	 * The method checkOutputPort validates that the stream on output port
@@ -89,7 +120,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 					.getStreamingOutputs().get(0);
 			if (streamingOutputPort.getStreamSchema().getAttributeCount() != 2) {
 				checker.setInvalidContext(
-						"The optional output port should have two attributes.",
+						"The optional output port should have two attributes, rstring for filename, uint64 for file size.",
 						null);
 
 			} else {
@@ -218,7 +249,8 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 					.getMetaType()
 					&& MetaType.USTRING != inputSchema.getAttribute(0)
 							.getType().getMetaType()
-					&& MetaType.BLOB != inputSchema.getAttribute(0).getType().getMetaType()) {
+					&& MetaType.BLOB != inputSchema.getAttribute(0).getType()
+							.getMetaType()) {
 				checker.setInvalidContext(
 						"Expected attribute of type blob,rstring or ustring on input port, found attribute of type "
 								+ inputSchema.getAttribute(0).getType()
@@ -229,22 +261,23 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			int numString = 0;
 			int numBlob = 0;
 			for (int i = 0; i < 2; i++) {
-				MetaType t = inputSchema.getAttribute(i).getType().getMetaType();
+				MetaType t = inputSchema.getAttribute(i).getType()
+						.getMetaType();
 				if (MetaType.USTRING == t || MetaType.RSTRING == t) {
 					numString++;
-				}
-				else if (MetaType.BLOB == t) {
+				} else if (MetaType.BLOB == t) {
 					numString++;
 				}
-			}  // end for loop;
-			
-			if (numBlob  == 0 && numString == 2 ||  // data is a string
-					numBlob == 1 && numString == 1) {  // data is a blob
+			} // end for loop;
+
+			if (numBlob == 0 && numString == 2 || // data is a string
+					numBlob == 1 && numString == 1) { // data is a blob
 				// we're golden.
-			}
-			else {
-				checker.setInvalidContext("Filename attribute must be of type ustring or rstring.  Data attribute must be of type blob, ustring, or rstring",null);
-				
+			} else {
+				checker.setInvalidContext(
+						"Filename attribute must be of type ustring or rstring.  Data attribute must be of type blob, ustring, or rstring",
+						null);
+
 			}
 		}
 	}
@@ -273,6 +306,21 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 				IHdfsConstants.PARAM_BYTES_PER_FILE,
 				IHdfsConstants.PARAM_TIME_PER_FILE);
 
+	}
+	
+	@ContextCheck(compile = true)
+	public static void checkConsistentRegion(OperatorContextChecker checker) {
+		
+		// check that the file sink is not at the start of the consistent region
+		OperatorContext opContext = checker.getOperatorContext();
+		ConsistentRegionContext crContext = opContext.getOptionalContext(ConsistentRegionContext.class);
+		if (crContext != null)
+		{
+			if (crContext.isStartOfRegion())
+			{
+				checker.setInvalidContext("This operator cannot be at the start of a consistent region.", null);
+			}
+		}
 	}
 
 	@ContextCheck(compile = false)
@@ -488,18 +536,10 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			// if the file contains variable, it will result in an
 			// URISyntaxException, replace % with _ so we can parse the URI
 			TRACE.log(TraceLevel.DEBUG, "file param: " + file);
+			
+			crContext = context.getOptionalContext(ConsistentRegionContext.class);
 
-			/*
-			 * Set appropriate variables if the optional output port is
-			 * specified. Also set outputPort to the output port at index 0
-			 */
-			if (context.getNumberOfStreamingOutputs() == 1) {
-
-				hasOutputPort = true;
-
-				outputPort = context.getStreamingOutputs().get(0);
-
-			}
+		
 			if (file != null) {
 				String fileparam = file;
 				fileparam = fileparam.replace("%", "_");
@@ -546,6 +586,28 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		}
 
 		super.initialize(context);
+		
+		
+		/*
+		 * Set appropriate variables if the optional output port is
+		 * specified. Also set outputPort to the output port at index 0
+		 */
+		if (context.getNumberOfStreamingOutputs() == 1) {
+
+			hasOutputPort = true;
+
+			outputPort = context.getStreamingOutputs().get(0);
+			
+			// create a queue and thread for submitting tuple on the output port
+			// this is done to allow us to properly support consistent region
+			// where we must acquire consistent region permit before doin submission.
+			// And allow us to submit tuples when a reset happens.
+			outputPortQueue = new LinkedBlockingQueue<>();			
+			outputPortThread = createProcessThread();
+			outputPortThread.start();
+
+		}
+		
 		if (fileAttrName != null) {
 			// We are in dynamic filename mode.
 			dynamicFilename = true;
@@ -579,15 +641,23 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		dataType = inputSchema.getAttribute(dataIndex).getType().getMetaType();
 		if (!dynamicFilename) {
 			refreshCurrentFileName(file);
-			createFile();
+			createFile(getCurrentFileName());
 		}
-		processThread = createProcessThread();
-
+		
+		initRestarting(context);
+		
+		// take a snapshot of initial state
+		initState = new InitialState();
 	}
 
-	private void createFile() {
-		fFileToWrite = new HdfsFile(getOperatorContext(), getCurrentFileName(),
-				getHdfsClient(), getEncoding(),dataIndex,dataType);
+	private void createFile(String filename) {
+		
+		if (TRACE.isLoggable(TraceLevel.DEBUG)) {
+			TRACE.log(TraceLevel.DEBUG,	"Create File: " + filename);
+		}
+		
+		fFileToWrite = new HdfsFile(getOperatorContext(), filename,
+				getHdfsClient(), getEncoding(), dataIndex, dataType);
 		if (getTimePerFile() > 0) {
 			fFileToWrite.setExpPolicy(EnumFileExpirationPolicy.TIME);
 			// time in parameter specified in seconds, need to convert to
@@ -657,18 +727,11 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			Calendar cal = Calendar.getInstance();
 			SimpleDateFormat sdf = new SimpleDateFormat(timeFormat);
 			currentFileName = currentFileName.replace(
-					IHdfsConstants.FILE_VAR_TIME, sdf.format(cal.getTime()));
-
-			if (fFileToWrite != null && fFileToWrite.numTuples == 0) {
-				int num = fileNum - 1; // we want to use the previous value
-				currentFileName = currentFileName.replace(
-						IHdfsConstants.FILE_VAR_FILENUM, String.valueOf(num));
-			} else {
-				currentFileName = currentFileName.replace(
-						IHdfsConstants.FILE_VAR_FILENUM,
-						String.valueOf(getNextFileNum()));
-			}
-
+					IHdfsConstants.FILE_VAR_TIME, sdf.format(cal.getTime()));		
+			
+			currentFileName = currentFileName.replace(
+					IHdfsConstants.FILE_VAR_FILENUM, String.valueOf(fileNum));			
+			fileNum++;
 		}
 	}
 
@@ -727,15 +790,15 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		// size
 
 		synchronized (this) {
+			
 		    boolean alreadyExpired = fFileToWrite.isExpired();
 
 			fFileToWrite.setExpired();
 			fFileToWrite.close();
-			
-			// signal must be fired AFTER the file is closed so downstream
+
 			// operators can perform additional 
 			if (hasOutputPort && !alreadyExpired) {
-				submitOnOutputPort(getCurrentFileName(), fFileToWrite.getSize());
+				submitOnOutputPort(fFileToWrite.getPath(), fFileToWrite.getSizeFromHdfs());
 			}
 		}
 
@@ -745,13 +808,22 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 	synchronized public void process(StreamingInput<Tuple> stream, Tuple tuple)
 			throws Exception {
 
+		// if operator is restarting in a consistent region, discard tuples
+		if (isRestarting())
+		{
+			if (TRACE.isLoggable(TraceLevel.DEBUG)) {
+				TRACE.log(TraceLevel.DEBUG,	"Restarting, discard: " + tuple.toString());
+			}
+			return;
+		}
+		
 		if (dynamicFilename) {
 			String filenameString = tuple.getString(fileIndex);
-			if (rawFileName == null) {
+			if (rawFileName == null || rawFileName.isEmpty()) {
 				// the first tuple. No raw file name is set.
 				rawFileName = filenameString;
 				refreshCurrentFileName(rawFileName);
-				createFile();
+				createFile(getCurrentFileName());
 				if (TRACE.isLoggable(Level.INFO))
 					TRACE.info("Created first file " + currentFileName
 							+ " from raw " + rawFileName);
@@ -766,7 +838,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 				if (TRACE.isLoggable(Level.INFO))
 					TRACE.info("Updating filename -- new name is "
 							+ currentFileName + " from raw " + rawFileName);
-				createFile();
+				createFile(getCurrentFileName());
 			}
 			// When we leave this block, we know the file is ready to be written
 			// to.
@@ -775,23 +847,22 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		if (fFileToWrite != null) {
 
 			if (fFileToWrite.isExpired()) {
-				// if the file is expired, , the file would have been closed
-				// create a new file and start writing from that instead
+				// these calls will set fFileToWrite to the new file
 				refreshCurrentFileName(file);
-				createFile();
+				createFile(getCurrentFileName());
 			}
 
 			fFileToWrite.writeTuple(tuple);
 			// This will check bytesPerFile and tuplesPerFile expiration policy
 			if (fFileToWrite.isExpired()) {
-				
+
 				fFileToWrite.close();
-				
+
 				// If Optional output port is present output the filename and
 				// file size
 				if (hasOutputPort) {
-					submitOnOutputPort(getCurrentFileName(),
-							fFileToWrite.getSize());
+					submitOnOutputPort(fFileToWrite.getPath(),
+							fFileToWrite.getSizeFromHdfs());
 				}
 			}
 
@@ -812,12 +883,13 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		outputTuple.setString(0, filename);
 		outputTuple.setLong(1, size);
 
-		outputPort.submit(outputTuple);
+		// put the output tuple to the queue... to be submitted on process thread
+		outputPortQueue.put(outputTuple);
 	}
 
 	@Override
 	public void shutdown() throws Exception {
-		if (fFileToWrite != null) {
+		if (fFileToWrite != null) {			
 			fFileToWrite.close();
 			fFileToWrite = null;
 		}
@@ -825,6 +897,11 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 		if (fFileTimerThread != null) {
 			fFileTimerThread.interrupt();
 		}
+		
+		if (outputPortThread != null) {
+			outputPortThread.interrupt();
+		}
+		
 		super.shutdown();
 	}
 
@@ -839,6 +916,199 @@ public class HDFS2FileSink extends AbstractHdfsOperator {
 			TRACE.log(TraceLevel.DEBUG, "File Timer Expired, close file");
 
 			closeFile();
+		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		TRACE.log(TraceLevel.DEBUG, "StateHandler close", CONSISTEN_ASPECT);
+
+	}
+
+	@Override
+	public void checkpoint(Checkpoint checkpoint) throws Exception {
+		TRACE.log(TraceLevel.DEBUG, "Checkpoint " + checkpoint.getSequenceId(),
+				CONSISTEN_ASPECT);	
+		
+		// get file size, tuple count and filename
+		String path = fFileToWrite.getPath();
+		long tupleCnt = fFileToWrite.getTupleCnt();
+		long size = fFileToWrite.getSize();
+		
+		
+		checkpoint.getOutputStream().writeObject(path);
+		checkpoint.getOutputStream().writeLong(tupleCnt);		
+		checkpoint.getOutputStream().writeLong(size);
+		checkpoint.getOutputStream().writeInt(fileNum);
+		
+		if (dynamicFilename)
+		{
+			if (rawFileName==null)
+				rawFileName = "";
+			checkpoint.getOutputStream().writeObject(rawFileName);
+		}
+
+	}
+
+	@Override
+	public void drain() throws Exception {
+		TRACE.log(TraceLevel.DEBUG, "Drain operator.", CONSISTEN_ASPECT);		
+		
+		// tell file to flush all content from buffer
+		fFileToWrite.flush();
+		
+		// force any tuple to be submitted on the output port to flush
+		if (outputPortQueue != null && outputPort != null)
+		{
+			while (outputPortQueue.peek() != null)
+			{
+				OutputTuple outputTuple = outputPortQueue.poll();
+				if (outputTuple != null)
+				{
+					outputPort.submit(outputTuple);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void reset(Checkpoint checkpoint) throws Exception {
+		TRACE.log(TraceLevel.DEBUG,
+				"Reset to checkpoint " + checkpoint.getSequenceId(),
+				CONSISTEN_ASPECT);	
+		
+		// close current file
+		if (fFileToWrite != null)
+			closeFile();
+				
+		String path = (String)checkpoint.getInputStream().readObject();
+		long tupleCnt = checkpoint.getInputStream().readLong();
+		long size =  checkpoint.getInputStream().readLong();
+		int fileNum = checkpoint.getInputStream().readInt();
+		
+		if (dynamicFilename)
+		{
+			rawFileName = (String) checkpoint.getInputStream().readObject();
+			
+			if (rawFileName == null)
+				rawFileName = "";
+		}
+		
+		// create HDFS file with path from checkpoint
+		// set as append mode to not overwrite content of file
+		// on reset		
+		createFile(path);
+		fFileToWrite.setTupleCnt(tupleCnt);
+		fFileToWrite.setSize(size);
+		fFileToWrite.setAppend(true);		
+		
+		currentFileName = path;
+		this.fileNum = fileNum;
+		
+		unsetRestarting();
+	}
+
+	@Override
+	public void resetToInitialState() throws Exception {
+		TRACE.log(TraceLevel.DEBUG, "Reset to initial state", CONSISTEN_ASPECT);				
+
+		// close current file
+		if (fFileToWrite != null)
+			closeFile();
+				
+		String path = initState.path;
+		fileNum = 0;
+		
+		if (dynamicFilename)
+		{
+			rawFileName = initState.rawFilename;
+			
+			if (rawFileName == null)
+				rawFileName = "";
+		}
+		
+		// create HDFS file with path from initial state
+		// set as append mode to false, file should be overwritten
+		// on reset to initial state
+	
+		// path can be null in dynamic filename mode
+		// as the name comes in from incoming tuples
+		if (path != null) {
+			createFile(path);
+			fFileToWrite.setTupleCnt(0);
+			fFileToWrite.setSize(0);
+			fFileToWrite.setAppend(false);
+			
+			// increment to 1 as we have created a file
+			currentFileName = path;
+			fileNum = 1;
+		}
+		
+		unsetRestarting();
+	}
+
+	@Override
+	public void retireCheckpoint(long id) throws Exception {
+		TRACE.log(TraceLevel.DEBUG, "Retire checkpoint", CONSISTEN_ASPECT);		
+	}
+	
+	private boolean isRestarting()
+	{
+		return isRestarting;
+	}
+	
+	private void initRestarting(OperatorContext opContext)
+	{
+		TRACE.log(TraceLevel.DEBUG, "restarting set to true", CONSISTEN_ASPECT);		
+		isRestarting = false;
+		if (crContext != null )
+		{
+			int relaunchCount = opContext.getPE().getRelaunchCount();
+			if (relaunchCount > 0)
+			{
+				System.out.println("Set restarting to true.");
+				isRestarting = true;
+			}
+		}		
+	}
+	
+	private void unsetRestarting()
+	{
+		TRACE.log(TraceLevel.DEBUG, "restarting set to false", CONSISTEN_ASPECT);
+		isRestarting = false;
+	}
+
+	
+	@Override
+	protected void process() throws Exception {		
+		while (!shutdownRequested)
+		{			
+			try {
+				OutputTuple tuple = outputPortQueue.take();			
+				if (outputPort != null)
+				{
+					
+					if (TRACE.isLoggable(TraceLevel.DEBUG))
+						TRACE.log(TraceLevel.DEBUG, "Submit output tuple: " + tuple.toString());
+					
+					// if operator is in consistent region, acquire permit before submitting
+					if (crContext != null)
+					{
+						crContext.acquirePermit();
+					}					
+					outputPort.submit(tuple);
+				}
+			} catch (Exception e) {
+				TRACE.log(TraceLevel.DEBUG,
+						"Exception in output port thread.", e);
+
+			} finally {			
+				// release permit when done submitting
+				if (crContext != null)
+				{
+					crContext.releasePermit();
+				}			
+			}			
 		}
 	}
 }

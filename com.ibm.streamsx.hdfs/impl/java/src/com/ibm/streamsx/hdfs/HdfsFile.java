@@ -54,6 +54,7 @@ public class HdfsFile {
 	private OperatorContext fOpContext;
 	
 	private boolean fIsBinary;
+	private boolean isAppend = false; 	// default is false, overwrite file
 	
 
 	/**
@@ -89,10 +90,10 @@ public class HdfsFile {
 	public void writeTuple(Tuple tuple) throws Exception {
 		if (fWriter == null) {
 			if (MetaType.BLOB == attrType) {
-				initWriter(true);
+				initWriter(true, isAppend);
 			}
 			else {
-				initWriter(false);
+				initWriter(false, isAppend);
 			}
 		}
 		
@@ -167,8 +168,52 @@ public class HdfsFile {
 	public IHdfsClient getHdfsClient() {
 		return fHdfsClient;
 	}
+	
+	/**
+	 * This method returns the size of the file as tracked by the operator.
+	 * When data is written to HDFS, if data is not flush and sync'ed with the flie system
+	 * the hdfsclient.getFileSize method will not reflect the latest size of the file.
+	 * The operator keeps track of how much data has been written to the file system,
+	 * and use this information to determine when a file should be closed and a new file should
+	 * be created
+	 * @return the size of file as tracked by operator
+	 */
 	public long getSize() {
+		
 		return size;
+	}
+	
+	/**
+	 * This method goes to the HDFS client and returns the size of the file as known
+	 * by the file system.  If any error occurs when fetching the size of the file,
+	 * the method returns the last known size by the operator.  This method should NOT
+	 * be used to determine the current size of the file, if the file is being written to
+	 * and data is buffered.  This method is created for reporting purposes when the operator
+	 * needs to return the actual size of the file from teh file system.
+	 * @return size of file as known by file system.
+	 */
+	public long getSizeFromHdfs()
+	{
+		try {
+			return fHdfsClient.getFileSize(fPath);
+		} catch (IOException e) {
+			
+		}
+		return getSize();
+	}
+	
+	// can only be called by HDFS2FileSink on reset
+	void setSize(long size) {
+		this.size = size;
+	}
+	
+	public long getTupleCnt() {
+		return tupleCnt;
+	}
+
+	// can only be called by HDFS2FileSink on reset
+	void setTupleCnt(long tupleCnt) {
+		this.tupleCnt = tupleCnt;
 	}
 
 	/**
@@ -179,11 +224,11 @@ public class HdfsFile {
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	synchronized private void initWriter(boolean isBinary) throws IOException, Exception {
+	synchronized private void initWriter(boolean isBinary, boolean append) throws IOException, Exception {
 		
 		if (fWriter == null)
 		{
-			OutputStream outStream = getHdfsClient().getOutputStream(fPath, false);
+			OutputStream outStream = getHdfsClient().getOutputStream(fPath, append);
 	
 			if (outStream == null) {
 				throw new Exception("Unable to open file for writing: " + fPath);
@@ -234,6 +279,18 @@ public class HdfsFile {
 		this.tuplesPerFile = tuplesPerFile;
 	}
 	
+	public void setAppend(boolean append) {
+		this.isAppend = append;
+	}
+	
+	public boolean isAppend() {
+		return isAppend;
+	}
+	
+	public String getPath() {
+		return fPath;
+	}
+	
 	// called by drain method for consistent region
 	public void flush() throws Exception {
 		// close the current writer and recreate
@@ -243,5 +300,13 @@ public class HdfsFile {
 			fWriter.flushAll();
 		}
 		
+	}
+	
+	public boolean isClosed()
+	{
+		if (fWriter != null)
+			return fWriter.isClosed();
+		
+		return true;
 	}
 }
