@@ -121,6 +121,14 @@ If the optional input port is used and the file name is specified, the operator 
         <cardinality>1</cardinality>
       </parameter>
       <parameter>
+        <name>blockSize</name>
+        <description>
+This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096`.</description>
+        <optional>true</optional>
+        <type>int32</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
         <name>initDelay</name>
         <description sampleUri="">
 This parameter specifies the time to wait in seconds before the operator reads the first file.  
