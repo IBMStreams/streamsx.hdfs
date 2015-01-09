@@ -57,12 +57,12 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 
 	private String encoding = "UTF-8";
 
-	/*
-	@Parameter(name=BLOCKSIZE_PARAM,description="The maximum number of bytes to read into a blob.   Defaults to 4096 bytes")
+	
+    @Parameter(name=BLOCKSIZE_PARAM,optional=true,description="This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob).  It its optional, and defaults to `4096`.")
 	public void setBlockSize (int inBlockSize) {
 		blockSize = inBlockSize;
 	}
-	*/
+	
 	
 	@Override
 	public synchronized void initialize(OperatorContext context)
