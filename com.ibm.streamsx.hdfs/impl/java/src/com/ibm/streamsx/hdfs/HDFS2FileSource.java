@@ -46,10 +46,10 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource";
 	private static final int BUFFER_SIZE = 1024*1024*8;
 
-	private static Logger logger = Logger.getLogger(LoggerNames.LOG_FACILITY
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
 			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
 
-	private static Logger trace = Logger.getLogger(HDFS2FileSource.class
+	private static Logger TRACE = Logger.getLogger(HDFS2FileSource.class
 			.getName());
 
 	// TODO check that name matches filesource change required
@@ -86,7 +86,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		if (fFileName != null) {
 			try {
 				URI uri = new URI(fFileName);
-				logger.log(TraceLevel.DEBUG, "uri: " + uri.toString());
+				LOGGER.log(TraceLevel.DEBUG, "uri: " + uri.toString());
 
 				String scheme = uri.getScheme();
 				if (scheme != null) {
@@ -99,7 +99,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 					if (getHdfsUri() == null)
 						setHdfsUri(fs);
 
-					logger.log(TraceLevel.DEBUG, "fileSystemUri: "
+					LOGGER.log(TraceLevel.DEBUG, "fileSystemUri: "
 							+ getHdfsUri());
 
 					// Use original parameter value
@@ -111,7 +111,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 					setFile(path);
 				}
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.DEBUG,
+				LOGGER.log(TraceLevel.DEBUG,
 						"Unable to construct URI: " + e.getMessage());
 
 				throw e;
@@ -122,7 +122,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 
 		// Associate the aspect Log with messages from the SPL log
 		// logger.
-		setLoggerAspects(logger.getName(), "HDFSFileSource");
+		setLoggerAspects(LOGGER.getName(), "HDFSFileSource");
 
 		initMetrics(context);
 
@@ -136,19 +136,19 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		// If we ever switch to the generated xml files, we'll be able to delete
 		// this.
 		if (context.getParameterNames().contains(BLOCKSIZE_PARAM)) {
-			trace.fine("Blocksize parameter is supplied, setting blocksize based on that.");
+			TRACE.fine("Blocksize parameter is supplied, setting blocksize based on that.");
 			fBlockSize = Integer.parseInt(context.getParameterValues(
 					BLOCKSIZE_PARAM).get(0));
 		} else {
-			trace.fine("Blocksize parameter not supplied, using default "
+			TRACE.fine("Blocksize parameter not supplied, using default "
 					+ fBlockSize);
 		}
 		if (MetaType.BLOB == outType) {
 			fBinaryFile = true;
-			trace.info("File will be read as a binary blobs of size "
+			TRACE.info("File will be read as a binary blobs of size "
 					+ fBlockSize);
 		} else {
-			trace.info("Files will be read as text files, with one tuple per line.");
+			TRACE.info("Files will be read as text files, with one tuple per line.");
 		}
 
 		fCrContext = context.getOptionalContext(ConsistentRegionContext.class);
@@ -295,7 +295,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.ERROR,
+				LOGGER.log(TraceLevel.ERROR,
 						"'hdfsUri' parameter contains an invalid URI: "
 								+ hdfsUriValue);
 				throw e;
@@ -304,7 +304,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				fileUri = new URI(fileValue);
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.ERROR,
+				LOGGER.log(TraceLevel.ERROR,
 						"'file' parameter contains an invalid URI: "
 								+ fileValue);
 				throw e;
@@ -344,8 +344,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	}
 
 	private void processFile(String filename) throws Exception {
-		if (logger.isLoggable(LogLevel.INFO)) {
-			logger.log(LogLevel.INFO, "Process File: " + filename);
+		if (LOGGER.isLoggable(LogLevel.INFO)) {
+			LOGGER.log(LogLevel.INFO, "Process File: " + filename);
 		}
 		IHdfsClient hdfsClient = getHdfsClient();
 		
@@ -362,7 +362,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 		
 		if (fDataStream == null) {
-			logger.log(LogLevel.ERROR, "Problem opening file " + filename);
+			LOGGER.log(LogLevel.ERROR, "Problem opening file " + filename);
 			return;
 		}
 		
@@ -375,7 +375,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				doReadTextFile(fDataStream, outputPort, filename);
 			}
 		} catch (IOException e) {
-			logger.log(LogLevel.ERROR,
+			LOGGER.log(LogLevel.ERROR,
 					"Exception occured during read: " + e.getMessage());
 		} finally {
 			closeFile();
@@ -428,7 +428,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				
 				if (fSeekToLine >=0)
 				{
-					System.out.println("Process File Seek to position: " + fSeekToLine);					
+
+					TRACE.info("Process File Seek to position: " + fSeekToLine);					
 					
 					reader.close();
 					closeFile();
@@ -451,9 +452,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				}
 								
 				line = reader.readLine();
-				fLineNum ++;
-				
-//				System.out.println("Process File readline: " + line);
+				fLineNum ++;				
 	
 				if (line != null) {
 					// submit tuple
@@ -490,7 +489,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				
 				if (fSeekPosition >=0)
 				{
-					System.out.println("reset to position: " + fSeekPosition);
+					TRACE.info("reset to position: " + fSeekPosition);
 					((FSDataInputStream)dataStream).seek(fSeekPosition);
 					fSeekPosition = -1;
 				}
@@ -518,7 +517,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				logger.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
 			}
 		}
 		if (!shutdownRequested) {
@@ -535,7 +534,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				logger.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
 			}
 		}
 		fIsFirstTuple = false;
@@ -544,14 +543,14 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		// check if file name is an empty string. If so, log a warning and
 		// continue with the next tuple
 		if (filename.isEmpty()) {
-			logger.log(LogLevel.WARN, "file name is an empty string. Skipping.");
+			LOGGER.log(LogLevel.WARN, "file name is an empty string. Skipping.");
 		} else {
 			// IHdfsClient hdfsClient = getHdfsClient();
 			try {
 				// hdfsClient.getInputStream(filename);
 				processFile(filename);
 			} catch (IOException ioException) {
-				logger.log(LogLevel.WARN, ioException.getMessage());
+				LOGGER.log(LogLevel.WARN, ioException.getMessage());
 			}
 		}
 	}
@@ -580,7 +579,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	@Override
 	public void checkpoint(Checkpoint checkpoint) throws Exception {		
 		
-		System.out.println("Checkpoint " + checkpoint.getSequenceId());
+		TRACE.info("Checkpoint " + checkpoint.getSequenceId());
 		
 		if (!isDynamicFile() && fDataStream instanceof FSDataInputStream)
 		{		
@@ -588,25 +587,25 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			FSDataInputStream fsDataStream = (FSDataInputStream)fDataStream;
 			long pos = fsDataStream.getPos();
 			
-			System.out.println("checkpoint position: " + pos);
+			TRACE.info("checkpoint position: " + pos);
 			
 			checkpoint.getOutputStream().writeLong(pos);
 			
 			// for text file
-			System.out.println("checkpoint lineNumber: " + fLineNum);
+			TRACE.info("checkpoint lineNumber: " + fLineNum);
 			checkpoint.getOutputStream().writeLong(fLineNum);
 		}
 	}
 
 	@Override
 	public void drain() throws Exception {
-		System.out.println("Drain");
+		TRACE.info("Drain");
 	}
 
 	@Override
 	public void reset(Checkpoint checkpoint) throws Exception {
 		
-		System.out.println("Reset " + checkpoint.getSequenceId());
+		TRACE.info("Reset " + checkpoint.getSequenceId());
 		
 		if (!isDynamicFile())
 		{	
@@ -616,8 +615,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			// for text file
 			fSeekToLine = checkpoint.getInputStream().readLong();
 			
-			System.out.println("reset position: " + fSeekPosition);
-			System.out.println("reset lineNumber: " + fSeekToLine);
+			TRACE.info("reset position: " + fSeekPosition);
+			TRACE.info("reset lineNumber: " + fSeekToLine);
 			
 			
 		}
@@ -626,15 +625,15 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	@Override
 	public void resetToInitialState() throws Exception {
 		
-		System.out.println("Resest to initial");
+		TRACE.info("Resest to initial");
 		if (!isDynamicFile())
 		{					
-			System.out.println("Seek to 0");
+			TRACE.info("Seek to 0");
 			fSeekPosition = 0;					
 			fSeekToLine = 0;
 			
-			System.out.println("reset position: " + fSeekPosition);
-			System.out.println("reset lineNumber: " + fSeekToLine);
+			TRACE.info("reset position: " + fSeekPosition);
+			TRACE.info("reset lineNumber: " + fSeekToLine);
 		}
 	}
 
