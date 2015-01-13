@@ -400,7 +400,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			fDataStream.close();
 	}
 
-	private void openFile(IHdfsClient hdfsClient, String filename)
+	private InputStream openFile(IHdfsClient hdfsClient, String filename)
 			throws IOException {
 		
 		if (filename != null)
@@ -408,6 +408,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		
 		// reset counter every time we open a file
 		fLineNum = 0;
+		return fDataStream;
 	}
 
 	private void doReadTextFile(InputStream dataStream,
@@ -433,9 +434,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 					
 					reader.close();
 					closeFile();
-					openFile(getHdfsClient(), filename);
-					
-					dataStream = fDataStream;					
+					dataStream = openFile(getHdfsClient(), filename);									
 									
 					// create new reader and start reading at beginning
 					reader = new BufferedReader(new InputStreamReader(
