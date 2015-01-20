@@ -382,7 +382,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 		outputPort.punctuate(Punctuation.WINDOW_MARKER);
 		
-		if (fCrContext != null)
+		if (fCrContext != null && fCrContext.isStartOfRegion())
 		{
 			try 
 			{
