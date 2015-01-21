@@ -535,8 +535,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			}
 		
 			
-			if (TRACE.isLoggable(TraceLevel.INFO))
-				TRACE.log(TraceLevel.INFO, "latestTimeFromLastCycle: " + latestTimeFromLastCycle);
+			if (TRACE.isLoggable(TraceLevel.DEBUG))
+				debug("latestTimeFromLastCycle: " + latestTimeFromLastCycle, null);
 
 		} finally {
 			if (crContext != null) {
@@ -556,17 +556,19 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 				// next scan will use the reset timestamp and filename
 				if (fResetToTs != -1)
 				{
-					// set the last submitted ts and filename to the reset value
-					// but reset does not happen until the next scan is done
-					// these two variables represent the last fully processed file
+					// Set the last submitted ts and filename to the reset value
+					// but reset does not happen until the next scan is done.
+					// These two variables represent the last fully processed file.
+					// If a checkpoint is done before the next can be completed,
+					// these two variables will be checkpointed, as they represent
+					// the last consistent state.
 					fLastSubmittedTs = fResetToTs;
 					fLastSubmittedFilename = fResetToFilename;
 					break;
 				}
 
 				if (TRACE.isLoggable(TraceLevel.DEBUG))
-					TRACE.log(TraceLevel.DEBUG,
-							"Found File: " + currentFile.getPath().toString() + " " + currentFile.getModificationTime());
+					debug("Found File: " + currentFile.getPath().toString() + " " + currentFile.getModificationTime(), CONSISTEN_ASPECT);
 
 				List<FileStatus> currentSet = new ArrayList<FileStatus>();
 				currentSet.add(currentFile);
@@ -600,8 +602,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 							&& fileToSubmit.getModificationTime() > latestTimeFromLastCycle) {
 						OutputTuple outputTuple = getOutput(0).newTuple();
 						if (TRACE.isLoggable(TraceLevel.DEBUG))
-							TRACE.log(TraceLevel.DEBUG, "Submit File: " + fileToSubmit.getPath().toString() + " "
-									+ fileToSubmit.getModificationTime());
+							debug("Submit File: " + fileToSubmit.getPath().toString() + " "
+									+ fileToSubmit.getModificationTime(),CONSISTEN_ASPECT);
 						outputTuple.setString(0, filePath);
 
 						try {
@@ -630,8 +632,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						{						
 							OutputTuple outputTuple = getOutput(0).newTuple();
 							if (TRACE.isLoggable(TraceLevel.DEBUG))
-								TRACE.log(TraceLevel.DEBUG, "Submit File: " + fileToSubmit.getPath().toString() + " "
-										+ fileToSubmit.getModificationTime());
+								debug("Submit File: " + fileToSubmit.getPath().toString() + " "
+										+ fileToSubmit.getModificationTime(), CONSISTEN_ASPECT);
 							outputTuple.setString(0, filePath);
 	
 							try {
@@ -853,7 +855,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 	@Override
 	public void checkpoint(Checkpoint checkpoint) throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
+		debug("Checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
 
 		// checkpoint scan time and directory
 		checkpoint.getOutputStream().writeObject(getDirectory());
@@ -862,22 +864,22 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		// as we are always looking for file that is larger that the last
 		// timestamp
 		checkpoint.getOutputStream().writeLong(fLastSubmittedTs);		
-		TRACE.log(TraceLevel.DEBUG, "Checkpoint timestamp " + fLastSubmittedTs, CONSISTEN_ASPECT);
+		debug( "Checkpoint timestamp " + fLastSubmittedTs, CONSISTEN_ASPECT);
 		
 		checkpoint.getOutputStream().writeObject(fLastSubmittedFilename);
-		TRACE.log(TraceLevel.DEBUG, "Checkpoint filename " + fLastSubmittedFilename, CONSISTEN_ASPECT);
+		debug("Checkpoint filename " + fLastSubmittedFilename, CONSISTEN_ASPECT);
 
 	}
 
 	@Override
 	public void drain() throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Drain", CONSISTEN_ASPECT);
+		debug("Drain", CONSISTEN_ASPECT);
 
 	}
 
 	@Override
 	public void reset(Checkpoint checkpoint) throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Reset to checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
+		debug("Reset to checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
 
 		String ckptDir = (String) checkpoint.getInputStream().readObject();
 
@@ -886,15 +888,15 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		}
 
 		fResetToTs = checkpoint.getInputStream().readLong();
-		TRACE.log(TraceLevel.DEBUG, "Reset timestamp " + fResetToTs, CONSISTEN_ASPECT);
+		debug("Reset timestamp " + fResetToTs, CONSISTEN_ASPECT);
 		
 		fResetToFilename = (String)checkpoint.getInputStream().readObject();
-		TRACE.log(TraceLevel.DEBUG, "Reset filename " + fResetToFilename, CONSISTEN_ASPECT);
+		debug("Reset filename " + fResetToFilename, CONSISTEN_ASPECT);
 	}
 
 	@Override
 	public void resetToInitialState() throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Reset to initial state", CONSISTEN_ASPECT);
+		debug("Reset to initial state", CONSISTEN_ASPECT);
 
 		synchronized (dirLock) {
 			setDirectory(fInitialDir);
@@ -906,8 +908,14 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 	@Override
 	public void retireCheckpoint(long id) throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Retire checkpoint " + id, CONSISTEN_ASPECT);
+		debug("Retire checkpoint " + id, CONSISTEN_ASPECT);
 
+	}
+	
+	private void debug(String message, Object aspect)
+	{
+		TRACE.log(TraceLevel.DEBUG, message, aspect);
+		System.out.println(message);
 	}
 
 }

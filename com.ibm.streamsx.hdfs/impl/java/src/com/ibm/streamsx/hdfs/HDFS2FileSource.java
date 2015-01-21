@@ -73,6 +73,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	private long fSeekPosition = -1;
 	private long fSeekToLine = -1;
 	private long fLineNum = -1;
+	private boolean fProcessThreadDone = false;
 
 	/*
 	 * @Parameter(name=BLOCKSIZE_PARAM,description=
@@ -382,11 +383,11 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 		outputPort.punctuate(Punctuation.WINDOW_MARKER);
 		
-		if (fCrContext != null && fCrContext.isStartOfRegion())
+		if (fCrContext != null && fCrContext.isStartOfRegion() && fCrContext.isTriggerOperator())
 		{
 			try 
 			{
-				fCrContext.acquirePermit();
+				fCrContext.acquirePermit();					
 				fCrContext.makeConsistent();
 			}
 			finally {
@@ -512,6 +513,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 
 	// called on background thread
 	protected void process() throws Exception {
+		
+		fProcessThreadDone = false;
 		if (fInitDelay > 0) {
 			try {
 				Thread.sleep((long) (fInitDelay * 1000));
@@ -519,8 +522,12 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
 			}
 		}
-		if (!shutdownRequested) {
-			processFile(fFileName);
+		try {
+			if (!shutdownRequested) {
+				processFile(fFileName);
+			}
+		}finally {
+			fProcessThreadDone = true;
 		}
 	}
 
@@ -617,7 +624,17 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			TRACE.info("reset position: " + fSeekPosition);
 			TRACE.info("reset lineNumber: " + fSeekToLine);
 			
-			
+			// if thread is not running anymore, restart thread
+			if (fProcessThreadDone)
+			{
+				TRACE.info("reset process thread");
+				processThread = createProcessThread();
+				
+				// set to false here to avoid the delay of unsetting
+				// it inside the process method and end up having multiple threads started
+				fProcessThreadDone = false;
+				startProcessing();
+			}
 		}
 	}
 
@@ -633,6 +650,18 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			
 			TRACE.info("reset position: " + fSeekPosition);
 			TRACE.info("reset lineNumber: " + fSeekToLine);
+			
+			// if thread is not running anymore, restart thread
+			if (fProcessThreadDone)
+			{
+				TRACE.info("reset process thread");
+				processThread = createProcessThread();
+				
+				// set to false here to avoid the delay of unsetting
+				// it inside the process method and end up having multiple threads started
+				fProcessThreadDone = false;
+				startProcessing();
+			}
 		}
 	}
 
