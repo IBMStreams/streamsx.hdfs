@@ -3,7 +3,7 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>
+      <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileSource.html">
 The `HDFS2FileSource` operator reads files from a Hadoop Distributed File System (HDFS).
 
 The operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
@@ -12,21 +12,23 @@ If the optional input port is not specified, the operator reads the HDFS file th
 provides the file contents on the output port.  If the optional input port is configured, the operator reads the files that are 
 named by the attribute in the tuples that arrive on its input port and places a punctuation marker between each file.
 
-** Consistent Region Behavior **
+# Consistent Region Behavior
+
  * The operator can participate in a consistent.
  * The operator can be at the start of a consistent region if there is no input port.
  * The operator supports periodic and operator-driven consistent region policies.
- * If consistent region policy is set as operator driven, the operator will initiates a drain after
-a file is fully read.
- * If consistent region policy is set as periodic, the operator will respect the period setting and establish
-consistent states accordingly.  This means that multiple consistent states can be established before a file is fully read.
- * At checkpoint, the operator saves the current filename and file cursor location.
- * If the operator does not have an input port, upon application failures, the operator resets 
- the file cursor back to the checkpointed location, and start replaying tuples from the cursor location.
- * If the operator has an input port and is in a consistent region, the operator relies on its upstream operators to properly
-reply the filenames for it to re-read the files from the beginning.
+ * If consistent region policy is set as operator driven,
+   the operator initiates a drain after a file is fully read.
+ * If consistent region policy is set as periodic, the operator respects the period setting
+   and establishes consistent states accordingly.
+   This means that multiple consistent states can be established before a file is fully read.
+ * At checkpoint, the operator saves the current file name and file cursor location.
+ * If the operator does not have an input port, upon application failures, the operator resets
+   the file cursor back to the checkpointed location, and starts replaying tuples from the cursor location.
+ * If the operator has an input port and is in a consistent region, the operator relies on its upstream operators
+   to properly reply the filenames for it to re-read the files from the beginning.
 
-**Exceptions**
+# Exceptions
 
 The `HDFS2FileSource` operator terminates in the following cases:
  * The operator cannot connect to HDFS.

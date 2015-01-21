@@ -3,25 +3,27 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>
+      <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">
 The `HDFS2DirectoryScan` operator scans a Hadoop Distributed File System directory for new or modified files.
 
 The `HDFS2DirectoryScan` is similar to the `DirectoryScan` operator. 
 The `HDFS2DirectoryScan` operator repeatedly scans an HDFS directory and writes the names of new or modified files 
 that are found in the directory to the output port. The operator sleeps between scans.
 
-** Consistent Region Behavior **
+# Consistent Region Behavior
+
  * The operator can participate in a consistent.
  * The operator can be at the start of a consistent region if there is no input port.
  * The operator supports periodic and operator-driven consistent region policies.
- * If consistent region policy is set as operator driven, the operator will initiates a drain after
-each tuple is submitted. This allows for a consistent state to be established after a file is fully processed.
- * If consistent region policy is set as periodic, the operator will respect the period setting and establish
-consistent states accordingly.  This means that multiple files can be processed before a consistent state is established.
+ * If consistent region policy is set as operator driven, the operator initiates a drain after
+   each tuple is submitted. This allows for a consistent state to be established after a file is fully processed.
+ * If consistent region policy is set as periodic, the operator respects the period setting
+   and establishes consistent states accordingly.  
+   This means that multiple files can be processed before a consistent state is established.
  * At checkpoint, the operator saves the last submitted filename and its modification timestamp to the checkpoint.
- * Upon application failures, the operator will resumbit all files that are newer than the last submitted file at checkpoint.
+ * Upon application failures, the operator resubmits all files that are newer than the last submitted file at checkpoint.
 
-**Exceptions** 
+# Exceptions
 
 The operator terminates in the following cases:
  * The operator cannot connect to HDFS.
