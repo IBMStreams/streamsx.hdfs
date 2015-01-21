@@ -155,6 +155,20 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	public boolean isStrictMode() {
 		return isStrictMode;
 	}
+	
+	@ContextCheck(compile = true)
+	public static void checkConsistentRegion(OperatorContextChecker checker) {
+				
+		OperatorContext opContext = checker.getOperatorContext();
+		ConsistentRegionContext crContext = opContext.getOptionalContext(ConsistentRegionContext.class);
+		if (crContext != null)
+		{
+			if (crContext.isStartOfRegion() && opContext.getNumberOfStreamingInputs()>0)
+			{
+				checker.setInvalidContext("The following operator cannot be the start of a consistent region when an input port is present: HDFS2DirectoryScan.", null);
+			}
+		}
+	}
 
 	@ContextCheck()
 	public static void checkInputPortSchema(OperatorContextChecker checker) {

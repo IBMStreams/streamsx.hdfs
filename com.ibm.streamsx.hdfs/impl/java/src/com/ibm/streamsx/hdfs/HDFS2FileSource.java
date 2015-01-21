@@ -185,6 +185,19 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 					null);
 		}
 	}
+	
+	@ContextCheck(compile = true)
+	public static void checkConsistentRegion(OperatorContextChecker checker) {		
+		OperatorContext opContext = checker.getOperatorContext();
+		ConsistentRegionContext crContext = opContext.getOptionalContext(ConsistentRegionContext.class);
+		if (crContext != null)
+		{
+			if (crContext.isStartOfRegion() && opContext.getNumberOfStreamingInputs()>0)
+			{
+				checker.setInvalidContext("The following operator cannot be the start of a consistent region when an input port is present: HDFS2FileSource.", null);
+			}
+		}
+	}
 
 	@ContextCheck(compile = false)
 	public static void validateParametersRuntime(OperatorContextChecker checker)
@@ -632,7 +645,6 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				
 				// set to false here to avoid the delay of unsetting
 				// it inside the process method and end up having multiple threads started
-				fProcessThreadDone = false;
 				startProcessing();
 			}
 		}
@@ -659,7 +671,6 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				
 				// set to false here to avoid the delay of unsetting
 				// it inside the process method and end up having multiple threads started
-				fProcessThreadDone = false;
 				startProcessing();
 			}
 		}

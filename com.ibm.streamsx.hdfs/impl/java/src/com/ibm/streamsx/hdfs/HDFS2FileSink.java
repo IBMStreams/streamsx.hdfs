@@ -318,7 +318,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		{
 			if (crContext.isStartOfRegion())
 			{
-				checker.setInvalidContext("This operator cannot be at the start of a consistent region.", null);
+				checker.setInvalidContext("The following operator cannot be the start of a consistent region: HDFS2FileSink.", null);
 			}
 		}
 	}
