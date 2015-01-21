@@ -35,6 +35,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 	
 	public BaseAuthenticationHelper() {
 		fConfiguration = new Configuration();
+
 	}
 	
 	public BaseAuthenticationHelper(String configPath) {

@@ -33,13 +33,14 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 			throws Exception {
 		fAuthHelper = AuthenticationHelperFactory.createAuthenticationHelper(fileSystemUri, hdfsUser, configPath);
 		fFileSystem = fAuthHelper.connect(fileSystemUri, hdfsUser, getConnectionProperties());
+		
 	}
 	
 	@Override
 	public InputStream getInputStream(String filePath) throws IOException {
 		if (fIsDisconnected) {
 			return null;
-		}
+		}		
 		return fFileSystem.open(new Path(filePath));
 	}
 
@@ -60,7 +61,8 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 			if (fFileSystem.exists(path)) {
 				return fFileSystem.append(path);
 			} else {
-				return fFileSystem.create(path);
+				OutputStream stream = fFileSystem.create(path);
+				return stream;
 			}
 		}
 	}

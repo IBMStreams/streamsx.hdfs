@@ -7,14 +7,14 @@ namespace hdfsexample ;
 use com.ibm.streamsx.hdfs::HDFS2FileSource;
 
 /**
- * The [HDFS2FileSourceSampleTxtFormat] composite demonstrates how to use the HDFSFileSink
+ * The [HDFS2FileSourceSampleTxtFormat] composite demonstrates how to use the HDFS2FileSink
  * operator to read a file from HDFS in "txt" format.
  *
- * Contrast from the HDFS2FileSource operator, HDFSFileSink operator only supports writing in "line" format.
+ * Contrast from the HDFS2FileSource operator, HDFS2FileSink operator only supports writing in "line" format.
  * If your existing application currently uses the HDFS2FileSource operator to read data in as "txt" format,
  * you will need to modify your application in order to maintain reading data as "txt" format.
  * 
- * To continue reading in "txt" format, you can insert a "Custom" operator after the HDFSFileSink operator
+ * To continue reading in "txt" format, you can insert a "Custom" operator after the HDFS2FileSink operator
  * to convert a line as rstring to a tuple.  You can continue processing the tuple as you normally would.
  * 
  * To build this application, you need to set up the HADOOP_HOME environment variable as follows:

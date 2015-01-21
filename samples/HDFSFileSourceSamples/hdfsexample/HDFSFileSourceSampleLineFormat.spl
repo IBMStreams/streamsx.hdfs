@@ -7,7 +7,7 @@ namespace hdfsexample ;
 
 use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 /**
-  * The [HDFS2FileSourceSampleLineFormat] demonstrates how you can use the HDFSFileSink operator
+  * The [HDFS2FileSourceSampleLineFormat] demonstrates how you can use the HDFS2FileSink operator
   * to read a file from the Hadoop file system.
   *
   * To build this application, you need to set up the HADOOP_HOME environment variable as follows:
@@ -52,7 +52,7 @@ composite HDFS2FileSourceSampleLineFormat
 		stream<rstring lines> LineStream = HDFS2FileSource()
 		{
 			param
-				file : "lineFile.txt" ;
+				file : "LineFile.txt" ;
 		} 
 
 		() as MySink = FileSink(LineStream)

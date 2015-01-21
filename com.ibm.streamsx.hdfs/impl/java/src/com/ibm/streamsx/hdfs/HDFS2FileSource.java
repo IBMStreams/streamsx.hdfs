@@ -9,10 +9,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Logger;
+
+import org.apache.hadoop.fs.FSDataInputStream;
 
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.OperatorContext.ContextCheck;
@@ -30,47 +33,61 @@ import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streams.operator.metrics.Metric;
 import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.SharedLoader;
+import com.ibm.streams.operator.state.Checkpoint;
+import com.ibm.streams.operator.state.ConsistentRegionContext;
+import com.ibm.streams.operator.state.StateHandler;
 import com.ibm.streams.operator.types.ValueFactory;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
 @SharedLoader
-public class HDFS2FileSource extends AbstractHdfsOperator {
+public class HDFS2FileSource extends AbstractHdfsOperator implements
+		StateHandler {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource";
+	private static final int BUFFER_SIZE = 1024*1024*8;
 
-	private static Logger logger = Logger.getLogger(LoggerNames.LOG_FACILITY
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
 			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
-	
-	private static Logger trace = Logger.getLogger(HDFS2FileSource.class.getName());
-			 
+
+	private static Logger TRACE = Logger.getLogger(HDFS2FileSource.class
+			.getName());
+
 	// TODO check that name matches filesource change required
 	private static final String FILES_OPENED_METRIC = "nFilesOpened";
 	private static final String BLOCKSIZE_PARAM = "blockSize";
 	private Metric nFilesOpened;
 
-	private String file;
-	private double initDelay;
+	private String fFileName;
+	private double fInitDelay;
 
-	boolean isFirstTuple = true;
-	boolean binaryFile = false;
-	private int blockSize = 1024 * 4;
+	boolean fIsFirstTuple = true;
+	boolean fBinaryFile = false;
+	private int fBlockSize = 1024 * 4;
 
-	private String encoding = "UTF-8";
+	private String fEncoding = "UTF-8";
+
+	private ConsistentRegionContext fCrContext;
+
+	private InputStream fDataStream;
+	
+	private long fSeekPosition = -1;
+	private long fSeekToLine = -1;
+	private long fLineNum = -1;
+	private boolean fProcessThreadDone = false;
 
 	/*
-	@Parameter(name=BLOCKSIZE_PARAM,description="The maximum number of bytes to read into a blob.   Defaults to 4096 bytes")
-	public void setBlockSize (int inBlockSize) {
-		blockSize = inBlockSize;
-	}
-	*/
-	
+	 * @Parameter(name=BLOCKSIZE_PARAM,description=
+	 * "The maximum number of bytes to read into a blob.   Defaults to 4096 bytes"
+	 * ) public void setBlockSize (int inBlockSize) { blockSize = inBlockSize; }
+	 */
+
 	@Override
 	public synchronized void initialize(OperatorContext context)
 			throws Exception {
-		if (file != null) {
+		if (fFileName != null) {
 			try {
-				URI uri = new URI(file);
-				logger.log(TraceLevel.DEBUG, "uri: " + uri.toString());
+				URI uri = new URI(fFileName);
+				LOGGER.log(TraceLevel.DEBUG, "uri: " + uri.toString());
 
 				String scheme = uri.getScheme();
 				if (scheme != null) {
@@ -83,11 +100,11 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 					if (getHdfsUri() == null)
 						setHdfsUri(fs);
 
-					logger.log(TraceLevel.DEBUG, "fileSystemUri: "
+					LOGGER.log(TraceLevel.DEBUG, "fileSystemUri: "
 							+ getHdfsUri());
 
 					// Use original parameter value
-					String path = file.substring(fs.length());
+					String path = fFileName.substring(fs.length());
 
 					if (!path.startsWith("/"))
 						path = "/" + path;
@@ -95,7 +112,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 					setFile(path);
 				}
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.DEBUG,
+				LOGGER.log(TraceLevel.DEBUG,
 						"Unable to construct URI: " + e.getMessage());
 
 				throw e;
@@ -106,31 +123,36 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 
 		// Associate the aspect Log with messages from the SPL log
 		// logger.
-		setLoggerAspects(logger.getName(), "HDFSFileSource");
+		setLoggerAspects(LOGGER.getName(), "HDFSFileSource");
 
 		initMetrics(context);
 
-		if (file != null) {
+		if (fFileName != null) {
 			processThread = createProcessThread();
 		}
-		
-		StreamSchema outputSchema =context.getStreamingOutputs().get(0).getStreamSchema();
+
+		StreamSchema outputSchema = context.getStreamingOutputs().get(0)
+				.getStreamSchema();
 		MetaType outType = outputSchema.getAttribute(0).getType().getMetaType();
-		// If we ever switch to the generated xml files, we'll be able to delete this.
+		// If we ever switch to the generated xml files, we'll be able to delete
+		// this.
 		if (context.getParameterNames().contains(BLOCKSIZE_PARAM)) {
-			trace.fine("Blocksize parameter is supplied, setting blocksize based on that.");
-		    blockSize = Integer.parseInt(context.getParameterValues(BLOCKSIZE_PARAM).get(0));
-		}
-		else {
-			trace.fine("Blocksize parameter not supplied, using default "+blockSize);
+			TRACE.fine("Blocksize parameter is supplied, setting blocksize based on that.");
+			fBlockSize = Integer.parseInt(context.getParameterValues(
+					BLOCKSIZE_PARAM).get(0));
+		} else {
+			TRACE.fine("Blocksize parameter not supplied, using default "
+					+ fBlockSize);
 		}
 		if (MetaType.BLOB == outType) {
-			binaryFile = true;
-			trace.info("File will be read as a binary blobs of size "+blockSize);
+			fBinaryFile = true;
+			TRACE.info("File will be read as a binary blobs of size "
+					+ fBlockSize);
+		} else {
+			TRACE.info("Files will be read as text files, with one tuple per line.");
 		}
-		else {
-			trace.info("Files will be read as text files, with one tuple per line.");
-		}
+
+		fCrContext = context.getOptionalContext(ConsistentRegionContext.class);
 	}
 
 	@ContextCheck(compile = true)
@@ -161,6 +183,19 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 			checker.setInvalidContext(
 					"HDFSFileSource requires either file parameter to be specified or the number of input ports to be one. Both cannot be specified together.",
 					null);
+		}
+	}
+	
+	@ContextCheck(compile = true)
+	public static void checkConsistentRegion(OperatorContextChecker checker) {		
+		OperatorContext opContext = checker.getOperatorContext();
+		ConsistentRegionContext crContext = opContext.getOptionalContext(ConsistentRegionContext.class);
+		if (crContext != null)
+		{
+			if (crContext.isStartOfRegion() && opContext.getNumberOfStreamingInputs()>0)
+			{
+				checker.setInvalidContext("The following operator cannot be the start of a consistent region when an input port is present: HDFS2FileSource.", null);
+			}
 		}
 	}
 
@@ -196,18 +231,22 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 		}
 
 		if (outputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING
-				&& outputSchema.getAttribute(0).getType().getMetaType() != MetaType.USTRING &&
-				outputSchema.getAttribute(0).getType().getMetaType() != MetaType.BLOB) {
+				&& outputSchema.getAttribute(0).getType().getMetaType() != MetaType.USTRING
+				&& outputSchema.getAttribute(0).getType().getMetaType() != MetaType.BLOB) {
 			checker.setInvalidContext(
 					"Expected attribute of type rstring, ustring or blob found attribute of type "
 							+ outputSchema.getAttribute(0).getType()
 									.getMetaType(), null);
 		}
-		
-		if (MetaType.BLOB != outputSchema.getAttribute(0).getType().getMetaType() &&
-				checker.getOperatorContext().getParameterNames().contains(BLOCKSIZE_PARAM)) {
+
+		if (MetaType.BLOB != outputSchema.getAttribute(0).getType()
+				.getMetaType()
+				&& checker.getOperatorContext().getParameterNames()
+						.contains(BLOCKSIZE_PARAM)) {
 			checker.setInvalidContext(
-					BLOCKSIZE_PARAM+" may only be used when the outstream an atribute of type blob",null);
+					BLOCKSIZE_PARAM
+							+ " may only be used when the outstream an atribute of type blob",
+					null);
 		}
 	}
 
@@ -270,7 +309,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 			try {
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.ERROR,
+				LOGGER.log(TraceLevel.ERROR,
 						"'hdfsUri' parameter contains an invalid URI: "
 								+ hdfsUriValue);
 				throw e;
@@ -279,7 +318,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 			try {
 				fileUri = new URI(fileValue);
 			} catch (URISyntaxException e) {
-				logger.log(TraceLevel.ERROR,
+				LOGGER.log(TraceLevel.ERROR,
 						"'file' parameter contains an invalid URI: "
 								+ fileValue);
 				throw e;
@@ -319,71 +358,189 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 	}
 
 	private void processFile(String filename) throws Exception {
-
-		if (logger.isLoggable(LogLevel.INFO)) {
-			logger.log(LogLevel.INFO, "Process File: " + filename);
+		if (LOGGER.isLoggable(LogLevel.INFO)) {
+			LOGGER.log(LogLevel.INFO, "Process File: " + filename);
 		}
-
 		IHdfsClient hdfsClient = getHdfsClient();
+		
+		try {
+			if (fCrContext != null) {
+				fCrContext.acquirePermit();
+			}
+			openFile(hdfsClient, filename);
 
-		InputStream dataStream = hdfsClient.getInputStream(filename);
-		if (dataStream == null) {
-			logger.log(LogLevel.ERROR, "Problem opening file " + filename);
+		} finally {
+			if (fCrContext != null) {
+				fCrContext.releasePermit();
+			}
+		}
+		
+		if (fDataStream == null) {
+			LOGGER.log(LogLevel.ERROR, "Problem opening file " + filename);
 			return;
 		}
+		
 		nFilesOpened.incrementValue(1);
-
 		StreamingOutput<OutputTuple> outputPort = getOutput(0);
-
 		try {
-			if (binaryFile) {
-				byte myBuffer[] = new byte[blockSize];
-				int num_read = dataStream.read(myBuffer);
-				while (num_read > 0) {
-					// TODO talk with dan about what's most efficient
-					OutputTuple toSend = outputPort.newTuple();
-					toSend.setBlob(0,
-							ValueFactory.newBlob(myBuffer, 0, num_read));
-					outputPort.submit(toSend);
-					num_read = dataStream.read(myBuffer);
-				}
+			if (fBinaryFile) {
+				doReadBinaryFile(fDataStream, outputPort);
 			} else {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(dataStream, encoding),
-						1024 * 1024 * 8);
-				String line = reader.readLine();
+				doReadTextFile(fDataStream, outputPort, filename);
+			}
+		} catch (IOException e) {
+			LOGGER.log(LogLevel.ERROR,
+					"Exception occured during read: " + e.getMessage());
+		} finally {
+			closeFile();
+		}
+		outputPort.punctuate(Punctuation.WINDOW_MARKER);
+		
+		if (fCrContext != null && fCrContext.isStartOfRegion() && fCrContext.isTriggerOperator())
+		{
+			try 
+			{
+				fCrContext.acquirePermit();					
+				fCrContext.makeConsistent();
+			}
+			finally {
+				fCrContext.releasePermit();
+			}
+		}
+	}
 
-				while (line != null) {
+	private void closeFile() throws IOException {
+		if (fDataStream != null)
+			fDataStream.close();
+	}
 
+	private InputStream openFile(IHdfsClient hdfsClient, String filename)
+			throws IOException {
+		
+		if (filename != null)
+			fDataStream = hdfsClient.getInputStream(filename);
+		
+		// reset counter every time we open a file
+		fLineNum = 0;
+		return fDataStream;
+	}
+
+	private void doReadTextFile(InputStream dataStream,
+			StreamingOutput<OutputTuple> outputPort, String filename)
+			throws UnsupportedEncodingException, IOException, Exception {				
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				dataStream, fEncoding), BUFFER_SIZE);			
+
+		String line = null;
+		do {
+			try {
+				
+				if (fCrContext != null)
+				{
+					fCrContext.acquirePermit();
+				}
+				
+				if (fSeekToLine >=0)
+				{
+
+					TRACE.info("Process File Seek to position: " + fSeekToLine);					
+					
+					reader.close();
+					closeFile();
+					dataStream = openFile(getHdfsClient(), filename);									
+									
+					// create new reader and start reading at beginning
+					reader = new BufferedReader(new InputStreamReader(
+							dataStream, fEncoding), BUFFER_SIZE);
+					
+					for (int i=0; i<fSeekToLine; i++)
+					{
+						// skip the lines that have already been processed
+						reader.readLine();
+						fLineNum++;
+					}
+					
+					fSeekToLine = -1;
+				}
+								
+				line = reader.readLine();
+				fLineNum ++;				
+	
+				if (line != null) {
 					// submit tuple
 					OutputTuple outputTuple = outputPort.newTuple();
 					outputTuple.setString(0, line);
 					outputPort.submit(outputTuple);
-
-					// read next line
-					line = reader.readLine();
-				}			
-				reader.close();	
+				}
+				
+			} finally {
+				if (fCrContext != null)
+				{
+					fCrContext.releasePermit();
+				}
 			}
-		} catch (IOException e) {
-			logger.log(LogLevel.ERROR,
-					"Exception occured during read: " + e.getMessage());
-		} finally {
-			dataStream.close();
-		}
-		outputPort.punctuate(Punctuation.WINDOW_MARKER);
+
+		} while (line != null);
+
+		reader.close();
 	}
 
-	protected void process() throws Exception {
-		if (initDelay > 0) {
+	private void doReadBinaryFile(InputStream dataStream,
+			StreamingOutput<OutputTuple> outputPort) throws IOException,
+			Exception {
+		byte myBuffer[] = new byte[fBlockSize];
+		
+		int numRead = 0;		
+		do {			
 			try {
-				Thread.sleep((long) (initDelay * 1000));
+				
+				if (fCrContext != null)
+				{
+					fCrContext.acquirePermit();
+				}
+				
+				if (fSeekPosition >=0)
+				{
+					TRACE.info("reset to position: " + fSeekPosition);
+					((FSDataInputStream)dataStream).seek(fSeekPosition);
+					fSeekPosition = -1;
+				}
+				
+				numRead = dataStream.read(myBuffer);
+				if (numRead > 0)
+				{
+					OutputTuple toSend = outputPort.newTuple();
+					toSend.setBlob(0, ValueFactory.newBlob(myBuffer, 0, numRead));
+					outputPort.submit(toSend);
+				}	
+			}
+			finally {
+				if (fCrContext != null)
+				{
+					fCrContext.releasePermit();
+				}
+			}			
+		} while (numRead > 0);				
+	}
+
+	// called on background thread
+	protected void process() throws Exception {
+		
+		fProcessThreadDone = false;
+		if (fInitDelay > 0) {
+			try {
+				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				logger.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
 			}
 		}
-		if (!shutdownRequested) {
-			processFile(file);
+		try {
+			if (!shutdownRequested) {
+				processFile(fFileName);
+			}
+		}finally {
+			fProcessThreadDone = true;
 		}
 	}
 
@@ -392,48 +549,142 @@ public class HDFS2FileSource extends AbstractHdfsOperator {
 			throws Exception {
 		if (shutdownRequested)
 			return;
-		if (isFirstTuple && initDelay > 0) {
+		if (fIsFirstTuple && fInitDelay > 0) {
 			try {
-				Thread.sleep((long) (initDelay * 1000));
+				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				logger.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
 			}
 		}
-		isFirstTuple = false;
+		fIsFirstTuple = false;
 		String filename = tuple.getString(0);
 
 		// check if file name is an empty string. If so, log a warning and
 		// continue with the next tuple
 		if (filename.isEmpty()) {
-			logger.log(LogLevel.WARN, "file name is an empty string. Skipping.");
+			LOGGER.log(LogLevel.WARN, "file name is an empty string. Skipping.");
 		} else {
 			// IHdfsClient hdfsClient = getHdfsClient();
 			try {
 				// hdfsClient.getInputStream(filename);
 				processFile(filename);
 			} catch (IOException ioException) {
-				logger.log(LogLevel.WARN, ioException.getMessage());
+				LOGGER.log(LogLevel.WARN, ioException.getMessage());
 			}
 		}
-
-		// TODO: Process file already submits a marker, why do we need to do
-		// this here?
-		// getOutput(0).punctuate(Punctuation.WINDOW_MARKER);
 	}
 
 	@Parameter(optional = true)
 	public void setFile(String file) {
-		this.file = file;
+		this.fFileName = file;
 	}
 
 	@Parameter(optional = true)
 	public void setInitDelay(double initDelay) {
-		this.initDelay = initDelay;
+		this.fInitDelay = initDelay;
 	}
 
 	@Parameter(optional = true)
 	public void setEncoding(String encoding) {
-		this.encoding = encoding;
+		this.fEncoding = encoding;
+	}
+
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void checkpoint(Checkpoint checkpoint) throws Exception {		
+		
+		TRACE.info("Checkpoint " + checkpoint.getSequenceId());
+		
+		if (!isDynamicFile() && fDataStream instanceof FSDataInputStream)
+		{		
+			// for binary file
+			FSDataInputStream fsDataStream = (FSDataInputStream)fDataStream;
+			long pos = fsDataStream.getPos();
+			
+			TRACE.info("checkpoint position: " + pos);
+			
+			checkpoint.getOutputStream().writeLong(pos);
+			
+			// for text file
+			TRACE.info("checkpoint lineNumber: " + fLineNum);
+			checkpoint.getOutputStream().writeLong(fLineNum);
+		}
+	}
+
+	@Override
+	public void drain() throws Exception {
+		TRACE.info("Drain");
+	}
+
+	@Override
+	public void reset(Checkpoint checkpoint) throws Exception {
+		
+		TRACE.info("Reset " + checkpoint.getSequenceId());
+		
+		if (!isDynamicFile())
+		{	
+			// for binary file
+			long pos = checkpoint.getInputStream().readLong();
+			fSeekPosition = pos;					
+			// for text file
+			fSeekToLine = checkpoint.getInputStream().readLong();
+			
+			TRACE.info("reset position: " + fSeekPosition);
+			TRACE.info("reset lineNumber: " + fSeekToLine);
+			
+			// if thread is not running anymore, restart thread
+			if (fProcessThreadDone)
+			{
+				TRACE.info("reset process thread");
+				processThread = createProcessThread();
+				
+				// set to false here to avoid the delay of unsetting
+				// it inside the process method and end up having multiple threads started
+				startProcessing();
+			}
+		}
+	}
+
+	@Override
+	public void resetToInitialState() throws Exception {
+		
+		TRACE.info("Resest to initial");
+		if (!isDynamicFile())
+		{					
+			TRACE.info("Seek to 0");
+			fSeekPosition = 0;					
+			fSeekToLine = 0;
+			
+			TRACE.info("reset position: " + fSeekPosition);
+			TRACE.info("reset lineNumber: " + fSeekToLine);
+			
+			// if thread is not running anymore, restart thread
+			if (fProcessThreadDone)
+			{
+				TRACE.info("reset process thread");
+				processThread = createProcessThread();
+				
+				// set to false here to avoid the delay of unsetting
+				// it inside the process method and end up having multiple threads started
+				startProcessing();
+			}
+		}
+	}
+
+	@Override
+	public void retireCheckpoint(long id) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+	
+	private boolean isDynamicFile()
+	{
+		return getOperatorContext().getNumberOfStreamingInputs() > 0;
 	}
 
 }
