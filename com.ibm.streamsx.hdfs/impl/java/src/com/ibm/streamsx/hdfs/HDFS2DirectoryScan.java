@@ -929,7 +929,6 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	private void debug(String message, Object aspect)
 	{
 		TRACE.log(TraceLevel.DEBUG, message, aspect);
-		System.out.println(message);
 	}
 
 }

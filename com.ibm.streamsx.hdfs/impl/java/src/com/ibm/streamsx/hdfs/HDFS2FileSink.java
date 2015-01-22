@@ -532,7 +532,6 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	public void initialize(OperatorContext context) throws Exception {
 
 		try {
-
 			// if the file contains variable, it will result in an
 			// URISyntaxException, replace % with _ so we can parse the URI
 			TRACE.log(TraceLevel.DEBUG, "file param: " + file);
@@ -884,7 +883,15 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		outputTuple.setLong(1, size);
 
 		// put the output tuple to the queue... to be submitted on process thread
-		outputPortQueue.put(outputTuple);
+		if (crContext != null)
+		{
+			// if consistent region, queue and submit with permit
+			outputPortQueue.put(outputTuple);
+		}
+		else if (outputPort != null){
+			// otherwise, submit immediately
+			outputPort.submit(outputTuple);
+		}
 	}
 
 	@Override

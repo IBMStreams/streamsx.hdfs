@@ -64,8 +64,8 @@ The operator overrides the value that is specified by the `fs.defaultFS` option 
         <library>
           <cmn:description>Java operator class library</cmn:description>
           <cmn:managedLibrary>
-            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:command></cmn:command>
           </cmn:managedLibrary>
         </library>
