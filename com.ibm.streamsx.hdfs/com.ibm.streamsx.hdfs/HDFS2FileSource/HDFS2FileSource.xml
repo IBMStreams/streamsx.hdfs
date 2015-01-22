@@ -224,6 +224,14 @@ configuration file. If this parameter is not specified, the operator searches th
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
+ 	  <parameter>
+	<name>blockSize</name>
+	<description>
+		This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096`.</description>
+	<optional>true</optional>
+	<type>int32</type>
+	<cardinality>1</cardinality>
+	</parameter>      
     </parameters>
     <inputPorts>
       <inputPortSet>

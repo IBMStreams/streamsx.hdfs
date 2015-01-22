@@ -75,11 +75,6 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	private long fLineNum = -1;
 	private boolean fProcessThreadDone = false;
 
-	/*
-	 * @Parameter(name=BLOCKSIZE_PARAM,description=
-	 * "The maximum number of bytes to read into a blob.   Defaults to 4096 bytes"
-	 * ) public void setBlockSize (int inBlockSize) { blockSize = inBlockSize; }
-	 */
 
 	@Override
 	public synchronized void initialize(OperatorContext context)
@@ -587,6 +582,11 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	@Parameter(optional = true)
 	public void setEncoding(String encoding) {
 		this.fEncoding = encoding;
+	}
+	
+	@Parameter(name=BLOCKSIZE_PARAM,optional=true)
+	public void setBlockSize (int inBlockSize) {
+		fBlockSize = inBlockSize;
 	}
 
 	@Override
