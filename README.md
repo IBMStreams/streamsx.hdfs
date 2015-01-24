@@ -14,5 +14,5 @@ Support for Streams 3.2.2 Beta Now Available!
 Getting started with development:
 * https://github.com/IBMStreams/streamsx.hdfs/wiki/Getting-Started-with-Developing-HDFS-Toolkit
 
-Our pretty site:
+Main Site:
 * http://ibmstreams.github.io/streamsx.hdfs/
