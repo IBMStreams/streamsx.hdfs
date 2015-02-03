@@ -10,7 +10,7 @@
     <info:name>HDFSFileSinkSamples</info:name>
     <info:description>Samples for HDFSFileSink operator</info:description>
     <info:version>1.0.0</info:version>
-    <info:requiredProductVersion>3.2.1</info:requiredProductVersion>
+    <info:requiredProductVersion>4.0.0.0</info:requiredProductVersion>
   </info:identity>
   <info:dependencies>
     <info:toolkit>
