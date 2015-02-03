@@ -267,9 +267,9 @@ If this parameter is not specified, the operator searches the default location f
       <inputPortSet>
         <description docHref="" sampleUri="">
 The `HDFS2FileSink` operator has one input port, which writes the contents of the input stream to the file that you specified.
-The input port is non-mutating, and its punctuation mode is `Oblivious`.
-The schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>, which specifies a single rstring or ustring attribute that represents 
-a line to be written to the file.</description>
+The input port is non-mutating, and its punctuation mode is `Oblivious`.  The HDFS2FileSink supports writing data into HDFS in two formats.
+For line format, the schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>, which specifies a single rstring or ustring attribute that represents 
+a line to be written to the file. For binary format, the schema of the input port is tuple&lt;blob data&gt;, which specifies a block of data to be written to the file. </description>
         <windowingDescription></windowingDescription>
         <windowingMode>NonWindowed</windowingMode>
         <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>

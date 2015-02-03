@@ -26,7 +26,7 @@ named by the attribute in the tuples that arrive on its input port and places a 
  * If the operator does not have an input port, upon application failures, the operator resets
    the file cursor back to the checkpointed location, and starts replaying tuples from the cursor location.
  * If the operator has an input port and is in a consistent region, the operator relies on its upstream operators
-   to properly reply the filenames for it to re-read the files from the beginning.
+   to properly replay the filenames for it to re-read the files from the beginning.
 
 # Exceptions
 
@@ -250,6 +250,8 @@ The input port is non-mutating.</description>
       <outputPortSet>
         <description>
 The `HDFS2FileSource` operator has one output port.  The tuples on the output port contain the data that is read from the files.
+The operator supports two modes of reading.  To read a file line-by-line, the expected output schema of the output port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>.
+To read a file as binary, the expected output schema of the output port is tuple&lt;blob data&gt;.  Use the blockSize parameter to control how much data to retrieve on each read.
 The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.</description>
         <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>

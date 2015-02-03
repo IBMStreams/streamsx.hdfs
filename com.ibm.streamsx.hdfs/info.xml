@@ -12,18 +12,18 @@
 The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
 
 The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
- * Apache Hadoop versions 1.2.1 and 2.x 
- * InfoSphere BigInsights 2.1.2 
- * Cloudera distribution including Apache Hadoop version 4 (CDH4) 
- * Hortonworks Data Platform (HDP) 2.0 
+ * Apache Hadoop versions 2.x 
+ * InfoSphere BigInsights 2.1.2, 3.0.0.x
+ * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
+ * Hortonworks Data Platform (HDP) 2.2
 
-Note: The reference platforms that were used for testing are Hadoop 2.2.0, InfoSphere BigInsights 2.1.2 and CDH 4.6.
+Note: The reference platforms that were used for testing are Hadoop 2.6.0, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
 
 When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 
 For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
 
-Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2.
+Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x.
 
 + Developing and running applications that use the HDFS Toolkit
 
@@ -49,7 +49,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 
 1. If InfoSphere Streams has access to the location where Hadoop is installed, 
    set the following environment variables:
-   * For Apache HDFS, Cloudera (CDH4), or Hortonworks (HDP2):
+   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
      * Set **HADOOP_HOME** to `Hadoop_Install_Directory`. For example, `/usr/lib/hadoop`.
      * Set **JAVA_HOME** to the location where Java is installed.
    * For IBM InfoSphere BigInsights:
@@ -60,7 +60,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
    copy the Hadoop library files to a location that is accessible to InfoSphere Streams
    and set the appropriate environment variables.
    The following list describes the Hadoop library files to copy:
-   * For Apache HDFS, Cloudera (CDH4), or Hortonworks Data Platform (HDP):
+   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
      1. Copy `/usr/lib/hadoop` to the InfoSphere Streams cluster and place it in a directory on the cluster,
         which is accessible to InfoSphere Streams.
         **Note**: When copying the directories, you must ensure that symbolic links are dereferenced,
@@ -90,7 +90,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
         For example, `/home/Streams/BigInsights_Install_Directory`.
    The following list describes the environment variables to set when Hadoop and IBM InfoSphere BigInsights
    libraries are copied to location that is accessible to InfoSphere Streams:
-   * For Apache HDFS or Cloudera (CDH4):
+   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
      * Set **HADOOP_HOME** to `/home/Streams/hadoop`.
      * Set **JAVA_HOME** to the location where Java is installed.
    * For IBM InfoSphere BigInsights:
@@ -101,10 +101,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
      * Set **HADOOP_HOME** to `/opt/ibm/biginsights/IHC/`.
      * Set **BIGINSIGHTS_HOME** to `/opt/ibm/biginsights`.
      * Set **JAVA_HOME** to the location where Java is installed.
-     
-     **Important**: If you set **JAVA_HOME** to the location where IBM Java SDK is installed, 
-     you must set the **IBM_JAVA_OPTIONS** environment variable by using the **export IBM_JAVA_OPTIONS=-Xrs** command. 
-     If you do not set the **IBM_JAVA_OPTIONS** environment variable, the operators terminate unexpectedly.
+        
 3. Configure the SPL compiler to find the toolkit root directory. Use one of the following methods:
   * Set the **STREAMS_SPLPATH** environment variable to the root directory of a toolkit
     or multiple toolkits (with : as a separator).  For example:
