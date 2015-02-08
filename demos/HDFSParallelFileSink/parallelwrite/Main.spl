@@ -1,7 +1,7 @@
-// (C) Copyright IBM Corp. 2011, 2012,2014  All Rights reserved.         
+// (C) Copyright IBM Corp. 2014  All Rights reserved.         
+namespace parallelwrite ;
 
-namespace parallelwrite;
-use com.ibm.streamsx.hdfs::HDFSFileSink;
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
 /**
  * Shows how speed up file writing using multiple HDFSFileSinks.
  * 
@@ -26,24 +26,34 @@ use com.ibm.streamsx.hdfs::HDFSFileSink;
  * * file2of3.txt
  * 
  */
-composite Main {
+composite Main
+{
+	param
+		expression<rstring> $baseDir : getSubmissionTimeValue("hadoopDir", "") ;
+		expression<uint32> $numTuples : 10000000u ;
+		expression<int32> $numParallelCopies :(int32) getSubmissionTimeValue("width",
+			"3") ;
+	graph
+		stream<rstring data> SourceStream = Beacon()
+		{
+			logic
+				state : mutable uint32 numTuples = 0 ;
+				// Eliminate the following line to make the data source run forever
 
-  param
-    expression<rstring>  $baseDir: getSubmissionTimeValue("hadoopDir","");
-    expression<uint32> $numTuples: 10000000u;
-    expression<int32> $numParallelCopies: (int32)getSubmissionTimeValue("width","3");
+			param
+				iterations : $numTuples ;
+			output
+				SourceStream : data = "This is line number " +(rstring)(numTuples ++) +
+					" of " +(rstring) $numTuples ;
+		}
 
-  graph
-    stream<rstring data> SourceStream = Beacon() {
-      logic state: mutable uint32 numTuples = 0;
-      // Eliminate the following line to make the data source run forever
-      param iterations: $numTuples;
-      output SourceStream: data = "This is line number "+(rstring)(numTuples++)+" of "+(rstring)$numTuples;
-    }
+		// Note the use of getChannel() in the filename.
+		@parallel(width = $numParallelCopies)
+		() as sink = HDFS2FileSink(SourceStream)
+		{
+			param
+				file : $baseDir + "file" +(rstring) getChannel() + "of" +(rstring)
+					$numParallelCopies + ".txt" ;
+		}
 
-	// Note the use of getChannel() in the filename.
-    @parallel(width=$numParallelCopies)
-    () as sink = HDFSFileSink(SourceStream) {
-    param file: $baseDir+"file"+(rstring)getChannel()+"of"+(rstring)$numParallelCopies+".txt";
-    }
 }
