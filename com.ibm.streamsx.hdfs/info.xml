@@ -21,7 +21,7 @@ Note: The reference platforms that were used for testing are Hadoop 2.6.0, InfoS
 
 When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 
-For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
+For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
 
 Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x.
 
