@@ -27,7 +27,6 @@ If the operator does not have an input port, upon application failures, the oper
 the file cursor back to the checkpointed location, and starts replaying tuples from the cursor location.
 If the operator has an input port and is in a consistent region, the operator relies on its upstream operators
 to properly reply the filenames for it to re-read the files from the beginning.
->>>>>>> 6214077756b540eb86756047b2a42c1a1e9ff684
 
 # Exceptions
 
