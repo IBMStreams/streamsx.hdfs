@@ -12,9 +12,9 @@ You can optionally control whether the operator closes the current output file a
 of the file in bytes, the number of tuples that are written to the file, or the time in seconds that the file is open for writing, 
 or when the operator receives a punctuation marker.
 
-# Consistent Region Behavior
+# Behavior in a consistent region
 
-The `HDFS2FileSink` operator supports consistent region.
+The `HDFS2FileSink` operator can participate in a consistent region.
 The operator can be part of a consistent region, but cannot be at the start of a consistent region.
 The operator guarantees that tuples are written to a file in HDFS at least once,
 but duplicated tuples can be written to the file if application failure occurs.
