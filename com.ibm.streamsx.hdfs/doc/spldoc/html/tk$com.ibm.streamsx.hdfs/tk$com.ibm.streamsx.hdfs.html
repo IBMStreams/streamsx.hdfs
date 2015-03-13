@@ -34,29 +34,35 @@
 
 <div class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
 <ul class="ul">
-<li class="li"> Apache Hadoop versions 1.2.1 and 2.x </li>
+<li class="li"> Apache Hadoop versions 2.x </li>
 
-<li class="li"> InfoSphere BigInsights 2.1.2 </li>
+<li class="li"> InfoSphere BigInsights 2.1.2, 3.0.0.x</li>
 
-<li class="li"> Cloudera distribution including Apache Hadoop version 4 (CDH4) </li>
+<li class="li"> Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)</li>
 
-<li class="li"> Hortonworks Data Platform (HDP) 2.0 </li>
+<li class="li"> Hortonworks Data Platform (HDP) 2.2</li>
 
 </ul>
 
 </div>
 
-<p class="p">Note: The reference platforms that were used for testing are Hadoop 2.2.0, InfoSphere BigInsights 2.1.2 and CDH 4.6.
+<p class="p">Note: The reference platforms that were used for testing are Hadoop 2.6.0, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
 </p>
 
 <p class="p">When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS.
 </p>
 
-<p class="p">For Hadoop 2.x, CDH4, and HDP 2.0, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> operator parameters at compile time. The <strong class="ph b">authPrincipal</strong> parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The <strong class="ph b">authKeytab</strong> parameter specifies the keytab file that is created for the principal.
+<p class="p">For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> operator parameters at compile time. The <strong class="ph b">authPrincipal</strong> parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The <strong class="ph b">authKeytab</strong> parameter specifies the keytab file that is created for the principal.
 </p>
 
-<p class="p">Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2.	
+<p class="p">Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x.
 </p>
+
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$1.html">Developing and running applications that use the HDFS Toolkit</a>
+</dt>
+<dd class="dd">To create applications that use the HDFS Toolkit, you must configure either Streams Studio or the SPL compiler to be aware of the location of the toolkit.
+</dd>
+</dl>
 
 <dl class="dl">
   
@@ -68,7 +74,7 @@
   
   <dt class="dt dlterm">Required Product Version</dt>
 
-  <dd class="dd">3.2.2</dd>
+  <dd class="dd">4.0.0.0</dd>
 
   
   
@@ -83,11 +89,14 @@
 
 <div class="section"><h2 class="title sectiontitle splhead-1">Indexes</h2>
   
-<dl class="dl">
-  <dt class="dt dlterm"><a class="xref" href="ix$Operator.html">Operators</a></dt>
+  <dl class="dl">
+    <dt class="dt dlterm"/>
 <dd class="dd"/>
 
-</dl>
+    <dt class="dt dlterm"><a class="xref" href="ix$Operator.html">Operators</a></dt>
+<dd class="dd"/>
+
+  </dl>
 
 </div>
 
@@ -97,23 +106,27 @@
     
       <dt class="dt dlterm splpart"><a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a></dt>
 
+      <dd class="dd"/>
+
       <dd class="dd"><dl class="dl">
         <dt class="dt dlterm">Operators</dt>
 
-        <dd class="dd"><ul class="sl simple">
-          <li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a></li>
+        <dd class="dd">
+<ul class="sl simple">
+<li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a></li>
 
-          <li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink.html">HDFS2FileSink</a></li>
+<li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink.html">HDFS2FileSink</a></li>
 
-          <li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSource.html">HDFS2FileSource</a></li>
+<li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSource.html">HDFS2FileSource</a></li>
 
-        </ul>
-</dd>
+</ul>
+
+        </dd>
 
       </dl>
 </dd>
 
-     </dl>
+       </dl>
 
 </div>
 
