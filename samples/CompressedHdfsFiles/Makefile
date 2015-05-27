@@ -10,10 +10,10 @@ SPLC_FLAGS = -a -z -t ../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/co
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
 SPL_CMD_ARGS ?=
-SPL_COMP1NAME=ScanAndRead
-SPL_COMP2NAME=ScanAndReadWithInputPort
-SPL_MAIN_COMPOSITE1 = hdfsexample::$(SPL_COMP1NAME)
-SPL_MAIN_COMPOSITE2 = hdfsexample::$(SPL_COMP2NAME)
+SPL_COMP1NAME=Read
+SPL_COMP2NAME=Write
+SPL_MAIN_COMPOSITE1 = com.ibm.streamsx.hdfs.sample::$(SPL_COMP1NAME)
+SPL_MAIN_COMPOSITE2 = com.ibm.streamsx.hdfs.sample::$(SPL_COMP2NAME)
 STANDALONE_OUTPUT_DIR = output/Standalone
 DISTRIBUTED_OUTPUT_DIR = output/Distributed
 
