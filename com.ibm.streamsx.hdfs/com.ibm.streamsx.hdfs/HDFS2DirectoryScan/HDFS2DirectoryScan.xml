@@ -3,14 +3,28 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>
+      <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">
 The `HDFS2DirectoryScan` operator scans a Hadoop Distributed File System directory for new or modified files.
 
 The `HDFS2DirectoryScan` is similar to the `DirectoryScan` operator. 
 The `HDFS2DirectoryScan` operator repeatedly scans an HDFS directory and writes the names of new or modified files 
 that are found in the directory to the output port. The operator sleeps between scans.
 
-**Exceptions** 
+# Behavior in a consistent region
+
+ The `HDFS2DirectoryScan` operator can participate in a consistent region.
+ The operator can be at the start of a consistent region if there is no input port.
+ The operator supports periodic and operator-driven consistent region policies.
+ 
+ If consistent region policy is set as operator driven, the operator initiates a drain after each tuple is submitted.
+ This allows for a consistent state to be established after a file is fully processed.
+ If consistent region policy is set as periodic, the operator respects the period setting and establishes consistent states accordingly.
+ This means that multiple files can be processed before a consistent state is established.
+ 
+ At checkpoint, the operator saves the last submitted filename and its modification timestamp to the checkpoint.
+ Upon application failures, the operator resubmits all files that are newer than the last submitted file at checkpoint.
+
+# Exceptions
 
 The operator terminates in the following cases:
  * The operator cannot connect to HDFS.
@@ -51,8 +65,8 @@ The operator overrides the value that is specified by the `fs.defaultFS` option 
         <library>
           <cmn:description>Java operator class library</cmn:description>
           <cmn:managedLibrary>
-            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:command></cmn:command>
           </cmn:managedLibrary>
         </library>

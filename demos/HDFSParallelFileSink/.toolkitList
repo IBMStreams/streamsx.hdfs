@@ -1,0 +1,6 @@
+HDFSParallelSink/1.0.0
+spl/1.2.0
+HDFSFileSinkSamples/1.0.0
+com.ibm.streams.perf/1.0.0
+com.ibm.streams.test/1.0.0
+com.ibm.streamsx.hdfs/2.0.0

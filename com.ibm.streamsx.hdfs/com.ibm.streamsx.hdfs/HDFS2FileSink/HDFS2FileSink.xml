@@ -3,7 +3,7 @@
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
-      <description>
+      <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileSink.html">
 The `HDFS2FileSink` operator writes files to a Hadoop Distributed File System. 
 
 The `HDFS2FileSink` operator is similar to the `FileSink` operator.  
@@ -12,21 +12,23 @@ You can optionally control whether the operator closes the current output file a
 of the file in bytes, the number of tuples that are written to the file, or the time in seconds that the file is open for writing, 
 or when the operator receives a punctuation marker.
 
-**Consistent Region Behavior**
-The 'HDFS2FileSink' operator supports consistent region.  The operator can be part of a consistent region, but cannot
-be at the start of a consistent region.  The operator gauranteeds that tuples will be written to a file in HDFS at least once,
+# Behavior in a consistent region
+
+The `HDFS2FileSink` operator can participate in a consistent region.
+The operator can be part of a consistent region, but cannot be at the start of a consistent region.
+The operator guarantees that tuples are written to a file in HDFS at least once,
 but duplicated tuples can be written to the file if application failure occurs.
 
 For the operator to support consistent region, the Hadoop Distributed File System must be configured with file append
-enabled.  Please refer to the documentation of your hadoop distribution on how to properly enable this feature.
+enabled. For information about how to properly enable this feature, refer to the documentation of your Hadoop distribution.
 
 On drain, the operator flushes its internal buffer to the file.
-On checkpoint, the operator stores the current filename, file size, tuple count and file number to the checkpoint.
-On reset, the operator closes the current file, and opens the file from checkpoint.  File states like file size
-and tuple count will be reset to the file.  The file will be opened in append mode, and data will be written to the 
-end of the file. 
+On checkpoint, the operator stores the current file name, file size, tuple count, and file number to the checkpoint.
+On reset, the operator closes the current file, and opens the file from checkpoint.
+File states like file size and tuple count are reset to the file.
+The file is opened in append mode, and data is written to the end of the file. 
 
-**Exceptions**
+# Exceptions
 
 The `HDFS2FileSink` operator terminates in the following cases:
  * The operator cannot connect to HDFS.
@@ -34,7 +36,7 @@ The `HDFS2FileSink` operator terminates in the following cases:
 
 + Examples
 
-This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`:
+This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`.
 
     stream&lt;PersonSchema&gt; In = FileSource(){
       param
@@ -60,8 +62,8 @@ This example uses the `HDFS2FileSink` operator to write tuples to output files t
         <library>
           <cmn:description>Java operator class library</cmn:description>
           <cmn:managedLibrary>
-            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:libPath>../../impl/java/bin</cmn:libPath>
+            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
             <cmn:command></cmn:command>
           </cmn:managedLibrary>
         </library>
@@ -265,9 +267,9 @@ If this parameter is not specified, the operator searches the default location f
       <inputPortSet>
         <description docHref="" sampleUri="">
 The `HDFS2FileSink` operator has one input port, which writes the contents of the input stream to the file that you specified.
-The input port is non-mutating, and its punctuation mode is `Oblivious`.
-The schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>, which specifies a single rstring or ustring attribute that represents 
-a line to be written to the file.</description>
+The input port is non-mutating, and its punctuation mode is `Oblivious`.  The HDFS2FileSink supports writing data into HDFS in two formats.
+For line format, the schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>, which specifies a single rstring or ustring attribute that represents 
+a line to be written to the file. For binary format, the schema of the input port is tuple&lt;blob data&gt;, which specifies a block of data to be written to the file. </description>
         <windowingDescription></windowingDescription>
         <windowingMode>NonWindowed</windowingMode>
         <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>

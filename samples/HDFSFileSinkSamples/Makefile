@@ -5,14 +5,14 @@
 
 .PHONY: all clean
 
-STREAMS_SPLPATH ?=../../com.ibm.streamsx.hdfs
-SPLC_FLAGS = -a -z --spl-path $(STREAMS_SPLPATH):../com.ibm.streamsx.hdfs
+STREAMS_SPLPATH ?=../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs
+SPLC_FLAGS = -a -z --spl-path $(STREAMS_SPLPATH)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
 SPL_CMD_ARGS ?=
-SPL_MAIN_COMPOSITE1 = HDFSFileSinkSampleLineFormat
-SPL_MAIN_COMPOSITE2 = HDFSFileSinkSampleTxtFormat
+SPL_MAIN_COMPOSITE1 = HDFS2FileSinkSampleLineFormat
+SPL_MAIN_COMPOSITE2 = HDFS2FileSinkSampleTxtFormat
 SPL_MAIN_DYNAMIC = DynamicFilename
 STANDALONE_OUTPUT_DIR = output/Standalone
 DISTRIBUTED_OUTPUT_DIR = output/Distributed

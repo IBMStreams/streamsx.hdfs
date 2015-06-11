@@ -1,6 +1,6 @@
 namespace com.ibm.streamsx.hdfs.sample;
 
-use com.ibm.streamsx.hdfs::HDFSFileSource ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 
 /**
  * Read compressed data from HDFS with the Decompress and Parse operators.
@@ -25,7 +25,7 @@ composite Read
 	expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri");
 	graph
 		stream<blob compressedBlock> Compressed =
-			HDFSFileSource()
+			HDFS2FileSource()
 		{
 			param
 				file : "testCompress.gz" ;
