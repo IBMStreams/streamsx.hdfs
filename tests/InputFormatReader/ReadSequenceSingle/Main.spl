@@ -1,0 +1,30 @@
+use com.ibm.streamsx.hdfs::InputFormatReader;
+use hdfs.test.common::CheckCount;
+
+/**
+ * Use to check input file reading for both compressed and uncompressed files.    
+ * Also checks that key-value output, key only, and value only output works.
+ */
+
+composite Main {
+
+param expression<rstring> $inputFile: getSubmissionTimeValue("inputFile");
+expression<rstring> $configFile: getSubmissionTimeValue("configFile");
+expression<int32> $recordCount: (int32)getSubmissionTimeValue("recordCount");
+
+graph
+
+stream<int64 key, rstring value> Both = InputFormatReader() {
+param 
+file: $inputFile;
+configResources: $configFile;
+fileType:sequence;
+}
+
+() as bothCheck = CheckCount(Both) {
+param
+tupleCount: $recordCount;
+}
+
+
+}

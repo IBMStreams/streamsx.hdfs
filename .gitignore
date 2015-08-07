@@ -1,0 +1,4 @@
+toolkit.xml
+*StreamsModel.java
+/com.ibm.streamsx.hdfs/com.ibm.streamsx.hdfs/InputFormatReader
+tests/*/*/output

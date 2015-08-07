@@ -1,0 +1,24 @@
+namespace hdfs.test.common;
+
+public composite CheckCount(input InStream) {
+
+param 
+expression<int32> $tupleCount;
+
+graph
+() as checker = Custom(InStream) {
+
+logic state: {
+    mutable int32 numTuples = 0;
+    int32 targetNumber = $tupleCount;
+}
+onTuple InStream: {
+    numTuples++;
+}
+onPunct InStream: 
+    if (currentPunct() == Sys.FinalMarker) {
+    assert(numTuples==targetNumber, "Received "+(rstring)numTuples+" but expected "+(rstring)targetNumber);
+    }
+}
+
+}

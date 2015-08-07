@@ -51,6 +51,9 @@
 	<path id="cp.ext.libs">
 		<fileset dir="${ext.downloads.dir}"/>
 	</path>
+    <path id="cp.inputformat.libs">
+        <fileset dir="opt/inputformatreader"/>
+        </path>
 
 
 	<path id="cp.compile">
