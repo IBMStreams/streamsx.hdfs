@@ -1,3 +1,5 @@
+/* Copyright (C) 2015, International Business Machines Corporation */
+/* All Rights Reserved */
 use com.ibm.streamsx.hdfs::InputFormatReader;
 use hdfs.test.common::CheckCount;
 
