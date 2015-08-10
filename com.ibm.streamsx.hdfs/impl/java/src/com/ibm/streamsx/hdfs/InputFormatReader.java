@@ -39,6 +39,7 @@ import com.ibm.streams.operator.model.OutputPortSet.WindowPunctuationOutputMode;
 import com.ibm.streams.operator.model.OutputPorts;
 import com.ibm.streams.operator.model.Parameter;
 import com.ibm.streams.operator.model.PrimitiveOperator;
+import java.io.File;
 
 /**
  * Operator to read input formats.
@@ -51,6 +52,7 @@ public class InputFormatReader extends AbstractOperator {
 
 	private static final String INPUT_PARAM_NAME = "file";
 	private static final String FILETYPE_PARAM_NAME="fileType";
+	Logger logger = Logger.getLogger(this.getClass());
 	
 	public static enum FileType {
 		text,
@@ -187,9 +189,27 @@ public class InputFormatReader extends AbstractOperator {
 		conf = new Configuration();
 		if (configResources != null ) {
 		for (String s : configResources) {
-			conf.addResource(new Path(s));
+            File toAdd = new File(s);
+            String pathToFile;
+            if (toAdd.isAbsolute()) {
+                pathToFile = toAdd.getAbsolutePath();
+            }
+            else {
+                pathToFile = context.getPE().getApplicationDirectory()+File.separator+s;
+                toAdd = new File(pathToFile);
+		    }
+            if (!toAdd.exists()) {
+                throw new Exception("Specified configuration file "+s+" not found at "+pathToFile);
+            }
+           logger.info("Adding "+pathToFile+" as config resource");
+            conf.addResource(new Path(pathToFile));
 		}
+		String defaultFS = conf.get("fs.defaultFS");
+		if (!defaultFS.startsWith("hdfs")) {
+			logger.warn("Default file system not HDFS; may be configuration problem");
 		}
+		logger.debug("Default file system is "+defaultFS);
+        }
 		Job job = Job.getInstance(conf);
 		
 		for (String p : inputFiles) {
@@ -197,7 +217,7 @@ public class InputFormatReader extends AbstractOperator {
 		}
 		
 		splits = inputFormat.getSplits(job);
-
+        logger.info("There are "+splits.size()+" splits");
 		}
 		catch (IOException e ) {
 			throw e;
@@ -248,7 +268,10 @@ public class InputFormatReader extends AbstractOperator {
         final StreamingOutput<OutputTuple> out = getOutput(0);
 
         for (int i = channel; i < splits.size(); i = i + maxChannels) {
-    		TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID("channel "+channel+" of "+maxChannels,0,TaskType.MAP,i,0));
+        	if (logger.isInfoEnabled()) {
+        		logger.info("Handling split "+i);
+        	}
+        	TaskAttemptContext context = new TaskAttemptContextImpl(conf, new TaskAttemptID("channel "+channel+" of "+maxChannels,0,TaskType.MAP,i,0));
 
 			RecordReader<LongWritable,Text> reader = inputFormat.createRecordReader(splits.get(i),context);
 			reader.initialize(splits.get(i), context);
@@ -256,10 +279,10 @@ public class InputFormatReader extends AbstractOperator {
 			while (reader.nextKeyValue()) {
 				OutputTuple toSend = out.newTuple();
 				// TODO set filename, if it makes sense.
-				if (keyIndex > 0) {
+				if (keyIndex >= 0) {
 					toSend.setLong(keyIndex, reader.getCurrentKey().get());
 				}
-				if (valueIndex > 0) {
+				if (valueIndex >= 0) {
 					toSend.setString(valueIndex, reader.getCurrentValue().toString());
 				}
 				out.submit(toSend);
