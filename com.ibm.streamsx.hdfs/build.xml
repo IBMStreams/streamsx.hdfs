@@ -53,12 +53,13 @@
 	</path>
     <path id="cp.inputformat.libs">
         <fileset dir="opt/inputformatreader"/>
-        </path>
+    </path>
 
 
 	<path id="cp.compile">
 		<path refid="cp.streams" />
 		<path refid="cp.ext.libs" />
+        <path refid="cp.inputformat.libs" />
 	</path>
 	
 	<target name="all" depends="jar,cpp"/>

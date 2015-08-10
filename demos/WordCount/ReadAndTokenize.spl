@@ -1,0 +1,46 @@
+use com.ibm.streamsx.hdfs::InputFormatReader ;
+type EmailTuple = rstring ID, rstring From, rstring Date, rstring Subject,
+	rstring ToList, rstring CcList, rstring BccList, rstring Body ;
+
+composite ReadAndTokenize(output WordStream )
+{
+	param
+		expression<rstring> $inputFile ;
+		expression<rstring> $configFile : "etc/core-site.xml" ;
+	graph
+		stream<rstring value> TuplesAsString = InputFormatReader()
+		{
+			param
+				file : $inputFile ;
+				configResources : $configFile ;
+		}
+
+		stream<rstring body> Body = Functor(TuplesAsString)
+		{
+			output
+				Body :
+				//        body = "This is a test";
+				body =((EmailTuple) value).Body ;
+		}
+
+		stream<rstring word> WordStream = Custom(Body)
+		{
+			logic
+				onTuple Body :
+				{
+					list<rstring> words = tokenize(body, ",\r\n \t", false) ;
+					for(rstring w in words)
+					{
+						submit({ word = w }, WordStream) ;
+					}
+
+				}
+
+				onPunct Body :
+				{
+					submit(currentPunct(), WordStream) ;
+				}
+
+		}
+
+}
