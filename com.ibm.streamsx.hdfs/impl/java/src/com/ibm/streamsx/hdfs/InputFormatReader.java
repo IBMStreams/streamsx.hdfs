@@ -47,9 +47,18 @@ import java.io.File;
 @Libraries({"opt/downloaded/*","opt/inputformatreader/*"})
 @PrimitiveOperator(name="InputFormatReader", namespace="com.ibm.streamsx.hdfs",
 description="Java Operator InputFormatReader")
-@OutputPorts({@OutputPortSet(description="Port that produces tuples", cardinality=1, optional=false, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating), @OutputPortSet(description="Optional output ports", optional=true, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating)})
+@OutputPorts({@OutputPortSet(description="The operator will populate the key and value attribute on this port with the key-value pairs given by the record reader.", cardinality=1, optional=false, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating), @OutputPortSet(description="Optional output ports", optional=true, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating)})
 public class InputFormatReader extends AbstractOperator {
-
+	
+	public static final String consistentCutIntroducer="\\n\\n**Behavior in a consistent region**\\n\\n";
+	
+	public static final String description = "The operator uses the InputFormat interface to read data from HDFS.  Use the fileType parameter to set the input format type.  Two are currently supported--text and sequence.  The default is text. "+
+	"The text format supports both compressed and uncompressed text."+
+	" The operator has one output port  It has two optional attributes, key and value.  These correspond to the key and value returned by the underlying RecordReader."+
+	"**Configurating the operator**"+
+	"To configure the operator, set the configResource parameter to your core-site.xml file."+
+	consistentCutIntroducer+
+	"The operator has no consistent region support.";
 	private static final String INPUT_PARAM_NAME = "file";
 	private static final String FILETYPE_PARAM_NAME="fileType";
 	Logger logger = Logger.getLogger(this.getClass());
@@ -117,9 +126,7 @@ public class InputFormatReader extends AbstractOperator {
     		checker.setInvalidContext("Number of streaming outputs must be 1",new Object[0]);
     	}
     }
-    
-    // TODO features
-    
+  
     
     @ContextCheck(compile=false)
     public static void runtimeCheck(OperatorContextChecker checker) { 
