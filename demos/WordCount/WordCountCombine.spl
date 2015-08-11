@@ -1,0 +1,65 @@
+
+
+composite ReduceFromCombine(input InStream ; output WordCount)
+{
+	graph
+		stream<InStream> Puncted = Custom(InStream)
+		{
+			logic
+				onTuple InStream : submit(InStream, Puncted) ;
+				onPunct InStream :
+				{
+					if(currentPunct() == Sys.FinalMarker)
+					{
+						submit(Sys.WindowMarker, Puncted) ;
+						submit(Sys.FinalMarker, Puncted) ;
+					}
+				}
+
+		}
+
+		stream<rstring word, int32 count> WordCount = Aggregate(Puncted as I)
+		{
+			window
+				I : tumbling, punct(), partitioned ;
+			param
+				partitionBy : word ;
+			output
+				WordCount : count = Sum(count) ;
+		}
+
+		() as sink = FileSink(WordCount)
+		{
+			param
+				file : "combine_words" +(rstring) getChannel() + ".txt" ;
+		}
+
+}
+
+composite WordCountCombine
+{
+	param
+		expression<int32> $numMappers :(int32) getSubmissionTimeValue("numMappers",
+			"1") ;
+		expression<int32> $numReducers :(int32) getSubmissionTimeValue("numReducers",
+			"1") ;
+	graph
+		@parallel(width = $numMappers)
+		stream<rstring word, int32 count> WordStream = ReadTokenizeCombine()
+		{
+			param
+				inputFile : getSubmissionTimeValue("inputFile", "allEnron.txt") ;
+			config
+				placement : partitionColocation("map") ;
+		}
+
+		@parallel(width = $numReducers, partitionBy = [ { port = WordStream,
+			attributes = [ word ] } ])
+		stream<rstring word, int32 count> WordCount = ReduceFromCombine(WordStream)
+		{
+			config
+				placement : partitionColocation("reduce") ;
+		}
+
+}
+
