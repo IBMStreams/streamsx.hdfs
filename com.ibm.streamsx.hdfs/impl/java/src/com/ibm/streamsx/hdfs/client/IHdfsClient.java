@@ -28,6 +28,10 @@ public interface IHdfsClient {
 	
 	public long getFileSize(String filename) throws IOException;
 	
+	public boolean rename(String src, String dst) throws IOException;
+	
+	public boolean delete(String filePath, boolean recursive) throws IOException;
+	
 	public void disconnect() throws Exception;
 	
 	public void setConnectionProperty(String name, String value);
