@@ -1,0 +1,81 @@
+use com.ibm.streamsx.hdfs::*;
+composite Writer {
+
+graph 
+
+stream<rstring line> Lines = Beacon() {
+param
+iterations: 48000;
+
+output Lines:
+    line = "This is tuple number "+(rstring)IterationCount();
+
+}
+
+() as sink = HDFS2FileSink(Lines) {
+
+param
+file: "testParallelRead.txt";
+
+}
+
+}
+
+composite ReadAndCheck(output Stats) {
+
+graph
+stream<rstring line> Read = HDFS2FileSource() {
+param file: "testParallelRead.txt";
+parallelRead: true;
+}
+
+stream<uint64 total,int64 min, int64 max,int32 channel> Stats = Custom(Read) {
+logic state: {
+mutable uint64 total=0;
+mutable int64 min=-1;
+mutable int64 max = -1;
+}
+
+onTuple Read: {
+total++;
+rstring tupleNumString = substring(line,20,length(line)-20);
+if (isTraceable(Trace.trace)) {
+appTrc(Trace.trace,"channel "+(rstring)getChannel()+" line is "+line+" string is "+tupleNumString);
+}
+int64 tupleNumber = (rstring)tupleNumString;
+if (min < 0l || tupleNumber < min) {
+   min = tupleNumber;
+}
+if (max > 0l || tupleNumber > max) {
+   max = tupleNumber;
+}
+
+}
+
+onPunct Read: {
+submit({total=total,min=min,max=max,channel = getChannel()},Stats);
+}
+
+} // end Custom
+
+}  // end ReadAndCheck
+ 
+composite Reader {
+
+graph
+
+@parallel(width=2)
+stream<uint64 total, int64 min, int64 max,int32 channel> Stats = ReadAndCheck() {
+
+}
+
+() as printer = Custom(Stats) {
+logic onTuple Stats: {
+println("total = "+(rstring)total+"from channel "+(rstring)channel+" min = "+(rstring)min+" max = "+(rstring)max);
+
+}
+
+}
+
+}
+

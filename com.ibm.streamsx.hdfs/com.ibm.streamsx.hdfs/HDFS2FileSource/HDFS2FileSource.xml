@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
   <javaOperatorModel>
     <context>
@@ -46,30 +45,30 @@ operator to read the files that are output by the `HDFS2DirectoryScan` operator.
     * HDFS2DirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
     * Overrides the URI in the fs.defaultFS option from core-site.xml file
     */
-    (stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){
+    (stream&lt;rstring filename> Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){
       param
-        directory     : "/user/myuser/";
-        hdfsUri:"hdfs : //hdfsServer:1883";
+        directory     : &quot;/user/myuser/&quot;;
+        hdfsUri:&quot;hdfs : //hdfsServer:1883&quot;;
         sleepTime     : 2.0;
     }
 	// HDFS2FileSource operator reads from files discovered by HDFS2DirectoryScan operator
-	(stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 =	HDFS2FileSource(Files){
+	(stream&lt;rstring data> FileContent) as HDFS2FileSource_2 =	HDFS2FileSource(Files){
 	  param
-	    hdfsUri:"hdfs://hdfsSever:1883";
+	    hdfsUri:&quot;hdfs://hdfsSever:1883&quot;;
 	 }
 
 The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
-    (stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
+    (stream&lt;rstring data> FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
       param
-        hdfsUri:"webhdfs://bigInsightSever:1883"; 
-        file   :"/user/myser/myfile.txt"; 
+        hdfsUri:&quot;webhdfs://bigInsightSever:1883&quot;; 
+        file   :&quot;/user/myser/myfile.txt&quot;; 
     }
 
 </description>
       <iconUri size="32">HDFS2FileSource_32.gif</iconUri>
-      <iconUri size="16">HDFS2FileSource_16.gif</iconUri> 
-      <metrics> 
+      <iconUri size="16">HDFS2FileSource_16.gif</iconUri>
+      <metrics>
         <metric>
           <name>nFilesOpened</name>
           <description sampleUri="">The number of files that are opened by the operator for reading data.</description>
@@ -224,14 +223,22 @@ configuration file. If this parameter is not specified, the operator searches th
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
- 	  <parameter>
-	<name>blockSize</name>
-	<description>
+      <parameter>
+        <name>blockSize</name>
+        <description>
 		This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096`.</description>
-	<optional>true</optional>
-	<type>int32</type>
-	<cardinality>1</cardinality>
-	</parameter>      
+        <optional>true</optional>
+        <type>int32</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      <parameter>
+        <name>parallelRead</name>
+        <description>If true, the operator assumes it is in a parallel region and processes the part of the input file corresponding to its channel.</description>
+        <optional>true</optional>
+        <expressionMode>AttributeFree</expressionMode>
+        <type>boolean</type>
+        <cardinality>1</cardinality>
+      </parameter>
     </parameters>
     <inputPorts>
       <inputPortSet>
@@ -250,8 +257,8 @@ The input port is non-mutating.</description>
       <outputPortSet>
         <description>
 The `HDFS2FileSource` operator has one output port.  The tuples on the output port contain the data that is read from the files.
-The operator supports two modes of reading.  To read a file line-by-line, the expected output schema of the output port is tuple&lt;rstring line&gt; or tuple&lt;ustring line>.
-To read a file as binary, the expected output schema of the output port is tuple&lt;blob data&gt;.  Use the blockSize parameter to control how much data to retrieve on each read.
+The operator supports two modes of reading.  To read a file line-by-line, the expected output schema of the output port is tuple&lt;rstring line> or tuple&lt;ustring line>.
+To read a file as binary, the expected output schema of the output port is tuple&lt;blob data>.  Use the blockSize parameter to control how much data to retrieve on each read.
 The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.</description>
         <windowPunctuationOutputMode>Generating</windowPunctuationOutputMode>
         <windowPunctuationInputPort>-1</windowPunctuationInputPort>

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
 
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.OperatorContext.ContextCheck;
@@ -73,7 +74,12 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	private long fSeekPosition = -1;
 	private long fSeekToLine = -1;
 	private long fLineNum = -1;
+	private long fLineReaderPos = -1;
 	private boolean fProcessThreadDone = false;
+	private static String PARALLEL_READ_PARAM = "parallelRead";
+	private boolean parallelRead = false;
+	private BufferedLineReader bufferedLineReader = null;
+	
 
 
 	@Override
@@ -139,6 +145,9 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			TRACE.fine("Blocksize parameter not supplied, using default "
 					+ fBlockSize);
 		}
+		if (context.getParameterNames().contains(PARALLEL_READ_PARAM)) {
+			parallelRead = Boolean.parseBoolean(context.getParameterValues(PARALLEL_READ_PARAM).get(0));
+		}
 		if (MetaType.BLOB == outType) {
 			fBinaryFile = true;
 			TRACE.info("File will be read as a binary blobs of size "
@@ -179,6 +188,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 					"HDFSFileSource requires either file parameter to be specified or the number of input ports to be one. Both cannot be specified together.",
 					null);
 		}
+		
 	}
 	
 	@ContextCheck(compile = true)
@@ -210,6 +220,17 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 								.get(0).trim() });
 			}
 		}
+		if (checker.getOperatorContext().getParameterNames().contains(PARALLEL_READ_PARAM) &&
+				Boolean.parseBoolean(checker.getOperatorContext().getParameterValues(PARALLEL_READ_PARAM).get(0))) {
+			// in parallel mode.
+			if (checker.getOperatorContext().getNumberOfStreamingInputs() > 0) {
+				checker.setInvalidContext(PARALLEL_READ_PARAM+" cannot be true when number of inputs is greater than zero",new Object[0]);
+			}
+			if (MetaType.BLOB == checker.getOperatorContext().getStreamingOutputs().get(0).getStreamSchema().getAttribute(0).getType()
+					.getMetaType()) {
+				checker.setInvalidContext(PARALLEL_READ_PARAM+" may only be used when reading text files.", new Object[0]);
+			}
+		}
 	}
 
 	@ContextCheck(compile = true)
@@ -234,6 +255,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 									.getMetaType(), null);
 		}
 
+		
+		
 		if (MetaType.BLOB != outputSchema.getAttribute(0).getType()
 				.getMetaType()
 				&& checker.getOperatorContext().getParameterNames()
@@ -380,6 +403,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		try {
 			if (fBinaryFile) {
 				doReadBinaryFile(fDataStream, outputPort);
+			}  else if (parallelRead) {
+				doReadFileSplit(fDataStream,outputPort, filename);
 			} else {
 				doReadTextFile(fDataStream, outputPort, filename);
 			}
@@ -420,6 +445,52 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		return fDataStream;
 	}
 
+	private void doReadFileSplit(InputStream dataStream,
+			StreamingOutput<OutputTuple> outputPort, String filename) 
+		throws UnsupportedEncodingException,IOException,Exception {
+		IHdfsClient hdfsClient = getHdfsClient();
+		long len = hdfsClient.getFileSize(filename);
+		long myStart;
+		long myEnd;
+		int channel = getOperatorContext().getChannel();
+		if (getOperatorContext().getChannel() >= 0) {
+			long chunkSize = len/getOperatorContext().getMaxChannels(); 
+			myStart = chunkSize*getOperatorContext().getChannel();
+			if (channel ==  getOperatorContext().getMaxChannels() -1 ) {
+				// we are the last channel
+			    myEnd = myStart + chunkSize+getOperatorContext().getMaxChannels();
+			}
+			else {
+				myEnd = myStart + chunkSize;
+			}
+		}
+		else {
+			myStart = 0;
+			myEnd = len +1;
+		}
+		bufferedLineReader = new BufferedLineReader(dataStream,myStart,myEnd,fEncoding);
+		boolean done = false;
+		while (!done) {
+			try {
+				if (fCrContext != null) {
+					fCrContext.acquirePermit();
+				}
+				String line = bufferedLineReader.readLine();
+				if (line != null) {
+					OutputTuple outputTuple = outputPort.newTuple();
+					outputTuple.setString(0, line);
+					outputPort.submit(outputTuple);
+				}
+				else {
+					done = true;
+				}
+			}
+			finally {
+				if (fCrContext != null) fCrContext.releasePermit();
+			}
+		}
+	}
+	
 	private void doReadTextFile(InputStream dataStream,
 			StreamingOutput<OutputTuple> outputPort, String filename)
 			throws UnsupportedEncodingException, IOException, Exception {				
@@ -613,6 +684,12 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			// for text file
 			TRACE.info("checkpoint lineNumber: " + fLineNum);
 			checkpoint.getOutputStream().writeLong(fLineNum);
+			if (bufferedLineReader != null) {
+				checkpoint.getOutputStream().writeLong(bufferedLineReader.getPos());
+			}
+			else {
+				checkpoint.getOutputStream().writeLong(-1);
+			}
 		}
 	}
 
@@ -633,7 +710,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			fSeekPosition = pos;					
 			// for text file
 			fSeekToLine = checkpoint.getInputStream().readLong();
-			
+			fLineReaderPos = checkpoint.getInputStream().readLong();
 			TRACE.info("reset position: " + fSeekPosition);
 			TRACE.info("reset lineNumber: " + fSeekToLine);
 			
