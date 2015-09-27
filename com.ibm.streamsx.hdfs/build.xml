@@ -17,7 +17,8 @@
 	<property name="lib.dir" value="lib" />
 	<property name="test.run.dir" value="tests" />
 	<property name="test.build.dir" value="${test.run.dir}/bin" />
-	<property name="ext.downloads.dir" value="opt/downloaded" />
+    <property name="ext.downloads.dir" value="opt/downloaded" />
+    <property name="ext.hadoopreader.dir" value="opt/hadoopreader" />
 	<property name="gensrc.dir" value="${basedir}/impl/java/src-gen" />
 	<property name="jarfile" value="BigData.jar" />
 	<property name="spl-mt" value="${streams.install}/bin/spl-make-toolkit" />
@@ -50,7 +51,8 @@
 
 	<path id="cp.ext.libs">
 		<fileset dir="${ext.downloads.dir}"/>
-	</path>
+        <fileset dir="${ext.hadoopreader.dir}"/>
+    </path>
 
 
 	<path id="cp.compile">
@@ -80,7 +82,23 @@
 		<exec executable="${maven.bin}"  failonerror="true">
 			<arg value="dependency:copy-dependencies"/>
 			<arg value="-DoutputDirectory=${ext.downloads.dir}"/>			
-	    </exec>
+        </exec>
+        <copy todir="${ext.hadoopreader.dir}">
+            <fileset dir="${ext.downloads.dir}">
+                <include name="avro*.jar"/>
+                <include name="commons-cli*.jar"/>
+                <include name="commons-configuration*.jar"/>
+                <include name="commons-logging*.jar"/>
+                <include name="hadoop-mapreduce-client-core*.jar"/>
+                <include name="hadoop-common*.jar"/>
+                <include name="hadoop-auth*.jar"/>
+                <include name="hadoop-hdfs*.jar"/>
+                <include name="commons-collections*.jar"/>
+                <include name="commons-compress*.jar"/>
+                <include name="htrace-core*.jar"/>
+                <include name="servlet-*.jar"/>
+            </fileset>
+       </copy>
 	</target>
 	
 

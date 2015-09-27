@@ -1,0 +1,9 @@
+com.ibm.streamsx.hdfs/opt/downloaded
+com.ibm.streamsx.hdfs/opt/hadoopreader
+output
+toolkit.xml
+data
+com.ibm.streamsx.hdfs/com.ibm.streamsx.hdfs/HadoopReader
+src-gen
+com.ibm.streamsx.hdfs/impl/lib
+.toolkitList
