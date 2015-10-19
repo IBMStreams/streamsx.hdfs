@@ -1,0 +1,89 @@
+namespace com.ibm.streamsx.webhdfs;
+
+/** WebHdfsRead -- Read a file from HDFS via the REST APIs
+  * 
+  * @param url The base url, should end with http://.../webhdfs/v1
+  * @param file the file to read
+  * @param username username to use to connect, if empty, it's ignored
+  * @param password password to use to connect, optional.
+  * @param format format to use for parse operator.  Defaults to Parse.line
+  * @param blockSize size of block to get per http call.  
+  * @param OutType the type of output stream.
+  */
+
+public composite WebHdfsRead(output OutStream ) {
+    param
+        expression<rstring> $url;
+    expression<rstring> $file;
+    expression<rstring> $username;
+    expression<rstring> $password;
+    expression $format: Parse.line;
+    expression<uint32> $blockSize: 16384u;
+    type $OutType: tuple<rstring line>;
+
+    graph
+        stream<blob block> Blocks = WebHdfsReadBinary() {
+            param
+                baseUrl: $url;
+                file: $file;
+                username: $username;
+                password: $password;
+                blockSize: $blockSize;
+        }
+
+    stream<$OutType> OutStream = Parse(Blocks) {
+        param format: $format;
+    }
+
+}
+
+public composite WebHdfsReadBinary(output Blocks) {
+
+    param 
+        expression<rstring> $baseUrl;
+    expression<rstring> $file;
+    expression<rstring> $username;
+    expression<rstring> $password;
+    expression<uint32> $blockSize: 16384u;
+    graph 
+
+        stream<blob block> Blocks = Custom() {
+
+            logic state: {
+                // If they are submission time values, this way we only compute them once.
+                rstring url = $baseUrl+"/"+$file+"?OP=OPEN";
+                rstring username = $username;
+                rstring password = $password;
+                rstring lengthSection = "&length="+(rstring)$blockSize;
+                int32 blockSize = (int32)$blockSize;
+            }
+            onProcess: {
+               mutable int32 error = 0;
+               mutable boolean done = false;
+               mutable int64 offset = 0;
+               while (!done) {
+                   rstring blockUrl = url+"&offset="+(rstring)offset+lengthSection;
+                   rstring result = com.ibm.streamsx.inet.http::httpGet(blockUrl,(list<rstring>)[],username,password,error);
+                   if (error != 0) {
+                       abort();
+                   }
+                   if (length(result) == 0) {
+                       // Nothing elft, mark done, and don't submit.
+                       done = true;
+                   }
+                   else {
+                       // we have something to submit.
+                       submit({block=convertToBlob(result)},Blocks);
+                       if (length(result) < blockSize) {
+                           // no more left, say we're done
+                           done =true;
+                       }
+                   }
+                   offset += (int64)length(result);
+               }
+               submit(Sys.WindowMarker,Blocks);
+           }
+
+        }
+
+}
