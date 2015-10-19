@@ -27,7 +27,7 @@ rstring getLocation(list<rstring> headers) {
  * If consistent cut is enabled, the same tuple could be sent to the file multiple times;
  * this could result in an corrupted file if the Format parameter is block.
  * 
- * @input Stream to write to WebHdfs
+ * @input InStream to write to WebHdfs
  * @param url to access webhdfs.  It should start with http://host:port/..webhdfs/v1
  * @param file filename to write
  * @param username username to use to connector to webhdfs if accessed via a knox gateway

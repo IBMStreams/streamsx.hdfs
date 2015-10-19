@@ -37,6 +37,11 @@ public composite WebHdfsRead(output OutStream ) {
 
 }
 
+/** Read binary data from a webhdfs file.
+  * 
+  * Except in the case where the file is binary, you should use WebHdfsRead
+  */
+
 public composite WebHdfsReadBinary(output Blocks) {
 
     param 
