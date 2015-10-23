@@ -26,6 +26,7 @@ rstring getLocation(list<rstring> headers) {
  * Formats the tuple with Format, and then sends the blob to WebHdfsWriteBinary.
  * If consistent cut is enabled, the same tuple could be sent to the file multiple times;
  * this could result in an corrupted file if the Format parameter is block.
+ * All operators in this composite are fused into one PE.
  * 
  * @input InStream to write to WebHdfs
  * @param url to access webhdfs.  It should start with http://host:port/..webhdfs/v1
@@ -33,7 +34,8 @@ rstring getLocation(list<rstring> headers) {
  * @param username username to use to connector to webhdfs if accessed via a knox gateway
  * @param password password to use to connect ot webhdfs if accessed via a knox gateway
  * @param overwrite true if hte file should be overwritten if present, false otherwise
- * @format format parameter to be passed to Format operator; defaults to line.
+ * @param format parameter to be passed to Format operator; defaults to line.
+ * @param partition (optional) colocation id to use.
  */
 public composite WebHdfsWrite (input InStream) {
 
@@ -43,14 +45,15 @@ expression<rstring> $file;
 expression<rstring> $username:"";
 expression<rstring> $password:"";
 expression<boolean> $overwrite: false;
-
 expression $format: Format.line;
+expression<rstring> $partition: getThisCompositeInstanceName();
 graph
 
 stream<blob data> Blobs = Format(InStream) {
 	param
 	format: $format;
 	output Blobs: data =Output();
+    config placement: partitionColocation($partition);
 }
 
 () as sink = WebHdfsWriteBinary(Blobs) {
@@ -60,6 +63,7 @@ stream<blob data> Blobs = Format(InStream) {
 		username: $username;
 		password: $password;
 		overwrite: $overwrite;
+   config placement: partitionColocation($partition);
 }
 
 }

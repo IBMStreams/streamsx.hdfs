@@ -3,6 +3,8 @@ namespace com.ibm.streamsx.webhdfs;
 /**
   * WebHdfsRead -- Read a file from HDFS via the REST APIs
   * 
+  * All operators in this composite will be fused into a single PE.
+  *
   * @param url The base url, should end with http://.../webhdfs/v1
   * @param file the file to be read
   * @username username to connect (optional)
@@ -10,6 +12,7 @@ namespace com.ibm.streamsx.webhdfs;
   * @param format format to use for the parse operator.  Defaults to Parse.line
   * @param blockSize size of block to get per http call.  (optional)
   * @param OutType the type of the output stream.
+  * @param partition (optional) partition colocation id to use.  Use this if you're doing higher-level fusion in your application.
   */
 
 public composite WebHdfsRead(output OutStream) {
@@ -22,6 +25,7 @@ public composite WebHdfsRead(output OutStream) {
     expression $format: Parse.line;
     expression $blockSize: 16384u;
     type $OutType: tuple<rstring line>;
+    expression<rstring> $partition: getThisCompositeInstanceName();
 
     graph 
 
@@ -29,6 +33,7 @@ public composite WebHdfsRead(output OutStream) {
     param iterations: 1;
     output Files: 
         filename= $file;
+    config placement: partitionColocation($partition);
     }
 
     stream<$OutType> OutStream = WebHdfsReadFiles(Files) {
@@ -39,11 +44,15 @@ password:$password;
 format: $format;
 blockSize: $blockSize;
 OutType:$OutType;
+partition: $partition;
+        config placement: partitionColocation($partition);
     }
 
 }
 
 /** WebHdfsReadFiles -- Read files given on an input stream from HDFS via the REST APIs
+  *
+  * All operators in this composite will be fused into the same PE.
   * 
   * @param url The base url, should end with http://.../webhdfs/v1
   * @param username username to use to connect, if empty, it's ignored
@@ -51,6 +60,7 @@ OutType:$OutType;
   * @param format format to use for parse operator.  Defaults to Parse.line
   * @param blockSize size of block to get per http call.  
   * @param OutType the type of output stream.
+  * @param partition (optional) the name of the partition to use in the partitionColocation statement
   */
 
 public composite WebHdfsReadFiles(input stream<rstring filename> FilenameStream;output OutStream ) {
@@ -61,6 +71,7 @@ public composite WebHdfsReadFiles(input stream<rstring filename> FilenameStream;
     expression $format: Parse.line;
     expression<uint32> $blockSize: 16384u;
     type $OutType: tuple<rstring line>;
+    expression<rstring> $partition:getThisCompositeInstanceName();
 
     graph
         stream<blob block> Blocks = WebHdfsReadBinaryFiles(FilenameStream) {
@@ -69,10 +80,12 @@ public composite WebHdfsReadFiles(input stream<rstring filename> FilenameStream;
                 username: $username;
                 password: $password;
                 blockSize: $blockSize;
+           config placement: partitionColocation($partition);
         }
 
     stream<$OutType> OutStream = Parse(Blocks) {
         param format: $format;
+        config placement: partitionColocation($partition);
     }
 
 }

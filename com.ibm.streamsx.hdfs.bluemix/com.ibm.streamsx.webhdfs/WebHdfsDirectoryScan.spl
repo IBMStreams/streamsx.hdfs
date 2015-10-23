@@ -13,7 +13,8 @@ rstring getValue(rstring string, rstring pattern, int32 startPos) {
 /** Scan a HDFS directory using WebHdfs.
  *
  * Periodically scans the directory and sends the filename of new 
- * or updated files.
+ * or updated files.  This composite consists of two primitive operators
+ * that will always be fused into the same PE.  
  * 
  * For best results, use a config placement: partitionColocation()
  * statement in your invocation.
@@ -47,7 +48,7 @@ public composite WebHdfsDirectoryScan(output stream<rstring filename> Filenames)
 initDelay: $initDelay;
            output Trigger:
                anInt = (int32)IterationCount();
-
+           config placement: partitionColocation(getThisCompositeInstanceName());
         }
 
 
@@ -82,5 +83,6 @@ initDelay: $initDelay;
             submit(Sys.WindowMarker,Filenames);
 
         }
+        config placement: partitionColocation(getThisCompositeInstanceName());
     }
 }
