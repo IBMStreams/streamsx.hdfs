@@ -1,9 +1,51 @@
 namespace com.ibm.streamsx.webhdfs;
 
-/** WebHdfsRead -- Read a file from HDFS via the REST APIs
+/**
+  * WebHdfsRead -- Read a file from HDFS via the REST APIs
   * 
   * @param url The base url, should end with http://.../webhdfs/v1
-  * @param file the file to read
+  * @param file the file to be read
+  * @username username to connect (optional)
+  * @password password to use to connect (optional)
+  * @param format format to use for the parse operator.  Defaults to Parse.line
+  * @param blockSize size of block to get per http call.  (optional)
+  * @param OutType the type of the output stream.
+  */
+
+public composite WebHdfsRead(output OutStream) {
+
+    param 
+        expression<rstring> $url;
+    expression<rstring> $username:"";
+    expression<rstring> $password:"";
+    expression<rstring> $file;
+    expression $format: Parse.line;
+    expression $blockSize: 16384u;
+    type $OutType: tuple<rstring line>;
+
+    graph 
+
+    stream<rstring filename> Files = Beacon() {
+    param iterations: 1;
+    output Files: 
+        filename= $file;
+    }
+
+    stream<$OutType> OutStream = WebHdfsReadFiles(Files) {
+        param
+            url:$url;
+username:$username;
+password:$password;
+format: $format;
+blockSize: $blockSize;
+OutType:$OutType;
+    }
+
+}
+
+/** WebHdfsReadFiles -- Read files given on an input stream from HDFS via the REST APIs
+  * 
+  * @param url The base url, should end with http://.../webhdfs/v1
   * @param username username to use to connect, if empty, it's ignored
   * @param password password to use to connect, optional.
   * @param format format to use for parse operator.  Defaults to Parse.line
@@ -11,10 +53,9 @@ namespace com.ibm.streamsx.webhdfs;
   * @param OutType the type of output stream.
   */
 
-public composite WebHdfsRead(output OutStream ) {
+public composite WebHdfsReadFiles(input stream<rstring filename> FilenameStream;output OutStream ) {
     param
         expression<rstring> $url;
-    expression<rstring> $file;
     expression<rstring> $username;
     expression<rstring> $password;
     expression $format: Parse.line;
@@ -22,10 +63,9 @@ public composite WebHdfsRead(output OutStream ) {
     type $OutType: tuple<rstring line>;
 
     graph
-        stream<blob block> Blocks = WebHdfsReadBinary() {
+        stream<blob block> Blocks = WebHdfsReadBinaryFiles(FilenameStream) {
             param
                 baseUrl: $url;
-                file: $file;
                 username: $username;
                 password: $password;
                 blockSize: $blockSize;
@@ -42,27 +82,26 @@ public composite WebHdfsRead(output OutStream ) {
   * Except in the case where the file is binary, you should use WebHdfsRead
   */
 
-public composite WebHdfsReadBinary(output Blocks) {
+public composite WebHdfsReadBinaryFiles(input stream<rstring filename> FilenameStream; output Blocks) {
 
     param 
         expression<rstring> $baseUrl;
-    expression<rstring> $file;
     expression<rstring> $username;
     expression<rstring> $password;
     expression<uint32> $blockSize: 16384u;
     graph 
 
-        stream<blob block> Blocks = Custom() {
+        stream<blob block> Blocks = Custom(FilenameStream) {
 
             logic state: {
                 // If they are submission time values, this way we only compute them once.
-                rstring url = $baseUrl+"/"+$file+"?OP=OPEN";
                 rstring username = $username;
                 rstring password = $password;
                 rstring lengthSection = "&length="+(rstring)$blockSize;
                 int32 blockSize = (int32)$blockSize;
             }
-            onProcess: {
+            onTuple FilenameStream: {
+               rstring url = $baseUrl+"/"+filename+"?OP=OPEN";
                mutable int32 error = 0;
                mutable boolean done = false;
                mutable int64 offset = 0;
@@ -88,7 +127,10 @@ public composite WebHdfsReadBinary(output Blocks) {
                }
                submit(Sys.WindowMarker,Blocks);
            }
-
+           onPunct FilenameStream: {
+            if (currentPunct() == Sys.FinalMarker) {
+                submit(currentPunct(),Blocks);
+            }
+           }
         }
-
 }

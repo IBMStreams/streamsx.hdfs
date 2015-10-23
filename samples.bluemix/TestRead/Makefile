@@ -7,11 +7,11 @@
 
 HDFS_BLUEMIX ?=../../com.ibm.streamsx.hdfs.bluemix
 INET_TOOLKIT ?= ../../../streamsx.inet/com.ibm.streamsx.inet
-SPLC_FLAGS = -a -t $(HDFS_BLUEMIX) -t $(INET_TOOLKIT)
+SPLC_FLAGS = -a -t $(HDFS_BLUEMIX) -t $(INET_TOOLKIT) --data-directory=data
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
-SPL_CMD_ARGS ?=
+SPL_CMD_ARGS ?= 
 SPL_MAIN_COMPOSITE = TestRead
 STANDALONE_OUTPUT_DIR = output/Standalone
 DISTRIBUTED_OUTPUT_DIR = output/Distributed
