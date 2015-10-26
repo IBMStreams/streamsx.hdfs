@@ -9,13 +9,15 @@ composite TestRead {
 	stream<rstring line> FileContents = WebHdfsRead() {
 	param 
 	url:getSubmissionTimeValue("url");
-file: getSubmissionTimeValue("linefile","/tmp/TxtFile3.txt");
+	file: getSubmissionTimeValue("personfile","/tmp/People.txt");
 	password: getSubmissionTimeValue("password");
 	username: getSubmissionTimeValue("username");
 	}
 
 () as sink = FileSink(FileContents) {
-param file: "lines.txt";
+	param
+	file: "lines.txt";
+	quoteStrings:false;
 }
 
     // Now we read a file as person-tuples.  To show that we're reading and parsing them correctly,
@@ -23,10 +25,10 @@ param file: "lines.txt";
     stream<PersonType> AsTuples = WebHdfsRead() {
     param
         url:getSubmissionTimeValue("url");
-        file: getSubmissionTimeValue("personfile","/tmp/TxtFile.txt");
+        file: getSubmissionTimeValue("personfile","/tmp/People.txt");
 	password: getSubmissionTimeValue("password");
 	username: getSubmissionTimeValue("username");
-	format: Parse.txt;
+	format: Parse.csv;
 	OutType: PersonType;
     }
     

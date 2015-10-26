@@ -7,7 +7,7 @@
 
 HDFS_BLUEMIX ?=../../com.ibm.streamsx.hdfs.bluemix
 INET_TOOLKIT ?= ../../../streamsx.inet/com.ibm.streamsx.inet
-SPLC_FLAGS = -a -t $(HDFS_BLUEMIX) -t $(INET_TOOLKIT)
+SPLC_FLAGS = -a -t $(HDFS_BLUEMIX) -t $(INET_TOOLKIT) --data-directory=data
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
