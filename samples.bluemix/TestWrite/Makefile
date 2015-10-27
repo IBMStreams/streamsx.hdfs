@@ -12,7 +12,8 @@ SPLC_FLAGS = -a -t $(HDFS_BLUEMIX) -t $(INET_TOOLKIT) --data-directory=data
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
 SPL_CMD_ARGS ?=
-SPL_MAIN_COMPOSITE = TestWrite
+SPL_COMP_NAME = TestWrite
+SPL_MAIN_COMPOSITE = com.ibm.streamsx.hdfs.bluemix.sample::$(SPL_COMP_NAME)
 STANDALONE_OUTPUT_DIR = output/Standalone
 DISTRIBUTED_OUTPUT_DIR = output/Distributed
 
@@ -20,17 +21,17 @@ DISTRIBUTED_OUTPUT_DIR = output/Distributed
 all: distributed
 
 standalone:
-	$(SPLC) $(SPLC_FLAGS) -T -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE) $(SPL_CMD_ARGS) 
+	$(SPLC) $(SPLC_FLAGS) -T -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_COMP_NAME) $(SPL_CMD_ARGS) 
 
 distributed:
-	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE) $(SPL_CMD_ARGS)
+	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_COMP_NAME) $(SPL_CMD_ARGS)
 
 clean: clean-standalone clean-distributed
 
 clean-standalone:
-	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE)
+	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_COMP_NAME)
 	-rm -rf toolkit.xml
 
 clean-distributed:
-	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE)
+	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_COMP_NAME)
 	-rm -rf toolkit.xml

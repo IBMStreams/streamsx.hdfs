@@ -1,3 +1,5 @@
+namespace com.ibm.streamsx.hdfs.bluemix.sample;
+
 use com.ibm.streamsx.webhdfs::*;
 
 composite TestWrite {
@@ -18,4 +20,3 @@ graph
         overwrite: true;
     }
 }
-

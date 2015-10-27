@@ -1,3 +1,5 @@
+namespace com.ibm.streamsx.hdfs.bluemix.sample;
+
 use com.ibm.streamsx.webhdfs::*;
 
 type PersonType = int32 id, rstring fname, rstring lname, int32 age, rstring gender, float32 score, float32 total;
@@ -37,4 +39,3 @@ graph
         suppress: fname;
     }
 }
-
