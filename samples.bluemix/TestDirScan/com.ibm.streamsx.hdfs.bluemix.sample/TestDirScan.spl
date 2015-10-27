@@ -4,18 +4,17 @@ use com.ibm.streamsx.webhdfs::*;
 
 composite TestDirScan {
 
-    graph
+graph
+	stream<rstring filename> Files = WebHdfsDirectoryScan() {
+		param 
+		url: getSubmissionTimeValue("url");
+		directory: getSubmissionTimeValue("linefile","/tmp/");
+		password: getSubmissionTimeValue("password");
+		username: getSubmissionTimeValue("username");
+	}
 
-        stream<rstring filename> Files = WebHdfsDirectoryScan() {
-            param 
-                url:getSubmissionTimeValue("url");
-directory: getSubmissionTimeValue("linefile","/tmp/");
-password: getSubmissionTimeValue("password");
-username: getSubmissionTimeValue("username");
-        }
-
-    () as sink = FileSink(Files) {
-        param file: "files.txt";
-    }
-
+	() as sink = FileSink(Files) {
+		param
+		file: "files.txt";
+	}
 }
