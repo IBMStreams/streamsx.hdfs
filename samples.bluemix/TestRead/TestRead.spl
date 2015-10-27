@@ -17,7 +17,7 @@ composite TestRead {
 () as sink = FileSink(FileContents) {
 	param
 	file: "lines.txt";
-	quoteStrings:false;
+	format: FileSink.line;
 }
 
     // Now we read a file as person-tuples.  To show that we're reading and parsing them correctly,
