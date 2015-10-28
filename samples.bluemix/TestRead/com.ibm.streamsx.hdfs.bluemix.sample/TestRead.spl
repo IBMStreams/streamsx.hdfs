@@ -1,0 +1,41 @@
+namespace com.ibm.streamsx.hdfs.bluemix.sample;
+
+use com.ibm.streamsx.webhdfs::*;
+
+type PersonType = int32 id, rstring fname, rstring lname, int32 age, rstring gender, float32 score, float32 total;
+
+composite TestRead {
+
+graph
+	stream<rstring line> FileContents = WebHdfsRead() {
+		param
+		url: getSubmissionTimeValue("url");
+		file: getSubmissionTimeValue("personfile","/tmp/People.txt");
+		password: getSubmissionTimeValue("password");
+		username: getSubmissionTimeValue("username");
+	}
+
+	() as sink = FileSink(FileContents) {
+		param
+		file: "lines.txt";
+		format: FileSink.line;
+	}
+
+	// Now we read a file as person-tuples.  To show that we're reading and parsing them correctly,
+	// when we print, we drop the first name.
+	stream<PersonType> AsTuples = WebHdfsRead() {
+		param
+		url: getSubmissionTimeValue("url");
+		file: getSubmissionTimeValue("personfile","/tmp/People.txt");
+		password: getSubmissionTimeValue("password");
+		username: getSubmissionTimeValue("username");
+		format: Parse.csv;
+		OutType: PersonType;
+	}
+
+	() as tuplesink = FileSink(AsTuples) {
+		param
+		file: "dropFirst.txt";
+		suppress: fname;
+	}
+}
