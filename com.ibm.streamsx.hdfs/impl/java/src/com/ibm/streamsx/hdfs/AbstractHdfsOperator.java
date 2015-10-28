@@ -38,11 +38,12 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private IHdfsClient fHdfsClient;
 	private String fHdfsUri;
 	private String fHdfsUser;
+	private String fHdfsPassword;
 	private String fAuthPrincipal;
 	private String fAuthKeytab;
 	private String fCredFile;
 	private String fConfigPath;
-
+	
 	// Other variables
 	protected Thread processThread = null;
 	protected boolean shutdownRequested = false;
@@ -55,6 +56,8 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		fHdfsClient = createHdfsClient();
 		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 	}
+	
+	
 
 	@Override
 	public void allPortsReady() throws Exception {
@@ -109,6 +112,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	protected IHdfsClient createHdfsClient() throws Exception {
 		IHdfsClient client = new HdfsJavaClient();
 
+		client.setConnectionProperty(IHdfsConstants.HDFS_PASSWORD, getHdfsPassword());
 		client.setConnectionProperty(IHdfsConstants.AUTH_PRINCIPAL, getAuthPrincipal());
 		client.setConnectionProperty(IHdfsConstants.AUTH_KEYTAB, getAbsolutePath(getAuthKeytab()));
 		client.setConnectionProperty(IHdfsConstants.CRED_FILE, getAbsolutePath(getCredFile()));
@@ -147,7 +151,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	public void setHdfsUser(String hdfsUser) {
 		this.fHdfsUser = hdfsUser;
 	}
-
+	
 	public String getHdfsUser() {
 		return fHdfsUser;
 	}
@@ -186,5 +190,13 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 	public String getConfigPath() {
 		return fConfigPath;
+	}
+	
+	public String getHdfsPassword() {
+		return fHdfsPassword;
+	}
+	@Parameter(optional=true)	
+	public void setHdfsPassword(String pass) {
+		fHdfsPassword = pass;
 	}
 }

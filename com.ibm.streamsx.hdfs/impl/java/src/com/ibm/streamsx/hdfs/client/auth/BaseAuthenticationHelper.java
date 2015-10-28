@@ -17,6 +17,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
+import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public abstract class BaseAuthenticationHelper implements IAuthenticationHelper {
 	
@@ -67,12 +68,23 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		if (uri == null) {
 			throw new Exception("Unable to find a URI to connect to.");
 		}
-
+		fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
+		
 		setHdfsUri(new URI(uri));
+		
+		if (isConnectionToBluemix(hdfsUser, connectionProperties)) {
+			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
+			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
+		} 
 		logger.log(TraceLevel.DEBUG, "Attempting to connect to URI: " + getHdfsUri().toString());
 		
 		return null;
 	}
+	
+	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties){
+		return hdfsUser != null && connectionProperties.get(IHdfsConstants.HDFS_PASSWORD) != null;
+	}
+	
 	
 	protected FileSystem internalGetFileSystem(URI hdfsUri, String hdfsUser) throws Exception {
 		FileSystem fs = null;

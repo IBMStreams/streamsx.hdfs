@@ -92,16 +92,7 @@ The following example shows how the operator accesses GPFS remotely and reads a 
         <library>
           <cmn:description>apache library</cmn:description>
           <cmn:managedLibrary>
-            <cmn:libPath>@HADOOP_HOME@/../hadoop-conf</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/etc/hadoop</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/conf</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/share/hadoop/hdfs/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/share/hadoop/common/lib/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/lib/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/client/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/*</cmn:libPath>
-            <cmn:libPath>@HADOOP_HOME@/../hadoop-hdfs/*</cmn:libPath>
+            <cmn:libPath>../../opt/downloaded/*</cmn:libPath>
           </cmn:managedLibrary>
         </library>
       </libraryDependencies>
@@ -177,6 +168,16 @@ to perform operations as the user that is specified by the **hdfsUser** paramete
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
+      <parameter>
+        <name>hdfsPassword</name>
+        <description>
+This parameter specifies the password to use when you connect to the WebHDFS file system. This parameter must be specified when connecting to a Hadoop file system deployed on Bluemix.  
+If this parameter is not specified, attempts to connect to a HDFS instance on Bluemix will cause an exception.</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+     
       <parameter>
         <name>authPrincipal</name>
         <description>
