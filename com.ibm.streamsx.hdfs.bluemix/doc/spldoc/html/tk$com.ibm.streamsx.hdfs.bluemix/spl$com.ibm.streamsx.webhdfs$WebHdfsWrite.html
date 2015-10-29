@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="reference"/>
+<meta name="DC.Title" content="SPL File WebHdfsWrite.spl"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="spldoc_compilationunit"/>
+<link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
+<link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
+<title>SPL File WebHdfsWrite.spl</title>
+</head>
+<body id="spldoc_compilationunit">
+
+
+<h1 class="title topictitle1">SPL File <tt class="ph tt">WebHdfsWrite.spl</tt></h1>
+
+<div class="body refbody">
+<div class="section">
+<p class="p">
+<a class="xref" href="../toolkits/toolkits.html">Toolkits</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.bluemix.html">com.ibm.streamsx.hdfs.bluemix 0.3.1</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.webhdfs.html">com.ibm.streamsx.webhdfs</a> &gt; WebHdfsWrite.spl</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Content</h2>
+  
+  <dl class="dl">
+    <dt class="dt dlterm"/>
+<dd class="dd"/>
+
+    
+      <dt class="dt dlterm splhead-2">Operators</dt>
+
+      <dd class="dd">
+<ul class="sl simple">
+<li class="sli"><strong class="ph b"><a class="xref" href="spl$com.ibm.streamsx.webhdfs$WebHdfsWrite.html#spldoc_compilationunit__composite_operator__WebHdfsWrite">WebHdfsWrite</a></strong>: Write data to WebHdfs Formats the tuple with Format, and then sends the blob to WebHdfsWriteBinary.
+</li>
+
+<li class="sli"><strong class="ph b"><a class="xref" href="spl$com.ibm.streamsx.webhdfs$WebHdfsWrite.html#spldoc_compilationunit__composite_operator__WebHdfsWriteBinary">WebHdfsWriteBinary</a></strong>: Used by WebHdfsWrite; the only case you should consider  using this is if your data is binary blobs so that you don't want a format operator.
+</li>
+
+</ul>
+
+      </dd>
+
+    
+  </dl>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Composites</h2>
+  
+</div>
+
+<div class="section" id="spldoc_compilationunit__composite_operator__WebHdfsWrite"><h2 class="title sectiontitle splpart">composite WebHdfsWrite(input InStream)</h2>
+  
+</div>
+
+<div class="section">
+
+<p class="p">Write data to WebHdfs
+</p>
+
+<p class="p">Formats the tuple with Format, and then sends the blob to WebHdfsWriteBinary. If consistent cut is enabled, the same tuple could be sent to the file multiple times; this could result in an corrupted file if the Format parameter is block. All operators in this composite are fused into one PE.
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Parameters</h2>
+
+<ul class="sl simple">
+<li class="sli"><strong class="ph b">url</strong>: to access webhdfs.  It should start with http://host:port/..webhdfs/v1
+</li>
+
+<li class="sli"><strong class="ph b">file</strong>: filename to write
+</li>
+
+<li class="sli"><strong class="ph b">username</strong>: username to use to connector to webhdfs if accessed via a knox gateway
+</li>
+
+<li class="sli"><strong class="ph b">password</strong>: password to use to connect ot webhdfs if accessed via a knox gateway
+</li>
+
+<li class="sli"><strong class="ph b">overwrite</strong>: true if hte file should be overwritten if present, false otherwise
+</li>
+
+<li class="sli"><strong class="ph b">format</strong>: parameter to be passed to Format operator; defaults to line.
+</li>
+
+<li class="sli"><strong class="ph b">partition</strong>: (optional) colocation id to use.
+</li>
+
+</ul>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Input Ports</h2>
+
+<ul class="sl simple">
+<li class="sli"><strong class="ph b">InStream</strong>: to write to WebHdfs
+</li>
+
+</ul>
+
+</div>
+
+<div class="section">
+</div>
+
+<div class="section" id="spldoc_compilationunit__composite_operator__WebHdfsWriteBinary"><h2 class="title sectiontitle splpart">composite WebHdfsWriteBinary(input InStream)</h2>
+  
+</div>
+
+<div class="section">
+
+<p class="p">Used by WebHdfsWrite; the only case you should consider  using this is if your data is binary blobs so that you don't want a format operator.  See WebHdfsWrite for parameter descriptions.   
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Parameters</h2>
+
+<ul class="sl simple">
+<li class="sli"><strong class="ph b">baseUrl</strong>
+</li>
+
+<li class="sli"><strong class="ph b">file</strong>
+</li>
+
+<li class="sli"><strong class="ph b">username</strong>
+</li>
+
+<li class="sli"><strong class="ph b">password</strong>
+</li>
+
+<li class="sli"><strong class="ph b">overwrite</strong>
+</li>
+
+</ul>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Input Ports</h2>
+
+<ul class="sl simple">
+<li class="sli"><strong class="ph b">InStream</strong>
+</li>
+
+</ul>
+
+</div>
+
+<div class="section">
+</div>
+
+</div>
+
+
+</body>
+</html>
