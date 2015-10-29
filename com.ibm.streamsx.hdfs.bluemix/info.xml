@@ -3,7 +3,7 @@
   <info:identity>
     <info:name>com.ibm.streamsx.hdfs.bluemix</info:name>
     <info:description>Experimental toolkit for interacting with HBASE</info:description>
-    <info:version>0.3.1</info:version>
+    <info:version>0.3.2</info:version>
     <info:requiredProductVersion>4.0.0.0</info:requiredProductVersion>
   </info:identity>
   <info:dependencies>

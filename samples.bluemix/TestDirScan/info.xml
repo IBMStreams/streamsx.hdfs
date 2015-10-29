@@ -3,7 +3,7 @@
   <info:identity>
     <info:name>Directory scan example</info:name>
     <info:description>Demonstrate the WebHdfsDirectoryScan operator</info:description>
-    <info:version>1.0.0</info:version>
+    <info:version>2.0.0</info:version>
     <info:requiredProductVersion>4.0.0.0</info:requiredProductVersion>
   </info:identity>
   <info:dependencies>
