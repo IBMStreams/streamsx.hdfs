@@ -51,6 +51,18 @@ This example uses the `HDFS2FileSink` operator to write tuples to output files t
         file : "output%FILENUM.txt" ;
         bytesPerFile: (int64)(16*1024);
     }
+
+
+This example uses the `HDFS2FileSink` operator to write output to a Hadoop filesystem deployed on Bluemix.
+    stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
+      param
+        hdfsUri:"webhdfs://server_host_name:8443/gateway/default/webhdfs/v1`.   
+        file   :"/user/biadmin/myfile.txt";
+        hdfsUser: "biadmin";
+        hdfsPassword: "BluemixPassword";
+        keyStorePassword: "storepass";
+        keyStorePath: "etc/store.jks";
+    }    
 </description>
       <iconUri size="32">HDFS2FileSink_32.gif</iconUri>
       <iconUri size="16">HDFS2FileSink_16.gif</iconUri>
@@ -134,7 +146,8 @@ property in the `core-site.xml` HDFS configuration file.  The operator expects t
 `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`. 
 
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option
-in the `core-site.xml` configuration file.</description>
+in the `core-site.xml` configuration file.
+**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -188,7 +201,7 @@ The **bytesPerFile**, **timePerFile**, and **tuplesPerFile** parameters are mutu
         <name>hdfsUser</name>
         <description>
 This parameter specifies the user ID to use when you connect to the HDFS file system.  
-If this parameter is not specified, the operator uses the instance owner ID to connect to the HDFS file system.
+If this parameter is not specified, the operator uses the instance owner ID to connect to the HDFS file system.  However, when connecting to Hadoop instances on Bluemix, this parameter must be specified otherwise the connection will be unsuccessful.  
 
 When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by 
 using the values that are specified in the **authPrincipal** and **authKeytab** parameters.  After successful authentication,
@@ -203,16 +216,16 @@ to perform operations as the user that is specified by the **hdfsUser** paramete
  <parameter>
         <name>hdfsPassword</name>
         <description>
-This parameter specifies the password to use when you connect to the WebHDFS file system. This parameter must be specified when connecting to a Hadoop file system deployed on Bluemix.  
-If this parameter is not specified, attempts to connect to a HDFS instance on Bluemix will cause an exception.</description>
+This parameter specifies the password to use when you connecting to a Hadoop instance deployed on Bluemix.  
+If this parameter is not specified, attempts to connect to a Hadoop instance deployed on Bluemix will cause an exception.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
        <parameter> 
         <name>keyStorePath</name>
-        <description>This optional attribute specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to, and is only valid when connecting to HDFS servers running on IBM Bluemix. 
-**Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.**         If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. The location of the keystore file can be absolute path on the filesystem or a path that is relative to the etc directory.
+        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server.  See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore.
+**Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.**  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.
         </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -220,7 +233,7 @@ If this parameter is not specified, attempts to connect to a HDFS instance on Bl
       </parameter>
         <parameter>
         <name>keyStorePassword</name>
-        <description>This optional attribute specifies the password for the keystore file. This attribute is specified when the keyStore attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
+        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
         </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -261,7 +274,16 @@ For example, the file must contain the user name and password for an IBM InfoSph
         <name>configPath</name>
         <description>
 This parameter specifies the absolute path to the configuration directory that contains the `core-site.xml` file. 
-If this parameter is not specified, the operator searches the default location for the `core-site.xml`.</description>
+If this parameter is not specified, by default the operator looks for the `core-site.xml` file in the following locations:
+ * `$HADOOP_HOME/../hadoop-conf`
+ * `$HADOOP_HOME/etc/hadoop`
+ * `$HADOOP_HOME/conf`
+ * `$HADOOP_HOME/share/hadoop/hdfs/\*`
+ * `$HADOOP_HOME/share/hadoop/common/\*`
+ * `$HADOOP_HOME/share/hadoop/common/lib/\*`
+ * `$HADOOP_HOME/lib/\*`
+ * `$HADOOP_HOME/\*`
+**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>

@@ -83,6 +83,8 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 					keyStorePass = "";
 				}
 				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
+			} else {
+				logger.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
 			}
 			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
 		} 

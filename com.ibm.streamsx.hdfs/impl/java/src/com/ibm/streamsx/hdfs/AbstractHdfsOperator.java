@@ -76,7 +76,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 			libList.add(HADOOP_HOME + "/*");
 			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
 		} else {
-			String dir = context.getToolkitDirectory() +"/opt/lib/*";
+			String dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
 			TRACE.log(TraceLevel.INFO, "Loading libraries from " + dir);
 			libList.add(dir);
 		}
@@ -144,7 +144,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	protected IHdfsClient createHdfsClient() throws Exception {
 		IHdfsClient client = new HdfsJavaClient();
 
-		client.setConnectionProperty(IHdfsConstants.KEYSTORE, getAbsolutePath(getKeyStorePath(), "etc"));
+		client.setConnectionProperty(IHdfsConstants.KEYSTORE, getAbsolutePath(getKeyStorePath()));
 		client.setConnectionProperty(IHdfsConstants.KEYSTORE_PASSWORD, getKeyStorePassword());
 
 		client.setConnectionProperty(IHdfsConstants.HDFS_PASSWORD, getHdfsPassword());
@@ -156,15 +156,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	}
 
 	protected String getAbsolutePath(String filePath) {
-		return getAbsolutePath(filePath, null);
-	}
-
-	/**
-	 * Get the absolute path to the given file.
-	 * If the file is relative, return its path relative to the application directory.
-	 * If subDir is not null and the file is relateive, return its path relative to the subDIr folder in the application directory.
-	 * */
-	protected String getAbsolutePath(String filePath, String subDir) {
 		if(filePath == null) 
 			return null;
 
@@ -172,9 +163,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		if(p.isAbsolute()) {
 			return filePath;
 		} else {
-			if (subDir != null) {
-				filePath = subDir + File.separator + filePath;
-			}
 			File f = new File (getOperatorContext().getPE().getApplicationDirectory(), filePath);
 			return f.getAbsolutePath();
 		}

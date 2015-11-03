@@ -47,8 +47,6 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 
 # Procedure
 
-# Procedure
-
 1. If InfoSphere Streams has access to the location where Hadoop is installed, 
    set the following environment variables:
    * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
@@ -65,6 +63,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
    copy the Hadoop library files to a location that is accessible to InfoSphere Streams
    and set the appropriate environment variables.
    The following list describes the Hadoop library files to copy:
+   * For applications running in the Streaming Analytics service on Bluemix, or applications connecting to Hadoop instances on Bluemix, the **HADOOP_HOME** environment variable is not supported and should not be set.  The required Hadoop library files are included in the toolkit in `impl/lib/ext`, so there are no additional files to copy.
    * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
      1. Copy `/usr/lib/hadoop` to the InfoSphere Streams cluster and place it in a directory on the cluster,
         which is accessible to InfoSphere Streams.
@@ -116,7 +115,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
    * IBM InfoSphere BigInsights 3.x installed on GPFS:
      * Set **HADOOP_HOME** to `/opt/ibm/biginsights/IHC/`.
      * Set **BIGINSIGHTS_HOME** to `/opt/ibm/biginsights`.
-     * Set **JAVA_HOME** to the location where Java is installed.        
+     * Set **JAVA_HOME** to the location where Java is installed.
 3. Configure the SPL compiler to find the toolkit root directory. Use one of the following methods:
   * Set the **STREAMS_SPLPATH** environment variable to the root directory of a toolkit
     or multiple toolkits (with : as a separator).  For example:
@@ -131,6 +130,24 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
       use com.ibm.streamsx.hdfs::*;
     You can also specify a use clause for individual operators by replacing the asterisk (\*) with the operator name. For example: 
       use com.ibm.streamsx.hdfs::HDFS2FileSink;
+5. SSL Configuration
+   * These directions apply when connecting to HDFS on Bluemix, through either the Enterprise Hadoop as a Service (EHaas) or  Analytics for Hadoop offerings.
+   * Decide on whether or not to enable SSL certificate validation for the connection to Bluemix.  If certificate validation is desired, follow these [https://www.ng.bluemix.net/docs/services/BigInsights/index-gentopic1.html#exportcerttotruststore|instructions] to  
+ 	export the SSL certificate and add it to your truststore.  Note that you should export the certificate from the  IBM BigInsights Home page, and not from the Ambari console.
+ 	The BigInsights home page is typically at `https://server_host_name:8443/gateway/default/BigInsightsWeb/index.html`.   
+   * Copy the truststore into a location accessible by your application directory, for example, &lt;application_directory>/etc/mystore.jks.
+   * Set the **keyStorePath** and **keyStorePassword** parameters in your application to the path to your keystore and the keystore password respectively. For example:
+   
+   () as HDFS2FileSink_2 = HDFS2FileSink(In){
+	 param
+	  file : "output_file.txt" ;
+	  hdfsUri : "https://server_host_name:8443/gateway/default/webhdfs/v1" ;
+	  keyStorePassword:"storepass";
+	  keyStorePath: "etc/store.jks";
+	  hdfsPassword: "ehaas_password";
+	  hdfsUser:"ehaas_user";
+   }
+   	              
 5. If IBM InfoSphere BigInsights 3.x or 4.x is installed on GPFS:
    * To access GPFS locally, set the `fs.defaultFS` option in the `core-site.xml` configuration file to `gpfs:///`.
    * To access GPFS remotely (**only applies to BigInsights 3.x**), modify the `core-site.xml` that you have copied over from the remote system. 
@@ -151,6 +168,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
      * `$HADOOP_HOME/\*`
      Tip: To specify a different location for the HDFS configuration files, set the **configPath** operator parameter.
    * Specify a value for the **hdfsUri** operator parameter.
+   **Note:** For connections to HDFS on Bluemix, the `$HADOOP_HOME` environment variable is not supported, and so either **hdfsUri** or **configPath**  must be specified.
 7. Build your application.  You can use the **sc** command or Streams Studio.  
 8. Start the InfoSphere Streams instance. 
 9. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 

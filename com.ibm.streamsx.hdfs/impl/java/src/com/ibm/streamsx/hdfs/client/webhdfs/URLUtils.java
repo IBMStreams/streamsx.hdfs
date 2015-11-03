@@ -99,11 +99,11 @@ public class URLUtils {
 			String keyStorePassword) throws Exception {
 
 		SSLContext sc = SSLContext.getInstance("TLS");
-		TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		TrustManagerFactory factory = TrustManagerFactory.getInstance("PKIX");
 		TrustManager[] managerArray = null;
 		KeyStore userKeyStore = null;
 		if (keyStore != null) {
-			userKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			userKeyStore = KeyStore.getInstance("JKS");
 			//load the user key store
 			userKeyStore.load(new FileInputStream(keyStore),   keyStorePassword.toCharArray());
 			factory.init(userKeyStore);
