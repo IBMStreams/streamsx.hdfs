@@ -1,11 +1,13 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.Path;
@@ -43,21 +45,51 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private String fAuthKeytab;
 	private String fCredFile;
 	private String fConfigPath;
-	
+
 	// Other variables
 	protected Thread processThread = null;
 	protected boolean shutdownRequested = false;
+	private String fKeyStorePath;
+	private String fKeyStorePassword;
 
 	@Override
 	public synchronized void initialize(OperatorContext context)
 			throws Exception {
 		super.initialize(context);
-
+		setupClassPaths(context);
 		fHdfsClient = createHdfsClient();
 		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 	}
-	
-	
+
+	private  void setupClassPaths(OperatorContext context) {
+		String HADOOP_HOME = System.getenv("HADOOP_HOME");
+		ArrayList<String> libList = new ArrayList<>();
+		if (HADOOP_HOME != null) {
+			libList.add(HADOOP_HOME + "/../hadoop-conf");
+			libList.add(HADOOP_HOME + "/etc/hadoop");
+			libList.add(HADOOP_HOME + "/conf");
+			libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
+			libList.add(HADOOP_HOME + "/share/hadoop/common/*");
+			libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+			libList.add(HADOOP_HOME + "/lib/*");
+			libList.add(HADOOP_HOME + "/client/*");
+			libList.add(HADOOP_HOME + "/*");
+			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+		} else {
+			String dir = context.getToolkitDirectory() +"/opt/lib/*";
+			TRACE.log(TraceLevel.INFO, "Loading libraries from " + dir);
+			libList.add(dir);
+		}
+
+		try {
+			context.addClassLibraries(libList.toArray(new String[0]));
+
+		} catch (MalformedURLException e) {
+			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR",  e);
+		}
+	}
+
+
 
 	@Override
 	public void allPortsReady() throws Exception {
@@ -112,6 +144,9 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	protected IHdfsClient createHdfsClient() throws Exception {
 		IHdfsClient client = new HdfsJavaClient();
 
+		client.setConnectionProperty(IHdfsConstants.KEYSTORE, getAbsolutePath(getKeyStorePath(), "etc"));
+		client.setConnectionProperty(IHdfsConstants.KEYSTORE_PASSWORD, getKeyStorePassword());
+
 		client.setConnectionProperty(IHdfsConstants.HDFS_PASSWORD, getHdfsPassword());
 		client.setConnectionProperty(IHdfsConstants.AUTH_PRINCIPAL, getAuthPrincipal());
 		client.setConnectionProperty(IHdfsConstants.AUTH_KEYTAB, getAbsolutePath(getAuthKeytab()));
@@ -119,20 +154,32 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 		return client;
 	}
-	
+
 	protected String getAbsolutePath(String filePath) {
+		return getAbsolutePath(filePath, null);
+	}
+
+	/**
+	 * Get the absolute path to the given file.
+	 * If the file is relative, return its path relative to the application directory.
+	 * If subDir is not null and the file is relateive, return its path relative to the subDIr folder in the application directory.
+	 * */
+	protected String getAbsolutePath(String filePath, String subDir) {
 		if(filePath == null) 
 			return null;
-		
+
 		Path p = new Path(filePath);
 		if(p.isAbsolute()) {
 			return filePath;
 		} else {
+			if (subDir != null) {
+				filePath = subDir + File.separator + filePath;
+			}
 			File f = new File (getOperatorContext().getPE().getApplicationDirectory(), filePath);
 			return f.getAbsolutePath();
 		}
 	}
-	
+
 	protected IHdfsClient getHdfsClient() {
 		return fHdfsClient;
 	}
@@ -151,7 +198,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	public void setHdfsUser(String hdfsUser) {
 		this.fHdfsUser = hdfsUser;
 	}
-	
+
 	public String getHdfsUser() {
 		return fHdfsUser;
 	}
@@ -191,12 +238,28 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	public String getConfigPath() {
 		return fConfigPath;
 	}
-	
+
 	public String getHdfsPassword() {
 		return fHdfsPassword;
+	}
+
+	public String getKeyStorePath() {
+		return fKeyStorePath;
+	}
+	public String getKeyStorePassword() {
+		return fKeyStorePassword;
 	}
 	@Parameter(optional=true)	
 	public void setHdfsPassword(String pass) {
 		fHdfsPassword = pass;
+	}
+
+	@Parameter(optional=true)	
+	public void setKeyStorePath(String path) {
+		fKeyStorePath = path;
+	}
+	@Parameter(optional=true)	
+	public void setKeyStorePassword(String pass) {
+		fKeyStorePassword = pass;
 	}
 }

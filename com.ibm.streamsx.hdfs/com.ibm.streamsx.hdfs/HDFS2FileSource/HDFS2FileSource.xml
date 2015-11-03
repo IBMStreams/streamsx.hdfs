@@ -89,12 +89,6 @@ The following example shows how the operator accesses GPFS remotely and reads a 
             <cmn:command></cmn:command>
           </cmn:managedLibrary>
         </library>
-        <library>
-          <cmn:description>apache library</cmn:description>
-          <cmn:managedLibrary>
-            <cmn:libPath>../../opt/downloaded/*</cmn:libPath>
-          </cmn:managedLibrary>
-        </library>
       </libraryDependencies>
       <codeTemplates>
         <codeTemplate name="HDFS2FileSource">
@@ -177,7 +171,23 @@ If this parameter is not specified, attempts to connect to a HDFS instance on Bl
         <type>rstring</type>
         <cardinality>1</cardinality>
       </parameter>
-     
+  <parameter> 
+        <name>keyStorePath</name>
+        <description>This optional attribute specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to, and is only valid when connecting to HDFS servers running on IBM Bluemix. 
+         **Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.** If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. The location of the keystore file can be absolute path on the filesystem or a path that is relative to the etc directory.
+        </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+        <parameter>
+        <name>keyStorePassword</name>
+        <description>This optional attribute specifies the password for the keystore file. This attribute is specified when the keyStore attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
+        </description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>     
       <parameter>
         <name>authPrincipal</name>
         <description>

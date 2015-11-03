@@ -104,7 +104,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
    The following list describes the environment variables to set when Hadoop and IBM InfoSphere BigInsights
    libraries are copied to location that is accessible to InfoSphere Streams:
    * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
-     * Set **HADOOP_HOME** to `/home/Streams/hadoop`.l
+     * Set **HADOOP_HOME** to `/home/Streams/hadoop`.
      * Set **JAVA_HOME** to the location where Java is installed.
    * For IBM InfoSphere BigInsights 3.x:
      * Set **HADOOP_HOME** to `/home/Streams/biginsights/IHC`.

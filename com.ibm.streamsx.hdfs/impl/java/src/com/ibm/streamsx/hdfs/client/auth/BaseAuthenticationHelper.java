@@ -68,12 +68,22 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		if (uri == null) {
 			throw new Exception("Unable to find a URI to connect to.");
 		}
-		fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
+		
 		
 		setHdfsUri(new URI(uri));
 		
 		if (isConnectionToBluemix(hdfsUser, connectionProperties)) {
+			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
 			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
+			String keyStore = connectionProperties.get(IHdfsConstants.KEYSTORE);
+			if (keyStore != null) {
+				fConfiguration.set(IHdfsConstants.KEYSTORE, keyStore);
+				String keyStorePass = connectionProperties.get(IHdfsConstants.KEYSTORE_PASSWORD);
+				if (keyStorePass == null) {
+					keyStorePass = "";
+				}
+				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
+			}
 			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
 		} 
 		logger.log(TraceLevel.DEBUG, "Attempting to connect to URI: " + getHdfsUri().toString());

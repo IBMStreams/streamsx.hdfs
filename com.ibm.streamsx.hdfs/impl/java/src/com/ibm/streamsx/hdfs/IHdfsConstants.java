@@ -33,6 +33,8 @@ public interface IHdfsConstants {
 	public final static String FS_WEBHDFS = "webhdfs";
 	public static final String KNOX_PASSWORD = "knox.password";
 	public static final String KNOX_USER = "knox.user";
+	public static final String KEYSTORE = "keystore_path";
+	public static final String KEYSTORE_PASSWORD = "keystore_password";
 	
 	
 }

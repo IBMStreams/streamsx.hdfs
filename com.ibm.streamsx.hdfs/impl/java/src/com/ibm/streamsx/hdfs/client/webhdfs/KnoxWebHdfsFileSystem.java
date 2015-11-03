@@ -11,19 +11,12 @@ import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedExceptionAction;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.net.ssl.HostnameVerifier;
@@ -31,7 +24,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
@@ -111,6 +103,7 @@ import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.ssl.SSLHostnameVerifier;
 import org.apache.hadoop.security.token.SecretManager.InvalidToken;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
@@ -192,7 +185,7 @@ public class KnoxWebHdfsFileSystem extends FileSystem
   @Override
   public synchronized void initialize(URI uri, Configuration conf
       ) throws IOException {
-    System.err.println("USING : " + uri.toString()  + " as uri");
+
     super.initialize(uri, conf);
     setConf(conf);
     /** set user pattern based on configuration file */
@@ -593,46 +586,8 @@ public class KnoxWebHdfsFileSystem extends FileSystem
       }
     }
 
-    
-    private void disableCertValidation() {
-    	// HACK!!!
-		TrustManager[] trustAllCerts = new TrustManager[] {
-			new X509TrustManager() {
-				
-				@Override
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-				
-				@Override
-				public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-						throws CertificateException {
-				}
-				
-				@Override
-				public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-						throws CertificateException {
-				}
-			}	
-		};
-		try {
-			SSLContext sc = SSLContext.getInstance("SSL");
-			sc.init(null, trustAllCerts, new java.security.SecureRandom());
-			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		} catch (KeyManagementException | NoSuchAlgorithmException e) {
-			LOG.error("Problem disabling certificate validation: " + e.getMessage(), e);
-		}
-		
-		HostnameVerifier allHostsValid = new HostnameVerifier() {
-			
-			@Override
-			public boolean verify(String arg0, SSLSession arg1) {
-				return true;
-			}
-		};
+   
 
-		HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-    }
     /**
      * Two-step requests redirected to a DN
      * 
@@ -689,6 +644,43 @@ public class KnoxWebHdfsFileSystem extends FileSystem
       }      
     }
 
+    private void configureCertValidation() {
+		try {
+			SSLContext sc = SSLContext.getInstance("TLS");
+			Configuration conf = getConf();
+			//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
+			String keyStore = conf.get(IHdfsConstants.KEYSTORE);
+			String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
+			TrustManager[] managerArray = new TrustManager[1];
+			if (keyStore != null) {
+				managerArray[0] =new DelegatingTrustManager(keyStore, keyStorePassword);
+			} else {
+				managerArray[0] = new DelegatingTrustManager();
+			}
+			sc.init(null, managerArray, new java.security.SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		} catch (Exception e) {
+			LOG.error("Problem enabling certificate validation: " + e.getMessage(), e);
+		}
+		
+		HostnameVerifier def = 
+		new HostnameVerifier() {
+			
+			@Override
+			public boolean verify(String host, SSLSession session) {
+				boolean valid = SSLHostnameVerifier.DEFAULT.verify(host, session);
+				if (!valid) {
+		    		LOG.warn("Cannot verify host " + host);
+
+					return true;
+				} 
+				return valid;
+			}
+		};
+
+		HttpsURLConnection.setDefaultHostnameVerifier(def);
+    }
+    
     private HttpURLConnection connect(final HttpOpParam.Op op, final URL url)
     		throws IOException {
 
@@ -696,8 +688,7 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     	final HttpURLConnection conn;
     	// first check if user wants to go basic authentication
     	if (authString != null) {
-    		/* HACK */
-    		disableCertValidation();
+    		configureCertValidation();
     		// http basic authentication has been set, apply it
     		LOG.debug("open URL connection with Basic Auth");
     		conn = (HttpURLConnection)URLUtils.openConnection(url);
