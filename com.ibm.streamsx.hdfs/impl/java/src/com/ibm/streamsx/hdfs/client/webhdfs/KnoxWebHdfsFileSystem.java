@@ -3,6 +3,7 @@ package com.ibm.streamsx.hdfs.client.webhdfs;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.security.KeyStore;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -24,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
@@ -103,6 +106,7 @@ import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.ssl.SSLFactory;
 import org.apache.hadoop.security.ssl.SSLHostnameVerifier;
 import org.apache.hadoop.security.token.SecretManager.InvalidToken;
 import org.apache.hadoop.security.token.Token;
@@ -192,24 +196,19 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     UserParam.setUserPattern(conf.get(
         DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_KEY,
         DFSConfigKeys.DFS_WEBHDFS_USER_PATTERN_DEFAULT));
-
+    
     connectionFactory = URLConnectionFactory
         .newDefaultURLConnectionFactory(conf);
 
     ugi = UserGroupInformation.getCurrentUser();
     this.uri = URI.create(uri.getScheme() + "://" + uri.getAuthority());
-//    try {
-//        this.uri = new URI(uri.getScheme(), uri.getAuthority(), null, null, null);
-//      } catch (URISyntaxException e) {
-//        throw new IllegalArgumentException(e);
-//      }
     this.nnAddrs = resolveNNAddr();
     String knox_password = conf.get(IHdfsConstants.KNOX_PASSWORD);
     String knox_user =  conf.get(IHdfsConstants.KNOX_USER);
     if (isValid(knox_user) && isValid(knox_password)) {
         authString = getAuthStringForRequest(knox_user, knox_password);
     }
-
+    
     boolean isHA = HAUtil.isClientFailoverConfigured(conf, this.uri);
     boolean isLogicalUri = isHA && HAUtil.isLogicalUri(conf, this.uri);
     // In non-HA or non-logical URI case, the code needs to call
@@ -651,12 +650,15 @@ public class KnoxWebHdfsFileSystem extends FileSystem
 			//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
 			String keyStore = conf.get(IHdfsConstants.KEYSTORE);
 			String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
-			TrustManager[] managerArray = new TrustManager[1];
+			TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			KeyStore userKeyStore = null;
 			if (keyStore != null) {
-				managerArray[0] =new DelegatingTrustManager(keyStore, keyStorePassword);
-			} else {
-				managerArray[0] = new DelegatingTrustManager();
+				 userKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+				//load the user key store
+				userKeyStore.load(new FileInputStream(keyStore),   keyStorePassword.toCharArray());
 			}
+			factory.init(userKeyStore);
+			TrustManager[] managerArray = factory.getTrustManagers();
 			sc.init(null, managerArray, new java.security.SecureRandom());
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 		} catch (Exception e) {
