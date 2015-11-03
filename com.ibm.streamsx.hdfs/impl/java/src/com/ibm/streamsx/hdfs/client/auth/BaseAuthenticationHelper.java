@@ -15,6 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
 import com.ibm.streamsx.hdfs.IHdfsConstants;
@@ -25,9 +26,9 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		SIMPLE, KERBEROS
 	}
 
-	private static Logger logger = Logger
-			.getLogger("BaseAuthenticationHelper.class");
-	
+	private static Logger logger =  
+	Logger.getLogger(LoggerNames.LOG_FACILITY
+			+ "." + "BaseAuthenticationHelper.class", "com.ibm.streamsx.hdfs.BigDataMessages");
 	public static final String SIMPLE_AUTH = "simple";
 	public static final String KERBEROS_AUTH = "kerberos";
 
