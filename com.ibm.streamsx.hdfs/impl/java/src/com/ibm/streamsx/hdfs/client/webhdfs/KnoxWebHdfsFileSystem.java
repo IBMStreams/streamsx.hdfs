@@ -15,6 +15,8 @@ import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.PrivilegedExceptionAction;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -25,8 +27,10 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.codec.binary.Base64;
@@ -643,30 +647,23 @@ public class KnoxWebHdfsFileSystem extends FileSystem
       }      
     }
 
+
     private void configureCertValidation() {
+    	Configuration conf = getConf();
+		//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
+		String keyStore = conf.get(IHdfsConstants.KEYSTORE);
+		String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
+    	SSLSocketFactory factory;
 		try {
-			SSLContext sc = SSLContext.getInstance("TLS");
-			Configuration conf = getConf();
-			//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
-			String keyStore = conf.get(IHdfsConstants.KEYSTORE);
-			String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
-			TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-			KeyStore userKeyStore = null;
-			if (keyStore != null) {
-				 userKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-				//load the user key store
-				userKeyStore.load(new FileInputStream(keyStore),   keyStorePassword.toCharArray());
-			}
-			factory.init(userKeyStore);
-			TrustManager[] managerArray = factory.getTrustManagers();
-			sc.init(null, managerArray, new java.security.SecureRandom());
-			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+			factory = URLUtils.getSocketFactory(keyStore, keyStorePassword);
+			HttpsURLConnection.setDefaultSSLSocketFactory(factory);
 		} catch (Exception e) {
-			LOG.error("Problem enabling certificate validation: " + e.getMessage(), e);
+			LOG.error("Error configuring SSL Connection ", e);
 		}
+    	
+    	
 		
-		HostnameVerifier def = 
-		new HostnameVerifier() {
+		HostnameVerifier def = new HostnameVerifier() {
 			
 			@Override
 			public boolean verify(String host, SSLSession session) {
