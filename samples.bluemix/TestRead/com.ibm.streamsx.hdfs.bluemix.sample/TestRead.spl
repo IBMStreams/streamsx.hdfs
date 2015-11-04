@@ -7,35 +7,19 @@ type PersonType = int32 id, rstring fname, rstring lname, int32 age, rstring gen
 composite TestRead {
 
 graph
-	stream<rstring line> FileContents = WebHdfsRead() {
-		param
-		url: getSubmissionTimeValue("url");
-		file: getSubmissionTimeValue("personfile","/tmp/People.txt");
-		password: getSubmissionTimeValue("password");
-		username: getSubmissionTimeValue("username");
-	}
-
-	() as sink = FileSink(FileContents) {
-		param
-		file: "lines.txt";
-		format: FileSink.line;
-	}
-
-	// Now we read a file as person-tuples.  To show that we're reading and parsing them correctly,
-	// when we print, we drop the first name.
+	// Read the file as person-tuples, converting from csv
 	stream<PersonType> AsTuples = WebHdfsRead() {
 		param
 		url: getSubmissionTimeValue("url");
-		file: getSubmissionTimeValue("personfile","/tmp/People.txt");
+		file: getSubmissionTimeValue("file","/tmp/People.txt");
 		password: getSubmissionTimeValue("password");
 		username: getSubmissionTimeValue("username");
 		format: Parse.csv;
 		OutType: PersonType;
 	}
-
-	() as tuplesink = FileSink(AsTuples) {
-		param
-		file: "dropFirst.txt";
-		suppress: fname;
+	
+	() as printer = Custom(AsTuples) {
+		logic onTuple AsTuples:
+			printStringLn((rstring)id+","+fname+","+lname+","+(rstring)age+","+gender+","+(rstring)score+","+(rstring)total);
 	}
 }
