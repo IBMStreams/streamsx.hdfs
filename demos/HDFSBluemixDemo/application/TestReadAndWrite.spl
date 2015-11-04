@@ -8,7 +8,7 @@ composite TestReadFromHDFSOnBluemix {
 param
 		expression<rstring> $user : getSubmissionTimeValue("user");
 		expression<rstring> $password : getSubmissionTimeValue("password");
-		expression<rstring> $uri :getSubmissionTimeValue("uri");
+		expression<rstring> $uri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
 	
 graph
 stream <rstring line> Input = Beacon() {
@@ -20,7 +20,7 @@ stream <rstring line> Input = Beacon() {
  
  stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) {
  	param
-		file : "write_test_%TIME.txt" ; //add the timestamp to the file name so a new file is created everytime
+		file : "write_test_%TIME.txt" ; //add the timestamp to the file name so a new file is created every time
 		hdfsUri : $uri ;
 		hdfsUser:$user;
 		hdfsPassword: $password;
