@@ -51,6 +51,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	protected boolean shutdownRequested = false;
 	private String fKeyStorePath;
 	private String fKeyStorePassword;
+	private String fLibPath; //Used to allow the user to override the hadoop home environment variable
 
 	@Override
 	public synchronized void initialize(OperatorContext context)
@@ -64,7 +65,12 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private  void setupClassPaths(OperatorContext context) {
 		String HADOOP_HOME = System.getenv("HADOOP_HOME");
 		ArrayList<String> libList = new ArrayList<>();
-		if (HADOOP_HOME != null) {
+		
+		if (getLibPath() != null) {
+			String user_defined_path = getLibPath()+ "/*";
+			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
+			libList.add(user_defined_path);
+		} else if (HADOOP_HOME != null) {
 			libList.add(HADOOP_HOME + "/../hadoop-conf");
 			libList.add(HADOOP_HOME + "/etc/hadoop");
 			libList.add(HADOOP_HOME + "/conf");
@@ -76,9 +82,8 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 			libList.add(HADOOP_HOME + "/*");
 			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
 		} else {
-			String dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
-			TRACE.log(TraceLevel.INFO, "Loading libraries from " + dir);
-			libList.add(dir);
+			String default_dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
+			libList.add(default_dir);
 		}
 
 		try {
@@ -226,6 +231,10 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	public String getConfigPath() {
 		return fConfigPath;
 	}
+	
+	public String getLibPath() {
+		return fLibPath;
+	}
 
 	public String getHdfsPassword() {
 		return fHdfsPassword;
@@ -249,5 +258,10 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	@Parameter(optional=true)	
 	public void setKeyStorePassword(String pass) {
 		fKeyStorePassword = pass;
+	}
+	
+	@Parameter(optional=true) 
+	public void setLibPath(String libPath) {
+		fLibPath = libPath;
 	}
 }

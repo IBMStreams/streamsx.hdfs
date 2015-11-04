@@ -145,7 +145,7 @@ The `HDFS2DirectoryScan` operator ignores file names that do not match the speci
  * To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` 
  * To access GPFS locally, use `gpfs:///` 
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` 
- 
+ * To access HDFS via a web connection for HDFS deployed on Bluemix, use `webhdfs://webhdfshost:webhdfsport`. 
 If this parameter is not specified, the operator finds the HDFS URI from the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file. The `core-site.xml` is expected to be located in one of the following locations:
  * `$HADOOP_HOME/../hadoop-conf`
  * `$HADOOP_HOME/etc/hadoop` 
@@ -175,8 +175,8 @@ If this parameter is not specified, attempts to connect to a Hadoop instance dep
      
       <parameter>
         <name>hdfsUser</name>
-        <description>This optional parameter specifies the user ID to use when you connect to HDFS. However, when connecting to Hadoop instances on Bluemix, this parameter must be specified otherwise the connection will be unsuccessful. If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
-
+        <description>This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
+When connecting to Hadoop instances on Bluemix, this parameter must be specified otherwise the connection will be unsuccessful.
 When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the **authPrincipal** and **authKeytab** parameters. After successful authentication, the operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.
 
 Note: When using Kerberos authentication, to perform operations as the user specified by the **hdfsUser** parameter, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS.
@@ -189,7 +189,7 @@ Note: When using Kerberos authentication, to perform operations as the user spec
         <name>keyStorePath</name>
         <description>This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. 
 See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. **Note: If this parameter is omitted, invalid certificates for secure connections will be accepted**. If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. 
-         The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.
+The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.
         </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -219,7 +219,8 @@ See the section on "SSL Configuration" in the main page of this toolkit's docume
       </parameter>
       <parameter>
         <name>credFile</name>
-        <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.  This parameter is not supported when connecting to HDFS instances running on Bluemix.</description>
+        <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user. 
+When connecting to HDFS instances deployed on Bluemix, the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -236,6 +237,16 @@ See the section on "SSL Configuration" in the main page of this toolkit's docume
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
  **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.  
+</description>
+        <optional>true</optional>
+        <type>rstring</type>
+        <cardinality>1</cardinality>
+      </parameter>
+      
+      <parameter>
+        <name>libPath</name>
+        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable.
+If not specified, the operator will look for Hadoop libraries in `$HADOOP_HOME`, if it is set. Otherwise, the libraries within the `impl/lib/ext` folder of the toolkit will be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>
