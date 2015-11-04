@@ -1,0 +1,54 @@
+namespace application;
+/**
+ * This application shows how to use the HDFS toolkit to connect to a Hadoop instance running on Bluemix
+ */
+use com.ibm.streamsx.hdfs::*;
+
+composite TestReadFromHDFSOnBluemix {
+param
+		expression<rstring> $user : getSubmissionTimeValue("user");
+		expression<rstring> $password : getSubmissionTimeValue("password");
+		expression<rstring> $uri :getSubmissionTimeValue("uri");
+	
+graph
+stream <rstring line> Input = Beacon() {
+ 	param
+ 		iterations: 10;
+ 	output 
+ 		Input : line = "HDFS and Streams on Bluemix Test: New LINE " + (rstring) IterationCount();
+ }
+ 
+ stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) {
+ 	param
+		file : "write_test_%TIME.txt" ; //add the timestamp to the file name so a new file is created everytime
+		hdfsUri : $uri ;
+		hdfsUser:$user;
+		hdfsPassword: $password;
+ 	
+ }
+ stream<rstring fileName> Functor1 = Functor(Sink) {
+ 	output
+ 		Functor1 : fileName = out_file_name;
+ }
+ stream <rstring line> FromHDFS = HDFS2FileSource(Functor1) {
+ 	param
+		hdfsUri : $uri ;
+		//Use the keystore related parameters if you have a trust store containing the certificate for the server
+		//keyStorePassword:"pass";  
+		//keyStorePath: "etc/store.jks";
+		hdfsPassword: $password;
+		hdfsUser:$user;
+ 	
+ }
+ () as C1 = Custom(FromHDFS) {
+ 
+ 	logic
+ 		onTuple FromHDFS: {
+ 			printStringLn("Output read from remote file: " + line);
+ 		}
+ }
+}
+
+
+ 
+
