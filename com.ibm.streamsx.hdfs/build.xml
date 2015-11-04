@@ -9,7 +9,6 @@
 
 	<property environment="env" />
 	<property name="streams.install" value="${env.STREAMS_INSTALL}" />
-	<property name="maven.bin" value="${env.M2_HOME}/bin/mvn" />
 
 	<property name="src.dir" value="impl/java/src" />
 	<property name="build.dir" value="impl/java/bin" />
@@ -17,7 +16,7 @@
 	<property name="lib.dir" value="lib" />
 	<property name="test.run.dir" value="tests" />
 	<property name="test.build.dir" value="${test.run.dir}/bin" />
-	<property name="ext.downloads.dir" value="opt/downloaded" />
+	<property name="ext.downloads.dir" value="impl/lib/ext" />
 	<property name="gensrc.dir" value="${basedir}/impl/java/src-gen" />
 	<property name="jarfile" value="BigData.jar" />
 	<property name="spl-mt" value="${streams.install}/bin/spl-make-toolkit" />
@@ -75,17 +74,10 @@
     </exec>
 	</target>
 
-	<!-- Downloads libraries using maven -->
-	<target name="maven-deps">
-		<exec executable="${maven.bin}"  failonerror="true">
-			<arg value="dependency:copy-dependencies"/>
-			<arg value="-DoutputDirectory=${ext.downloads.dir}"/>			
-	    </exec>
-	</target>
-	
 
-	<target name="compile" depends="init, maven-deps">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" debug="true"
+
+	<target name="compile" depends="init">
+		<javac compiler="modern" srcdir="${src.dir}" destdir="${build.dir}" debug="true"
 			includeantruntime="no"
 			excludes="com/ibm/streamsx/hdfs/**/*$StreamsModel.java" >
 			<classpath>
