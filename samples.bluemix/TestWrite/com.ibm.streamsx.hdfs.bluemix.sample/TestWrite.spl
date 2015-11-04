@@ -5,10 +5,25 @@ use com.ibm.streamsx.webhdfs::*;
 composite TestWrite {
 
 graph
-	stream<rstring line> Lines = FileSource() {
-		param
-		file: getSubmissionTimeValue("localfile","People-local.txt");
-		format: line;
+	stream<rstring line> Lines = Custom() {
+		logic onProcess: {
+			submit({line = "1,\"Tasos\",\"Kementsietsidis\",35,\"M\",78.3,349.3"}, Lines);
+			submit({line = "2,\"Lipyeow\",\"Lim\",31,\"M\",23.2,235.3"}, Lines);
+			submit({line = "3,\"Min\",\"Wang\",29,\"F\",29.3,923.3"}, Lines);
+			submit({line = "4,\"Mike\",\"Ward\",31,\"M\",33.3,912.3"}, Lines);
+			submit({line = "5,\"Daby\",\"Sow\",30,\"M\",98.3,476.3"}, Lines);
+			submit({line = "6,\"Marion\",\"Blount\",22,\"M\",75.3,834.3"}, Lines);
+			submit({line = "7,\"Kyriakos\",\"Karenos\",20,\"M\",12.3,923.3"}, Lines);
+			submit({line = "8,\"Petros\",\"Zerfos\",20,\"M\",93.2,473.3"}, Lines);
+			submit({line = "9,\"Aktina\",\"Stathaki\",40,\"F\",57.3,523.3"}, Lines);
+			submit({line = "10,\"Fanis\",\"Tsandilas\",22,\"M\",11.2,924.3"}, Lines);
+			submit({line = "11,\"Anastasia\",\"Bezerianos\",55,\"F\",63.2,247.3"}, Lines);
+			submit({line = "12,\"Giorgos\",\"Katsirelos\",34,\"M\",41.3,347.3"}, Lines);
+			submit({line = "13,\"Yannis\",\"Velegrakis\",30,\"M\",12.3,743.3"}, Lines);
+			submit({line = "14,\"Cristiana\",\"Chitic\",30,\"F\",93.2,663.3"}, Lines);
+			submit({line = "15,\"Georgia\",\"Papakleov\",28,\"F\",12.1,549.3"}, Lines);
+			submit({line = "16,\"Kyriaki\",\"Levanti\",26,\"F\",73.8,349.3"}, Lines);
+		}
 	}
 
 	() as writer = WebHdfsWrite(Lines) {
