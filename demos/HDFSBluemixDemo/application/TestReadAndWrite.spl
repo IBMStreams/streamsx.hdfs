@@ -8,7 +8,7 @@ composite TestReadFromHDFSOnBluemix {
 param
 		expression<rstring> $user : getSubmissionTimeValue("user");
 		expression<rstring> $password : getSubmissionTimeValue("password");
-		expression<rstring> $uri :getSubmissionTimeValue("uri");
+		expression<rstring> $uri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
 	
 graph
 stream <rstring line> Input = Beacon() {
