@@ -211,6 +211,8 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     String knox_user =  conf.get(IHdfsConstants.KNOX_USER);
     if (isValid(knox_user) && isValid(knox_password)) {
         authString = getAuthStringForRequest(knox_user, knox_password);
+		configureCertValidation();
+
     }
     
     boolean isHA = HAUtil.isClientFailoverConfigured(conf, this.uri);
@@ -260,6 +262,37 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     this.delegationToken = null;
   }
 
+  private void configureCertValidation() {
+  	Configuration conf = getConf();
+		//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
+		String keyStore = conf.get(IHdfsConstants.KEYSTORE);
+		String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
+  	SSLSocketFactory factory;
+		try {
+			factory = URLUtils.getSocketFactory(keyStore, keyStorePassword);
+			HttpsURLConnection.setDefaultSSLSocketFactory(factory);
+		} catch (Exception e) {
+			LOG.error("Error configuring SSL Connection ", e);
+		}
+  	
+  	
+		
+		HostnameVerifier def = new HostnameVerifier() {
+			
+			@Override
+			public boolean verify(String host, SSLSession session) {
+				boolean valid = SSLHostnameVerifier.DEFAULT.verify(host, session);
+				if (!valid) {
+		    		LOG.warn("Cannot verify host " + host);
+
+					return true;
+				} 
+				return valid;
+			}
+		};
+
+		HttpsURLConnection.setDefaultHostnameVerifier(def);
+  }
   private boolean isValid(String value) {
 	  return value != null && !value.isEmpty(); 
   }
@@ -648,37 +681,7 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     }
 
 
-    private void configureCertValidation() {
-    	Configuration conf = getConf();
-		//if the keystore and its password aren't specified, we assume that the user is not interested in certificate validation.
-		String keyStore = conf.get(IHdfsConstants.KEYSTORE);
-		String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
-    	SSLSocketFactory factory;
-		try {
-			factory = URLUtils.getSocketFactory(keyStore, keyStorePassword);
-			HttpsURLConnection.setDefaultSSLSocketFactory(factory);
-		} catch (Exception e) {
-			LOG.error("Error configuring SSL Connection ", e);
-		}
-    	
-    	
-		
-		HostnameVerifier def = new HostnameVerifier() {
-			
-			@Override
-			public boolean verify(String host, SSLSession session) {
-				boolean valid = SSLHostnameVerifier.DEFAULT.verify(host, session);
-				if (!valid) {
-		    		LOG.warn("Cannot verify host " + host);
-
-					return true;
-				} 
-				return valid;
-			}
-		};
-
-		HttpsURLConnection.setDefaultHostnameVerifier(def);
-    }
+  
     
     private HttpURLConnection connect(final HttpOpParam.Op op, final URL url)
     		throws IOException {
@@ -687,7 +690,6 @@ public class KnoxWebHdfsFileSystem extends FileSystem
     	final HttpURLConnection conn;
     	// first check if user wants to go basic authentication
     	if (authString != null) {
-    		configureCertValidation();
     		// http basic authentication has been set, apply it
     		LOG.debug("open URL connection with Basic Auth");
     		conn = (HttpURLConnection)URLUtils.openConnection(url);
