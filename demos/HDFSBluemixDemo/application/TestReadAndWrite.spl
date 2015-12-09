@@ -42,7 +42,7 @@ stream <rstring line> Input = Beacon() {
 		hdfsPassword: $password;
 		hdfsUser:$user;
   }
- stream <rstring line> C1 = Custom(FromHDFS) {
+ () as C1 = Custom(FromHDFS) {
  
  	logic
  		onTuple FromHDFS: {
