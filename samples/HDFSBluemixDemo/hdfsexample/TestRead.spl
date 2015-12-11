@@ -1,0 +1,35 @@
+namespace hdfsexample;
+/**
+ * This application shows how to use the HDFS toolkit to connect to a Hadoop instance running on Bluemix.
+ * Specify the name of a file to read from  HDFS as a submission time parameter.
+ * Additional required parameters are the uri of the HDFS server and the username and password information for authentication.
+ * Tip: Run the TestWrite composite first and specify the name of the file created by that application as input in this one. 
+ */
+use com.ibm.streamsx.hdfs::*;
+
+composite TestRead {
+ 	param
+	///specify the filename to write to at submission time. 
+	//default is to create a new file every time and add the timestamp to the file name so a new file is created every time
+		expression<rstring> $file: getSubmissionTimeValue("file");
+		expression<rstring> $user : getSubmissionTimeValue("user");
+		expression<rstring> $password : getSubmissionTimeValue("password");
+		expression<rstring> $uri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
+
+graph
+ 	stream <rstring line> FromHDFS = HDFS2FileSource() {
+ 		param
+			hdfsUri : $uri ;
+			hdfsPassword: $password;
+			hdfsUser:$user;
+			file: $file;
+  	}
+  
+	 () as PrintContents = Custom(FromHDFS) {
+	 
+	 	logic
+	 		onTuple FromHDFS: {
+	 			printStringLn("Output read from remote file: " + line);
+	 		}
+	 }
+}

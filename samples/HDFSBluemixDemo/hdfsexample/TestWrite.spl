@@ -1,0 +1,43 @@
+namespace hdfsexample;
+/**
+ * This application shows how to use the HDFS toolkit to connect to a Hadoop instance running on Bluemix
+ */
+use com.ibm.streamsx.hdfs::*;
+
+composite TestWrite {
+param
+	///specify the filename to write to at submission time. 
+	//default is to create a new file every time and add the timestamp to the file name so a new file is created every time
+		expression<rstring> $file: getSubmissionTimeValue("file", "/tmp/hdfs_test_%TIME.txt");
+		expression<rstring> $user : getSubmissionTimeValue("user");
+		expression<rstring> $password : getSubmissionTimeValue("password");
+		expression<rstring> $uri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
+	
+graph
+	stream <rstring line> Input = Beacon() {
+	 	param
+	 		iterations: 10;
+	 	output 
+	 		Input : line = "HDFS and Streams on Bluemix Test: New LINE " + (rstring) IterationCount();
+	 }
+	 
+ stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) {
+ 	param
+		file : $file ; 
+		hdfsUri : $uri ;
+		hdfsUser:$user;
+		hdfsPassword: $password;
+ 	
+ }
+ () as Log = Custom(Sink) {
+	logic
+		onTuple Sink: {
+			printStringLn("Wrote " + (rstring)size + " bytes to file " + out_file_name);
+		}
+ }
+ 
+}
+
+
+ 
+
