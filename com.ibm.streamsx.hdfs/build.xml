@@ -77,7 +77,7 @@
 
 
 	<target name="compile" depends="init">
-		<javac compiler="modern" srcdir="${src.dir}" destdir="${build.dir}" debug="true"
+		<javac compiler="modern" srcdir="${src.dir}" destdir="${build.dir}" debug="false"
 			includeantruntime="no"
 			excludes="com/ibm/streamsx/hdfs/**/*$StreamsModel.java" >
 			<classpath>
