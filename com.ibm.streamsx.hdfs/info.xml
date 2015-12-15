@@ -9,32 +9,31 @@
   <identity>
     <name>com.ibm.streamsx.hdfs</name>
     <description>
-The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
-
+The HDFS Toolkit for Bluemix enhances the operators in the standard HDFS toolkit to support read and write operations to HDFS running in the BigInsights service on Bluemix.
 The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
  * Apache Hadoop versions 2.x 
- * InfoSphere BigInsights 2.1.2, 3.0.0.x, 4.0.0.0
+ * InfoSphere BigInsights 4.0.0.0 and 4.1.0.0.
  * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
  * Hortonworks Data Platform (HDP) 2.2
 
-Note: The reference platforms that were used for testing are Hadoop 2.6.0, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
+Note: The reference platforms that were used for testing are Hadoop 2.7.1.
 
 When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 
 For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
 
-Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x.
+Restriction: Kerberos authentication is not currently supported when connecting to Bluemix.
 
-+ Developing and running applications that use the HDFS Toolkit
++ Developing and running applications that use the HDFS Toolkit for Bluemix
 
-To create applications that use the HDFS Toolkit, you must configure either Streams Studio
+To create applications that use the HDFS Toolkit for Bluemix, you must configure either Streams Studio
 or the SPL compiler to be aware of the location of the toolkit. 
 
 # Before you begin
 
 * Install IBM InfoSphere Streams.  Configure the product environment variables by entering the following command: 
-      source product-installation-root-directory/4.0.0.0/bin/streamsprofile.sh
-* Install a supported version of Hadoop.
+      source product-installation-root-directory/4.1.0.0/bin/streamsprofile.sh
+* (Optional) Install a supported version of Hadoop.  This step is not required if connecting to HDFS on Bluemix.
 * Ensure that InfoSphere Streams has access to Hadoop libraries and configuration files
   to allow streams processing applications to read and write to HDFS.
 
@@ -142,8 +141,8 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
       hdfsUri : "webhdfs://server_host_name:8443" ;
       keyStorePassword:"storepass";
       keyStorePath: "etc/store.jks";
-      hdfsPassword: "ehaas_password";
-      hdfsUser:"ehaas_user";
+      hdfsPassword: "bi_password";
+      hdfsUser:"bi_user";
    }
 6. If IBM InfoSphere BigInsights 3.x or 4.x is installed on GPFS:
    * To access GPFS locally, set the `fs.defaultFS` option in the `core-site.xml` configuration file to `gpfs:///`.

@@ -1,6 +1,7 @@
 HDFS Toolkit for Bluemix
 =============
-This is a fork of the [HDFS toolkit](https://github.com/IBMStreams/streamsx.hdfs) that provides operators for interacting with a Hadoop File System that is running on the BigInsights service in Bluemix. 
+The HDFS Toolkit for Bluemix is a fork of the [HDFS toolkit](https://github.com/IBMStreams/streamsx.hdfs).
+The purpose of this fork is to enhance the existing operators to also support interacting with HDFS the BigInsights service in Bluemix. 
 
 The HDFS Toolkit for Bluemix is officially released to support InfoSphere Streams v4.1 and BigInsights version 4.0:
 * https://github.com/IBMStreams/streamsx.hdfs/releases
