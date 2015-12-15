@@ -33,8 +33,6 @@
 
 	<target name="clean" depends="cpp-clean">
 		<delete dir="${build.dir}" />
-		<delete dir="${impl.lib.dir}" />
-		<delete dir="${ext.downloads.dir}" />
 		<delete dir="output"/>
 		<delete dir="impl/java/bin"/>
 		<delete dir="${test.run.dir}"/>
