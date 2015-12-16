@@ -1,6 +1,15 @@
+/*******************************************************************************
+* Copyright (C) 2015, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/  
 namespace hdfsexample;
+ 
 /**
- * This application shows how to use the HDFS toolkit to connect to a Hadoop instance running on Bluemix
+ * This application shows how to connect to a Hadoop instance running on Bluemix.
+ * Specify the name of a file to write to  HDFS as a submission time parameter.
+ * Additional required parameters are the uri of the HDFS server and the username and password information for authentication.
+ * Tip: Run this composite, then run the TestRead composite  and specify the same file name to read that file from HDFS and verify the write worked correctly. 
+ * See the readme.txt for compile and run instructions.
  */
 use com.ibm.streamsx.hdfs::*;
 
