@@ -44,31 +44,27 @@ operator to read the files that are output by the `HDFS2DirectoryScan` operator.
    
 	/*
     * HDFS2DirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
-    * Overrides the URI in the fs.defaultFS option from core-site.xml file
     */
     (stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){
       param
         directory     : "/user/myuser/";
         hdfsUri:"hdfs : //hdfsServer:1883";
+        hdfsUser: "biadmin";
+        hdfsPassword: "Password";
         sleepTime     : 2.0;
     }
 	// HDFS2FileSource operator reads from files discovered by HDFS2DirectoryScan operator
+	//If the **keyStorePath** and **keyStorePassword** are omitted,  the operator will accept all certificates as valid
+	
 	(stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 =	HDFS2FileSource(Files){
 	  param
 	    hdfsUri:"hdfs://hdfsSever:1883";
+	    hdfsUser: "biadmin";
+        hdfsPassword: "Password";
 	 }
 
-The following example shows how the operator accesses GPFS remotely and reads a file that is specified by the **file** parameter:
 
-    (stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
-      param
-        hdfsUri:"webhdfs://bigInsightSever:1883"; 
-        file   :"/user/myser/myfile.txt"; 
-    }
-
-
-The following example shows the operator configured to access a HDFS instance on Bluemix.  The **hdfsUser** and **hdfsPassword** are the username and password that have access to the Hadoop instance.
-If the **keyStorePath** and **keyStorePassword** are omitted,  the operator will accept all certificates as valid - this is insecure and should not be used in production. 
+The following example shows the operator configured to access a HDFS instance on Bluemix to read a file specified by the *file* parameter.  The **hdfsUser** and **hdfsPassword** are the username and password that have access to the Hadoop instance.
 
     stream&lt;rstring data&gt; FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){
       param
@@ -105,19 +101,20 @@ If the **keyStorePath** and **keyStorePassword** are omitted,  the operator will
         </library>
       </libraryDependencies>
       <codeTemplates>
-        <codeTemplate name="HDFS2FileSource">
+       <codeTemplate name="HDFS2FileSource">
           <description sampleUri="">HDFS2FileSource basic template</description>
           <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
                 file : &quot;${filename}&quot;;
                 }</template>
         </codeTemplate>
-        <codeTemplate name="HDFS2FileSource with hdfsUser and hdfsUri">
-          <description sampleUri="">HDFS2FileSource template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+        <codeTemplate name="HDFS2FileSource connecting to Bluemix">
+          <description sampleUri="">Basic HDFS2FileSource template with required parameters for connecting to HDFS on Bluemix..</description>
           <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
                 file: &quot;${filename}&quot;;
                 hdfsUser: &quot;${hdfsUser}&quot;;
+                hdfsPassword: &quot;${hdfsPassword}&quot;;
                 hdfsUri: &quot;${hdfsUri}&quot;;
                 }</template>
         </codeTemplate>
@@ -249,7 +246,7 @@ configuration file. If this parameter is not specified, by default the operator 
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
-**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
+**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
