@@ -27,18 +27,19 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  * 2. Copy a few files from local file system to the testDirectory on HDFS:
  *  * <HADOOP_HOME>/bin/hadoop fs -copyFromLocal <localFile> /user/<userid>/testDirectory
  * Otherwise, you could test it by scanning the /tmp directory of Hadoop filesystem or the /user/<userid> directory, where <userid> is the same id used to authenticate.
- * @param hdfsUri URI to HDFS. 
+ * @param hdfsUri HDFS URI to connect to, of the form  webhdfs://<host>:<port>
  * @param hdfsUser User to connect to HDFS.
  * @param hdfsPassword Password to connect to HDFS.
- * 
+ * @param directory the HDFS directory to scan
  *  
  */
-composite TestDirScan
+public composite TestDirScan
 {
 	param
-		expression<rstring> $user : getSubmissionTimeValue("hdfsUser");
-		expression<rstring> $password : getSubmissionTimeValue("hdfsPassword");
-		expression<rstring> $uri :getSubmissionTimeValue("hdfsUri"); //format webhdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser");
+		expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword");
+		expression<rstring> $hdfsUri :getSubmissionTimeValue("hdfsUri"); //format webhdfs://host:port
+		expression<rstring>  $directory : getSubmissionTimeValue("directory", ".");
 		
 	graph
 
@@ -46,19 +47,19 @@ composite TestDirScan
 		stream<rstring fileNames> FileNameStream1 = HDFS2DirectoryScan()
 		{
 			param
-				directory : getSubmissionTimeValue("directory", ".");
-				hdfsUri : $uri ;
-				hdfsUser:$user;
-				hdfsPassword: $password;
+				directory : $directory;
+				hdfsUri : $hdfsUri ;
+				hdfsUser:$hdfsUser;
+				hdfsPassword: $hdfsPassword;
 		}
 
 		// use the file name from directory scan to read the file
 		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
 			param
-				hdfsUri : $uri ;
-				hdfsUser:$user;
-				hdfsPassword: $password;
+				hdfsUri : $hdfsUri ;
+				hdfsUser:$hdfsUser;
+				hdfsPassword: $hdfsPassword;
 		} 
 
 		//print out the names of each file found in the directory
