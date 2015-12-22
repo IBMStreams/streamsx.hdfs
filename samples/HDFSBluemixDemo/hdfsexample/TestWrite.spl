@@ -4,23 +4,27 @@
 *******************************************************************************/  
 namespace hdfsexample;
  
+
+use com.ibm.streamsx.hdfs::*;
 /**
  * This application shows how to connect to a Hadoop instance running on Bluemix.
  * Specify the name of a file to write to  HDFS as a submission time parameter.
  * Additional required parameters are the uri of the HDFS server and the username and password information for authentication.
  * Tip: Run this composite, then run the TestRead composite  and specify the same file name to read that file from HDFS and verify the write worked correctly. 
- * See the readme.txt for compile and run instructions.
+ * See the toolkit's documentation for compile and run instructions.
+ * @param hdfsUri HDFS URI to connect to, of the form  webhdfs://<host>:<port>
+ * @param hdfsUser User to connect to HDFS.
+ * @param hdfsPassword Password to connect to HDFS.
+ * @oaram file the file to write to on HDFS.
  */
-use com.ibm.streamsx.hdfs::*;
-
-composite TestWrite {
+public composite TestWrite {
 param
 	///specify the filename to write to at submission time. 
 	//default is to create a new file every time and add the timestamp to the file name so a new file is created every time
 		expression<rstring> $file: getSubmissionTimeValue("file", "/tmp/hdfs_test_%TIME.txt");
-		expression<rstring> $user : getSubmissionTimeValue("user");
-		expression<rstring> $password : getSubmissionTimeValue("password");
-		expression<rstring> $uri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("user");
+		expression<rstring> $hdfsPassword : getSubmissionTimeValue("password");
+		expression<rstring> $hdfsUri :getSubmissionTimeValue("uri"); //format webhdfs://host:port
 	
 graph
 	stream <rstring line> Input = Beacon() {
@@ -33,9 +37,9 @@ graph
  stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) {
  	param
 		file : $file ; 
-		hdfsUri : $uri ;
-		hdfsUser:$user;
-		hdfsPassword: $password;
+		hdfsUri : $hdfsUri ;
+		hdfsUser:$hdfsUser;
+		hdfsPassword: $hdfsPassword;
  	
  }
  () as Log = Custom(Sink) {
