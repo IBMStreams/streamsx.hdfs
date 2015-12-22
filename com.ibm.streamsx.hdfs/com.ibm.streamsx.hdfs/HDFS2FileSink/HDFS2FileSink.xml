@@ -36,7 +36,17 @@ The `HDFS2FileSink` operator terminates in the following cases:
 
 + Examples
 
-This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`.
+This is a basic example using the `HDFS2FileSink` operator to write output to a Hadoop filesystem deployed on Bluemix.
+    () as Sink= HDFS2FileSink(Input){
+      param
+        file   :"/user/biadmin/myfile.txt";
+        hdfsUri:"webhdfs://server_host_name:port";   
+        hdfsUser: "biadmin";
+        hdfsPassword: "BluemixPassword";
+    }   
+    
+    
+This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`. SSL certificate validation is enabled.
 
     stream&lt;PersonSchema&gt; In = FileSource(){
       param
@@ -50,19 +60,14 @@ This example uses the `HDFS2FileSink` operator to write tuples to output files t
       param
         file : "output%FILENUM.txt" ;
         bytesPerFile: (int64)(16*1024);
-    }
-
-
-This example uses the `HDFS2FileSink` operator to write output to a Hadoop filesystem deployed on Bluemix.
-    () as Sink= HDFS2FileSink(Input){
-      param
-        hdfsUri:"webhdfs://server_host_name:port";   
-        file   :"/user/biadmin/myfile.txt";
+ 		hdfsUri:"webhdfs://server_host_name:port";   
         hdfsUser: "biadmin";
         hdfsPassword: "BluemixPassword";
         keyStorePassword: "storepass";
-        keyStorePath: "etc/store.jks";
-    }    
+        keyStorePath: "etc/store.jks";        
+    }
+
+     
 </description>
       <iconUri size="32">HDFS2FileSink_32.gif</iconUri>
       <iconUri size="16">HDFS2FileSink_16.gif</iconUri>
@@ -81,20 +86,22 @@ This example uses the `HDFS2FileSink` operator to write output to a Hadoop files
         </library>
       </libraryDependencies>
       <codeTemplates>
-        <codeTemplate name="HDFS2FileSink">
+      <codeTemplate name="HDFS2FileSink">
           <description sampleUri="">Basic HDFS2FileSink template</description>
           <template>() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
             param
                 file: &quot;${filename}&quot;;
         }</template>
         </codeTemplate>
-        <codeTemplate name="HDFS2FileSink with hdfsUser and hdfsUri">
-          <description sampleUri="">HDFS2FileSink template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
+        <codeTemplate name="HDFS2FileSink">
+          <description sampleUri="">HDFS2FileSink template for Bluemix</description>
           <template>() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
             param
                 file: &quot;${filename}&quot;;
                 hdfsUser: &quot;${hdfsUser}&quot;;
                 hdfsUri: &quot;${hdfsUri}&quot;;
+                hdfsPassword: &quot;${hdfsPassword}&quot;;
+                
         }</template>
         </codeTemplate>
       </codeTemplates>
@@ -147,7 +154,7 @@ property in the `core-site.xml` HDFS configuration file.  The operator expects t
 
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option
 in the `core-site.xml` configuration file.
-**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
+**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -284,7 +291,7 @@ If this parameter is not specified, by default the operator looks for the `core-
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
-**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
+**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>

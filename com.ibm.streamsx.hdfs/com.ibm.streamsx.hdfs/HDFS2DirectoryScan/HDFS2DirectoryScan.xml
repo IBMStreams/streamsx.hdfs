@@ -35,7 +35,19 @@ The operator terminates in the following cases:
 
 + Examples
 
-This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory every two seconds. 
+This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory on Bluemix every two seconds. 
+	
+	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
+	{
+		param
+			directory :"/user/biuser/";
+			hdfsUri   :"webhdfs://hdfsServer:8443";
+			hdfsPassword: "password";
+			hdfsUser: "biuser";
+			sleepTime : 2.0;
+	}
+
+This example uses the `HDFS2DirectoryScan` operator to scan a HDFS directory every two seconds. 
 The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
 
 	
@@ -45,8 +57,7 @@ The operator overrides the value that is specified by the `fs.defaultFS` option 
 			directory :"/user/myuser/";
 			hdfsUri   :"hdfs://hdfsServer:1883";
 			sleepTime : 2.0;
-	}
-	
+	}	
  </description>
       <iconUri size="32">HDFS2DirectoryScan_32.gif</iconUri>
       <iconUri size="16">HDFS2DirectoryScan_16.gif</iconUri>
@@ -71,31 +82,29 @@ The operator overrides the value that is specified by the `fs.defaultFS` option 
           </cmn:managedLibrary>
         </library>
       </libraryDependencies>
-      <codeTemplates>
-        <codeTemplate name="HDFS2DirectoryScan">
+       <codeTemplates>
+       <codeTemplate name="HDFS2DirectoryScan">
           <description>Basic use of HDFS Directory Scan</description>
           <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
                 directory: &quot;${directoryToScan}&quot;;
         } </template>
         </codeTemplate>
-        <codeTemplate name="HDFS2DirectoryScan with hdfsUser and hdfsUri">
-          <description>HDFS2DirectoryScan template with optional parameters. If hdfsUri parameter is provided , operator will connect using the host and port given in the hdfsUri and if hdfsUser is provided , operator will connect using the user given in the hdfsUser.</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
-            param
-                directory: &quot;${directoryToScan}&quot;
-                hdfsUser: &quot;${hdfsUser}&quot;;
-                hdfsUri: &quot;${hdfsUri}&quot;;
-        } </template>
-        </codeTemplate>
-        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource">
-          <description>Read all the files in an HDFS directory</description>
+        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource connecting to Bluemix">
+          <description>Read all the files in an HDFS directory using the HDFS2FileSource operator</description>
           <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
                 directory: &quot;${directoryToScan}&quot;;
+                hdfsUri   :&quot;{webhdfs://hdfsServer:8443&quot;};
+				hdfsPassword: &quot;{password&quot;};
+				hdfsUser: &quot;{biuser&quot;};
         }
         
         stream&lt;${schema}> ${fileSourceStream} = HDFS2FileSource(${outputStream})   {
+        	param
+				hdfsUri	:&quot;{webhdfs://hdfsServer:8443}&quot;;
+				hdfsPassword	:&quot;{password}&quot;;
+				hdfsUser	:&quot;{user}&quot;;
         }</template>
         </codeTemplate>
       </codeTemplates>
@@ -141,7 +150,9 @@ The `HDFS2DirectoryScan` operator ignores file names that do not match the speci
       </parameter>
       <parameter>
         <name>hdfsUri</name>
-        <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS. The URI has the following format:
+        <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS. 
+**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so the **hdfsUri** must be specified.
+        The URI has the following format:
  * To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` 
  * To access GPFS locally, use `gpfs:///` 
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` 
@@ -156,7 +167,6 @@ If this parameter is not specified, the operator finds the HDFS URI from the `fs
  * `$HADOOP_HOME/lib/\*` 
  * `$HADOOP_HOME/\*` 
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
-**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either **hdfsUri** or **configPath**  must be specified.
 </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -236,7 +246,7 @@ When connecting to HDFS instances deployed on Bluemix, the credentials are provi
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
- **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.  
+ **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.
 </description>
         <optional>true</optional>
         <type>rstring</type>
