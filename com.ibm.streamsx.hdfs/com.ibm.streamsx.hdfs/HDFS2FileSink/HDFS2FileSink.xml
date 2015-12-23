@@ -60,14 +60,12 @@ This example uses the `HDFS2FileSink` operator to write tuples to output files t
       param
         file : "output%FILENUM.txt" ;
         bytesPerFile: (int64)(16*1024);
- 		hdfsUri:"webhdfs://server_host_name:port";   
+ 		hdfsUri: "webhdfs://server_host_name:port";   
         hdfsUser: "biadmin";
         hdfsPassword: "BluemixPassword";
         keyStorePassword: "storepass";
         keyStorePath: "etc/store.jks";        
     }
-
-     
 </description>
       <iconUri size="32">HDFS2FileSink_32.gif</iconUri>
       <iconUri size="16">HDFS2FileSink_16.gif</iconUri>
@@ -86,14 +84,14 @@ This example uses the `HDFS2FileSink` operator to write tuples to output files t
         </library>
       </libraryDependencies>
       <codeTemplates>
-      <codeTemplate name="HDFS2FileSink">
+      <codeTemplate name="Basic HDFS2FileSink template">
           <description sampleUri="">Basic HDFS2FileSink template</description>
           <template>() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
             param
                 file: &quot;${filename}&quot;;
         }</template>
         </codeTemplate>
-        <codeTemplate name="HDFS2FileSink">
+        <codeTemplate name="HDFS2FileSink template for Bluemix">
           <description sampleUri="">HDFS2FileSink template for Bluemix</description>
           <template>() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
             param
@@ -150,11 +148,11 @@ The URI has the following format:
  * To access HDFS via a web connection for HDFS deployed on Bluemix, use `webhdfs://webhdfshost:webhdfsport`. 
 If this parameter is not specified, the operator expects that the HDFS URI is specified as the `fs.defaultFS` or `fs.default.name` 
 property in the `core-site.xml` HDFS configuration file.  The operator expects the `core-site.xml` file to be located in 
-`$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`. 
+`$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop` or in the directory specified by the **configPath** parameter. 
 
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option
 in the `core-site.xml` configuration file.
-**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
+**Note:** For applications connecting to HDFS deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported so either  **hdfsUri** or **configPath**  must be specified.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -291,7 +289,8 @@ If this parameter is not specified, by default the operator looks for the `core-
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
-**Note:** For applications connecting to a Hadoop instance deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
+You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
+ **Note:** For connections to HDFS on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -305,8 +304,8 @@ If this parameter is not specified, by default the operator looks for the `core-
       </parameter>
           <parameter>
         <name>libPath</name>
-        <description>This optional parameter specifies the  path to the directory that contains the Hadoop library files. If specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable.
-If not specified, the operator will look for Hadoop libraries in `$HADOOP_HOME`, if it is set.  Otherwise, the libraries within the `impl/lib/ext` folder of the toolkit will be used.
+        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the Bluemix specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
+When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>

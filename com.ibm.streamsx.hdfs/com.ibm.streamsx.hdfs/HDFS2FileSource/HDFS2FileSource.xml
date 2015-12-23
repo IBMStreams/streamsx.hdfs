@@ -105,17 +105,17 @@ The following example shows the operator configured to access a HDFS instance on
           <description sampleUri="">HDFS2FileSource basic template</description>
           <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
-                file : &quot;${filename}&quot;;
+                 file : &quot;${filename}&quot;;
                 }</template>
         </codeTemplate>
         <codeTemplate name="HDFS2FileSource connecting to Bluemix">
           <description sampleUri="">Basic HDFS2FileSource template with required parameters for connecting to HDFS on Bluemix..</description>
           <template>stream&lt;${streamType}> ${streamName} = HDFS2FileSource() {
                 param
-                file: &quot;${filename}&quot;;
-                hdfsUser: &quot;${hdfsUser}&quot;;
-                hdfsPassword: &quot;${hdfsPassword}&quot;;
-                hdfsUri: &quot;${hdfsUri}&quot;;
+               	 file: &quot;${filename}&quot;;
+               	 hdfsUser: &quot;${hdfsUser}&quot;;
+               	 hdfsPassword: &quot;${hdfsPassword}&quot;;
+                 hdfsUri: &quot;${hdfsUri}&quot;;
                 }</template>
         </codeTemplate>
       </codeTemplates>
@@ -150,9 +150,10 @@ the HDFS file system.  The URI has the following format:
  * To access GPFS locally, use `gpfs:///`.
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport`.
  * To access HDFS via a web connection for HDFS deployed on Bluemix, use `webhdfs://webhdfshost:webhdfsport`.
+
 If this parameter is not specified, the operator expects that the HDFS URI is specified as the `fs.defaultFS` or 
 `fs.default.name` property in the `core-site.xml` HDFS configuration file.  The operator expects the `core-site.xml` 
-file to be in `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`.
+file to be in `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`  or in the directory specified by the **configPath** parameter.
 **Note:** For connections to HDFS on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.
  </description>
         <optional>true</optional>
@@ -246,7 +247,7 @@ configuration file. If this parameter is not specified, by default the operator 
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
-**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.</description>
+**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and should not be used.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -268,8 +269,9 @@ configuration file. If this parameter is not specified, by default the operator 
 	</parameter>   
 	    <parameter>
         <name>libPath</name>
-        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable.
-If not specified, the operator will look for Hadoop libraries in `$HADOOP_HOME`, if it is set.  Otherwise, the libraries within the `impl/lib/ext` folder of the toolkit will be used.
+        <description>
+This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the Bluemix specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
+When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>
