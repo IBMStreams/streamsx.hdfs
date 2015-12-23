@@ -126,7 +126,8 @@
 		</exec>
 		<copy file="${bluemix-sample-dir}/output/Distributed/TestWrite/hdfsexample.TestWrite.sab" todir="${bluemix-sample-dir}/deploy"/>
 		<copy file="${bluemix-sample-dir}/output/Distributed/TestRead/hdfsexample.TestRead.sab" todir="${bluemix-sample-dir}/deploy"/>
-		<copy file="${bluemix-sample-dir}/output/Distributed/TestDirScan/hdfsexample.TestDirScan.sab" todir="${bluemix-sample-dir}/deploy"/>		
+		<copy file="${bluemix-sample-dir}/output/Distributed/TestDirScan/hdfsexample.TestDirScan.sab" todir="${bluemix-sample-dir}/deploy"/>	
+			
 	</target>
 
 
@@ -146,7 +147,7 @@
              destfile="${releasefilename}"
     	     basedir="${basedir}"
              includes="${tkinfo.identity.name}/** samples/**"
-             excludes="**/.gitignore **/.settings/** **/.settings **/.project **/.classpath **/opt/downloaded/**"
+             excludes="**/.gitignore **/.settings/** **/.settings com.ibm.streamsx.hdfs/.project com.ibm.streamsx.hdfs/.classpath **/opt/downloaded/** samples/HDFSBluemixDemo/output/**"
     	/>		
 		<checksum file="${releasefilename}" />
 		<checksum algorithm="sha1" file="${releasefilename}" />
