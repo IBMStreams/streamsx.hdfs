@@ -21,7 +21,7 @@ For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operator
 Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x, 4.0.0.x or on BigInsights on Bluemix.
 
 
-+ Developing applications to connect to HDFS in the BigInsights on Bluemix service
++ Using the toolkit to connect to HDFS in the BigInsights on Bluemix service
 
 To create applications that use the HDFS Toolkit for Bluemix, you must configure either Streams Studio or the SPL compiler to be aware of the location of the toolkit. 
 
@@ -40,7 +40,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 **Important Note**
 
 The HDFS for Bluemix toolkit depends on specific Hadoop libraries and these have been included in the `impl/lib/ext` folder.
-Thus, unlike the standard HDFS toolkit, the **HADOOP_HOME** environment variable should *not* be used to specify the location of the Hadoop libraries or the path to the `core-site.xml`.
+Thus, unlike the standard HDFS toolkit, the **HADOOP_HOME** environment variable should *not* be used to specify the location of the Hadoop libraries.
 If the  **HADOOP_HOME** environment variable is set, attempts to connect to a HDFS server on Bluemix will be unsuccessful. 
 
 
@@ -64,7 +64,7 @@ If the  **HADOOP_HOME** environment variable is set, attempts to connect to a HD
       use com.ibm.streamsx.hdfs::HDFS2FileSink;
 4. SSL Configuration
 
-   These directions apply when developing an application that will connect to HDFS on Bluemix, through either the BigInsights for Apache Hadoop or  Analytics for Hadoop offerings.  By default, the server certificate is accepted without validation. If you decide to enable SSL certificate validation for the connection to Bluemix, complete the following steps.
+   By default, when connecting to HDFS on Bluemix, the server certificate is accepted without validation. If you decide to enable SSL certificate validation for the connection to Bluemix, complete the following steps.
    * Follow these [https://www.ng.bluemix.net/docs/services/BigInsights/index-gentopic1.html#exportcerttotruststore|instructions] to export the SSL certificate and add it to your truststore.  Note that you should export the certificate from the  IBM BigInsights Home page, and not from the Ambari console.  The BigInsights home page is typically at `https://server_host_name:8443/gateway/default/BigInsightsWeb/index.html`.   
    * Copy the truststore into a location accessible by your application directory, for example, &lt;application_directory>/etc/mystore.jks.
    * Set the **keyStorePath** and **keyStorePassword** parameters in your application to the path to your keystore and the keystore password respectively. For example:
@@ -82,7 +82,7 @@ If the  **HADOOP_HOME** environment variable is set, attempts to connect to a HD
 6. Start the InfoSphere Streams instance. 
 7. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. You can also submit the application to run in the cloud using the Streaming Analytics service on Bluemix.
 
-+ Developing applications that use the HDFS Toolkit to connect to other Hadoop installations
++ Using the toolkit to connect to HDFS outside of Bluemix
 
 These instructions apply if you are not connecting to HDFS in Bluemix.  
 To create applications that use the HDFS Toolkit, you must configure either Streams Studio or the SPL compiler to be aware of the location of the toolkit. 
