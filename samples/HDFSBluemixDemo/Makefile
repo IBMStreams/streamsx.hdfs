@@ -6,7 +6,7 @@
 .PHONY: all clean
 
 HDFS_TOOLKIT_LOCATION = ../../com.ibm.streamsx.hdfs
-SPLC_FLAGS = -a -z -t $(HDFS_TOOLKIT_LOCATION)
+SPLC_FLAGS = -a -t $(HDFS_TOOLKIT_LOCATION)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
@@ -35,11 +35,11 @@ clean: clean-standalone clean-distributed
 clean-standalone:
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_WRITE_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_WRITE_COMPOSITE)
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_READ_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_READ_COMPOSITE)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_SCAN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_SCAN_COMPOSITE) $(SPL_CMD_ARGS)
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_SCAN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_SCAN_COMPOSITE) 
 	-rm -rf toolkit.xml
 
 clean-distributed:
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_WRITE_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_WRITE_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_WRITE_COMPOSITE)
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_READ_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_READ_COMPOSITE)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_SCAN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_SCAN_COMPOSITE) $(SPL_CMD_ARGS)
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_SCAN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_SCAN_COMPOSITE)
 	-rm -rf toolkit.xml

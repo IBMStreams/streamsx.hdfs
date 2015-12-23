@@ -35,12 +35,12 @@ The operator terminates in the following cases:
 
 + Examples
 
-This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory on Bluemix every two seconds. 
+This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory on Bluemix.  The **hdfsUser** and **hdfsPassword** parameters are used to provide the username and password for authentication.
 	
 	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
 	{
 		param
-			directory :"/user/biuser/";
+			directory :"/user/myuser/";
 			hdfsUri   :"webhdfs://hdfsServer:8443";
 			hdfsPassword: "password";
 			hdfsUser: "biuser";
@@ -48,7 +48,7 @@ This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory o
 	}
 
 This example uses the `HDFS2DirectoryScan` operator to scan a HDFS directory every two seconds. 
-The operator overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
+The **hdfsUri** parameter in this case overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`.
 
 	
 	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
@@ -150,14 +150,12 @@ The `HDFS2DirectoryScan` operator ignores file names that do not match the speci
       </parameter>
       <parameter>
         <name>hdfsUri</name>
-        <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS. 
-**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so the **hdfsUri** must be specified.
-        The URI has the following format:
+        <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS.  The URI has the following format:
  * To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` 
  * To access GPFS locally, use `gpfs:///` 
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` 
  * To access HDFS via a web connection for HDFS deployed on Bluemix, use `webhdfs://webhdfshost:webhdfsport`. 
-If this parameter is not specified, the operator finds the HDFS URI from the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file. The `core-site.xml` is expected to be located in one of the following locations:
+If this parameter is not specified, the operator finds the HDFS URI from the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file. The path to the folder containing the `core-site.xml` can be set using the **configPath** parameter.  Otherwise, the file is expected to be located in one of the following locations:
  * `$HADOOP_HOME/../hadoop-conf`
  * `$HADOOP_HOME/etc/hadoop` 
  * `$HADOOP_HOME/conf` 
@@ -166,7 +164,8 @@ If this parameter is not specified, the operator finds the HDFS URI from the `fs
  * `$HADOOP_HOME/share/hadoop/common/lib/\*` 
  * `$HADOOP_HOME/lib/\*` 
  * `$HADOOP_HOME/\*` 
-You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
+**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either the **hdfsUri** or the **configPath** parameter must be specified.
+
 </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -246,7 +245,9 @@ When connecting to HDFS instances deployed on Bluemix, the credentials are provi
  * `$HADOOP_HOME/share/hadoop/common/lib/\*`
  * `$HADOOP_HOME/lib/\*`
  * `$HADOOP_HOME/\*`
- **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported.
+ 
+You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
+ **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and should not be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -255,8 +256,8 @@ When connecting to HDFS instances deployed on Bluemix, the credentials are provi
       
       <parameter>
         <name>libPath</name>
-        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable.
-If not specified, the operator will look for Hadoop libraries in `$HADOOP_HOME`, if it is set. Otherwise, the libraries within the `impl/lib/ext` folder of the toolkit will be used.
+        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the Bluemix specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
+When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>
