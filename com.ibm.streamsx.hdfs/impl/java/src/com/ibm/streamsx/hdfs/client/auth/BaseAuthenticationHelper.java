@@ -15,8 +15,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
+import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public abstract class BaseAuthenticationHelper implements IAuthenticationHelper {
 	
@@ -24,9 +26,9 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		SIMPLE, KERBEROS
 	}
 
-	private static Logger logger = Logger
-			.getLogger("BaseAuthenticationHelper.class");
-	
+	private static Logger logger =  
+	Logger.getLogger(LoggerNames.LOG_FACILITY
+			+ "." + "BaseAuthenticationHelper.class", "com.ibm.streamsx.hdfs.BigDataMessages");
 	public static final String SIMPLE_AUTH = "simple";
 	public static final String KERBEROS_AUTH = "kerberos";
 
@@ -67,12 +69,35 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		if (uri == null) {
 			throw new Exception("Unable to find a URI to connect to.");
 		}
-
+		
+		
 		setHdfsUri(new URI(uri));
+		
+		if (isConnectionToBluemix(hdfsUser, connectionProperties)) {
+			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
+			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
+			String keyStore = connectionProperties.get(IHdfsConstants.KEYSTORE);
+			if (keyStore != null) {
+				fConfiguration.set(IHdfsConstants.KEYSTORE, keyStore);
+				String keyStorePass = connectionProperties.get(IHdfsConstants.KEYSTORE_PASSWORD);
+				if (keyStorePass == null) {
+					keyStorePass = "";
+				}
+				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
+			} else {
+				logger.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
+			}
+			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
+		} 
 		logger.log(TraceLevel.DEBUG, "Attempting to connect to URI: " + getHdfsUri().toString());
 		
 		return null;
 	}
+	
+	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties){
+		return hdfsUser != null && connectionProperties.get(IHdfsConstants.HDFS_PASSWORD) != null;
+	}
+	
 	
 	protected FileSystem internalGetFileSystem(URI hdfsUri, String hdfsUser) throws Exception {
 		FileSystem fs = null;
