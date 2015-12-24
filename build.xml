@@ -140,7 +140,7 @@
 	</target>
 
 	<!-- Targets to build releases, this will build the sample applications and place them in the deploy folder-->
-	<target name="release" depends="clean, all, spldoc, toolkit, build-sample-apps">		
+	<target name="release" depends="clean, all, spldoc, toolkit">		
 		<mkdir dir="${tmp}" />
 		<property name="releasefilename" value="${tmp}/streamsx.hdfs.toolkits-${tkinfo.identity.version}-${DSTAMP}-${TSTAMP}.tgz" />
 		<tar compression="gzip" longfile="gnu"
