@@ -14,7 +14,7 @@ or when the operator receives a punctuation marker.
 
 # Behavior in a consistent region
 
-The `HDFS2FileSink` operator can participate in a consistent region.
+The `HDFS2FileSink` operator can participate in a consistent region, however this is not supported when connecting to BigInsights on Bluemix.
 The operator can be part of a consistent region, but cannot be at the start of a consistent region.
 The operator guarantees that tuples are written to a file in HDFS at least once,
 but duplicated tuples can be written to the file if application failure occurs.
