@@ -14,7 +14,6 @@
 	<property name="toolkit" location="com.ibm.streamsx.hdfs" />
 	<property name="toolkit.test" location="tests" />
 	<property name="tmp" location="tmp" />
-	<property name="bluemix-sample-dir" value="samples/HDFSBluemixDemo"/>
 
 	<target name="all" depends="toolkit,samples" />
 
@@ -48,7 +47,7 @@
 		</exec>
 	</target>
 
-	<target name="clean" depends="cleansamples, clean-sample-apps" description="clean up">
+	<target name="clean" depends="cleansamples" description="clean up">
 		<ant dir="${toolkit}" target="clean" />
 		<delete dir="${tmp}" />
 	</target>
@@ -120,26 +119,8 @@
 		</exec>
 	</target>
 
-	<target name="build-sample-apps">
-		<property name="tkdir" value="${basedir}" />
-		<exec executable="make" dir="${bluemix-sample-dir}" failonerror="true">
-		</exec>
-		<copy file="${bluemix-sample-dir}/output/Distributed/TestWrite/hdfsexample.TestWrite.sab" todir="${bluemix-sample-dir}/deploy"/>
-		<copy file="${bluemix-sample-dir}/output/Distributed/TestRead/hdfsexample.TestRead.sab" todir="${bluemix-sample-dir}/deploy"/>
-		<copy file="${bluemix-sample-dir}/output/Distributed/TestDirScan/hdfsexample.TestDirScan.sab" todir="${bluemix-sample-dir}/deploy"/>	
-			
-	</target>
 
-
-	<target name="clean-sample-apps">
-		<!--delete the pre built files-->
-		<exec executable="make" dir="${bluemix-sample-dir}" failonerror="true">
-			<arg value="clean" />
-		</exec>
-		<delete><fileset dir="${bluemix-sample-dir}/deploy"/></delete>
-	</target>
-
-	<!-- Targets to build releases, this will build the sample applications and place them in the deploy folder-->
+	<!-- Targets to build releases-->
 	<target name="release" depends="clean, all, spldoc, toolkit">		
 		<mkdir dir="${tmp}" />
 		<property name="releasefilename" value="${tmp}/streamsx.hdfs.toolkits-${tkinfo.identity.version}-${DSTAMP}-${TSTAMP}.tgz" />
