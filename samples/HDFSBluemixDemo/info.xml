@@ -38,15 +38,15 @@ Follow the instructions to compile above.  Once the project is built, select the
  * Specify the uri, username and password as submission parameters and submit the job.
 
 # Running from the command line:
-
+The following are examples of how to launch the `TestDirScan` sample which demonstrates the use of the `HDFS2DirectoryScan` operator:
 * Running in standalone mode: 
   * From the samples directory, run the following command:
   
-   `./output/Standalone/hdfsexample::&lt;TestToRun>/bin/standalone hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; hdfsUser=&quot;&lt;user_name>&quot; hdfsPassword=&quot;&lt;password>&quot;` 
+   `./output/Standalone/hdfsexample::&lt;TestDirScan>/bin/standalone hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; hdfsUser=&quot;&lt;user_name>&quot; hdfsPassword=&quot;&lt;password>&quot; -P directory="/tmp"` 
 * Running in distributed mode:  
   * If using a local installation of Streams, start your IBM InfoSphere Streams instance, then use the `streamtool` command to submit the .adl files that were generated during the application build: 
 
-   `streamtool submitjob -i &lt;instance_name> output/Distributed/hdfsexample::TestDirScan/hdfsexample.TestDirScan.adl -P hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; -P hdfsUser=&quot;&lt;user_name>&quot; -P hdfsPassword=&quot;&lt;password>&quot;`
+   `streamtool submitjob -d &lt;domain_name> -i &lt;instance_name> output/Distributed/hdfsexample::TestDirScan/hdfsexample.TestDirScan.adl -P hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; -P hdfsUser=&quot;&lt;user_name>&quot; -P directory="/tmp" -P hdfsPassword=&quot;&lt;password>&quot;`
 </info:description>
     <info:version>1.0.0</info:version>
     <info:requiredProductVersion>4.1.0.0</info:requiredProductVersion>
