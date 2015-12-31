@@ -12,13 +12,13 @@ It is suggested to run the `hdfsexample::TestWrite` composite first in order for
 
 # Pre-compiled Binaries for Bluemix
 Each composite has been compiled and the resulting .sab files are in the `deploy` directory.  
-These applications are ready to be submitted as jobs in the Streaming Analytics service in Bluemix so you can quickly verify that they work with your BigInsights service.  See "Running the samples" below for more information.
+These applications are ready to be submitted as jobs in the Streaming Analytics service in Bluemix so you can quickly verify that they work with your BigInsights service.  See &quot;Running the samples&quot; below for more information.
 
 
 # Compiling the samples
 Compiling in Streams Studio:
 1. Start Streams Studio
-2. In Streams Explorer view, add the "com.ibm.streamsx.hdfs" toolkit as one of the toolkit locations
+2. In Streams Explorer view, add the &quot;com.ibm.streamsx.hdfs&quot; toolkit as one of the toolkit locations
 3. From the main menu, select File -> Import.
 4. Select General ->Existing Project into Workspace
 5. Browse to the location of the HDFSBluemixDemo project and select it
@@ -37,7 +37,7 @@ Compiling at the command line:
 Follow the instructions to compile above.  Once the project is built, select the main composite of the sample, right click -> Launch Active Build Config 
 
 # Running using the Streaming Analytics service:
- * Go to the Application Dashboard in your browser and click "submit job".  
+ * Go to the Application Dashboard in your browser and click &quot;submit job&quot;.  
  * Browse to the deploy folder if using the pre compiled files or to the output/Distributed folder and upload the .sab file to the service.
  * Specify the uri, username and password as submission parameters.
 
@@ -46,14 +46,14 @@ Follow the instructions to compile above.  Once the project is built, select the
 * Running in standalone mode: 
   * From the samples directory, run the following command:
   
-   `./output/Standalone/hdfsexample::&lt;TestToRun>/bin/standalone hdfsUri="webhdfs://&lt;machine_name>:&lt;port>" hdfsUser="&lt;user_name>" hdfsPassword="&lt;password>"` 
+   `./output/Standalone/hdfsexample::&lt;TestToRun>/bin/standalone hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; hdfsUser=&quot;&lt;user_name>&quot; hdfsPassword=&quot;&lt;password>&quot;` 
 * Running in distributed mode:  
   * If using a local installation of Streams, start your IBM InfoSphere Streams instance, then use the `streamtool` command to submit the .adl files that were generated during the application build: 
 
-   `streamtool submitjob -i &lt;instance_name> output/Distributed/hdfsexample::TestDirScan/hdfsexample.TestDirScan.adl -P hdfsUri="webhdfs://&lt;machine_name>:&lt;port>" -P hdfsUser="&lt;user_name>" -P hdfsPassword="&lt;password>"`
+   `streamtool submitjob -i &lt;instance_name> output/Distributed/hdfsexample::TestDirScan/hdfsexample.TestDirScan.adl -P hdfsUri=&quot;webhdfs://&lt;machine_name>:&lt;port>&quot; -P hdfsUser=&quot;&lt;user_name>&quot; -P hdfsPassword=&quot;&lt;password>&quot;`
 </info:description>
     <info:version>1.0.0</info:version>
-    <info:requiredProductVersion>4.0.0.0</info:requiredProductVersion>
+    <info:requiredProductVersion>4.1.0.0</info:requiredProductVersion>
   </info:identity>
   <info:dependencies>
     <info:toolkit>
