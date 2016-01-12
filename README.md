@@ -17,3 +17,9 @@ Getting started with development:
 
 Main Site:
 * http://ibmstreams.github.io/streamsx.hdfs/
+
+To learn more about Streams:
+* IBM Streams on Github
+* Introduction to Streams Quick Start Edition
+* Streams Getting Started Guide
+* StreamsDev
