@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -329,11 +330,14 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		// check that the file sink is not at the start of the consistent region
 		OperatorContext opContext = checker.getOperatorContext();
 		ConsistentRegionContext crContext = opContext.getOptionalContext(ConsistentRegionContext.class);
-		if (crContext != null)
-		{
-			if (crContext.isStartOfRegion())
-			{
+		if (crContext != null) {
+			if (crContext.isStartOfRegion()) {
 				checker.setInvalidContext("The following operator cannot be the start of a consistent region: HDFS2FileSink.", null);
+			}
+			// check that tempFile parameter is not used in consistent region
+			Set<String> parameters = opContext.getParameterNames();
+			if (parameters.contains("tempFile")) {
+				checker.setInvalidContext("The following operator cannot use parameter tempFile if it is a member of a consistent region: HDFS2FileSink.", null);
 			}
 		}
 	}
@@ -802,7 +806,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 
 	private void closeFile() throws Exception {
 
-		TRACE.log(TraceLevel.DEBUG, "Close File");
+		TRACE.log(TraceLevel.DEBUG, "closeFile()");
 
 		// stop the timer thread.. and create a new one when a new file is
 		// created.
@@ -816,8 +820,6 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 
 			fFileTimerThread = null;
 		}
-
-		TRACE.log(TraceLevel.DEBUG, "Close file");
 
 		// If Optional output port is present output the filename and file
 		// size
@@ -1050,7 +1052,14 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		TRACE.log(TraceLevel.DEBUG,
 				"Reset to checkpoint " + checkpoint.getSequenceId(),
 				CONSISTEN_ASPECT);	
-		
+
+		//Interrupt timer if running
+		if (fFileTimerThread != null) {
+			TRACE.log(TraceLevel.DEBUG, "Stop file timer thread");
+			fFileTimerThread.interrupt();
+			fFileTimerThread = null;
+		}
+
 		// close current file
 		if (fFileToWrite != null)
 			fFileToWrite.close();
@@ -1084,7 +1093,14 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 
 	@Override
 	public void resetToInitialState() throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Reset to initial state", CONSISTEN_ASPECT);				
+		TRACE.log(TraceLevel.DEBUG, "Reset to initial state", CONSISTEN_ASPECT);
+
+		//Interrupt timer if running
+		if (fFileTimerThread != null) {
+			TRACE.log(TraceLevel.DEBUG, "Stop file timer thread");
+			fFileTimerThread.interrupt();
+			fFileTimerThread = null;
+		}
 
 		// close current file
 		if (fFileToWrite != null)
@@ -1123,7 +1139,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 
 	@Override
 	public void retireCheckpoint(long id) throws Exception {
-		TRACE.log(TraceLevel.DEBUG, "Retire checkpoint", CONSISTEN_ASPECT);		
+		TRACE.log(TraceLevel.DEBUG, "Retire checkpoint", CONSISTEN_ASPECT);
 	}
 	
 	private boolean isRestarting()
@@ -1133,7 +1149,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	
 	private void initRestarting(OperatorContext opContext)
 	{
-		TRACE.log(TraceLevel.DEBUG, "restarting set to true", CONSISTEN_ASPECT);		
+		TRACE.log(TraceLevel.DEBUG, "restarting set to true", CONSISTEN_ASPECT);
 		isRestarting = false;
 		if (crContext != null )
 		{
@@ -1158,7 +1174,8 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		while (!shutdownRequested)
 		{			
 			try {
-				OutputTuple tuple = outputPortQueue.take();			
+				//System.out.println("process()!!!!!!.");
+				OutputTuple tuple = outputPortQueue.take();
 				if (outputPort != null)
 				{
 					

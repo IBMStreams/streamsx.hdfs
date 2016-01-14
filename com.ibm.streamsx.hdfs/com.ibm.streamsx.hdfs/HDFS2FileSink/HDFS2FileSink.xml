@@ -128,13 +128,14 @@ the file names are `myFile020141130_132443.txt`, `myfile120141130_132443.txt`, a
       <parameter>
         <name>tempFile</name>
         <description>
-This parameter specifies the name of the file that the operator writes to. When the file is closed the file is renamed to the **file** parameter value.
-The **file** parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:
+This parameter specifies the name of the file that the operator writes to. When the file is closed the file is renamed to the final filename defined by the **file** parameter or **fileAttributeName** parameter.
+The **tempFile** parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:
  * %HOST 		The host that is running the processing element (PE) of this operator.
  * %PROCID		The process ID of the processing element.
  * %PEID 		The processing element ID.
  * %PELAUNCHNUM	The PE launch count.
  * %TIME 		The time when the file is created.  If the **timeFormat** parameter is not specified, the default time format is `yyyyMMdd_HHmmss`.
+**Important:** This parameter must not be used in a consistent region.
 </description>
         <optional>true</optional>
         <type>rstring</type>
