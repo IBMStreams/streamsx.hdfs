@@ -119,17 +119,18 @@
 		</exec>
 	</target>
 
-	<!-- Targets to build releases -->
-	<target name="release" depends="clean, all, spldoc, toolkitIndexOnly">		
+
+	<!-- Targets to build releases-->
+	<target name="release" depends="clean, all, spldoc, toolkit">		
 		<mkdir dir="${tmp}" />
-		<property name="releasefilename" value="${tmp}/streamx.hdfs.toolkits-${tkinfo.identity.version}-${DSTAMP}-${TSTAMP}.tgz" />
+		<property name="releasefilename" value="${tmp}/streamsx.hdfs.toolkits-${tkinfo.identity.version}-${DSTAMP}-${TSTAMP}.tgz" />
 		<tar compression="gzip" longfile="gnu"
              destfile="${releasefilename}"
     	     basedir="${basedir}"
              includes="${tkinfo.identity.name}/** samples/**"
-             excludes="**/.gitignore **/.settings/** **/.settings **/.project **/.classpath **/opt/downloaded/**"
+             excludes="**/.gitignore com.ibm.streamsx.hdfs/.settings/** com.ibm.streamsx.hdfs/.project com.ibm.streamsx.hdfs/.classpath **/opt/downloaded/** samples/HDFSBluemixDemo/output/**"
     	/>		
 		<checksum file="${releasefilename}" />
 		<checksum algorithm="sha1" file="${releasefilename}" />
-	</target>
+	</target>	
 </project>
