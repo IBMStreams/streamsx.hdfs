@@ -1,25 +1,13 @@
-streamsx.hdfs
+HDFS Toolkit for Bluemix
 =============
-This toolkit provides operators and functions for interacting with Hadoop File System.
+The HDFS Toolkit for Bluemix is a fork of the [HDFS toolkit](https://github.com/IBMStreams/streamsx.hdfs).
+The purpose of this fork is to enhance the existing operators to also support interacting with HDFS the BigInsights service in Bluemix. 
 
-HDFS Toolkit v3.0 is officially released to support InfoSphere Streams v4.1:
+Download the latest releaes of the HDFS Toolkit for Bluemix supporting Streams v4.1 and BigInsights version 4.0:
 * https://github.com/IBMStreams/streamsx.hdfs/releases
 
-Check out what's new with Streams 4.1:
- * https://developer.ibm.com/streamsdev/2015/11/20/whats-new-streams-v4-1/
+## Getting started with development:
+ 
+* See the [sample](https://github.com/IBMStreams/streamsx.hdfs/tree/bluemix/samples/HDFSBluemixDemo) for usage examples.
 
-Check out the binary read / write support!
-* https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/HDFSBinary
-* https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CompressedHdfsFiles
 
-Getting started with development:
-* https://github.com/IBMStreams/streamsx.hdfs/wiki/Getting-Started-with-Developing-HDFS-Toolkit
-
-Main Site:
-* http://ibmstreams.github.io/streamsx.hdfs/
-
-To learn more about Streams:
-* [IBM Streams on Github](http://ibmstreams.github.io)
-* [Introduction to Streams Quick Start Edition](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-intro/)
-* [Streams Getting Started Guide](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-getting-started/)
-* [StreamsDev](https://developer.ibm.com/streamsdev/)
