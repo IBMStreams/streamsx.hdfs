@@ -1,0 +1,81 @@
+/*******************************************************************************
+* Copyright (C) 2015, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/                      
+namespace hdfsexample ;
+
+use com.ibm.streamsx.hdfs::HDFS2DirectoryScan ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
+
+/**
+ * The [TestDirScan] composite demonstrates how you can use the HDFS2DirectoryScan operator
+ * to scan for new files from a directory in HDFS on Bluemix.
+  The HDFS2DirectoryScan can be used in conjunction
+ * with the HDFS2FileSource operator, where you can read new files from HDFS as they are created in 
+ * a directory.
+ * 
+ * To see the effect of HDFS2DirectoryScan, let the application run for a few minutes, and then copy more
+ * files to the testDirectory.  You should see that the directory scan will discover the new files for the
+ * HDFS2FileSource operator to read.
+ *
+ * 
+ * Setup:
+ * You will need to create new directory for the HDFS2DirectoryScan operator to scan.
+ * if you have SSH access to the system where Hadoop is installed:
+ * 1. Create a new directory in HDFS by running this command at the command line, 
+ *  * <HADOOP_HOME>/bin/hadoop fs -mkdir /user/<userid>/testDirectory
+ * 2. Copy a few files from local file system to the testDirectory on HDFS:
+ *  * <HADOOP_HOME>/bin/hadoop fs -copyFromLocal <localFile> /user/<userid>/testDirectory
+ * Otherwise, you could test it by scanning the /tmp directory of Hadoop filesystem or the /user/<userid> directory, where <userid> is the same id used to authenticate.
+ * @param hdfsUri HDFS URI to connect to, of the form  webhdfs://<host>:<port>
+ * @param hdfsUser User to connect to HDFS.
+ * @param hdfsPassword Password to connect to HDFS.
+ * @param directory the HDFS directory to scan
+ *  
+ */
+public composite TestDirScan
+{
+	param
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser");
+		expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword");
+		expression<rstring> $hdfsUri :getSubmissionTimeValue("hdfsUri"); //format webhdfs://host:port
+		expression<rstring>  $directory : getSubmissionTimeValue("directory", ".");
+		
+	graph
+
+		// scan the given directory from HDFS, default to . which is the user's home directory
+		stream<rstring fileNames> FileNameStream1 = HDFS2DirectoryScan()
+		{
+			param
+				directory : $directory;
+				hdfsUri : $hdfsUri ;
+				hdfsUser:$hdfsUser;
+				hdfsPassword: $hdfsPassword;
+		}
+
+		// use the file name from directory scan to read the file
+		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
+		{
+			param
+				hdfsUri : $hdfsUri ;
+				hdfsUser:$hdfsUser;
+				hdfsPassword: $hdfsPassword;
+		} 
+
+		//print out the names of each file found in the directory
+		() as NameSink1 = Custom(FileNameStream1)
+		{
+			logic
+				onTuple FileNameStream1: {
+					printStringLn("Found file in directory: " + fileNames);
+				}
+		}
+		// write out content of file in the "FileContents.txt" file in the /tmp directory
+		() as Lines = FileSink(LineStream)
+		{
+			param
+				file: "/tmp/FileContents.txt";
+				flush: 1u;
+		}
+
+}
