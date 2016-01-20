@@ -54,7 +54,7 @@ The following are examples of how to launch the `TestDirScan` sample which demon
   <info:dependencies>
     <info:toolkit>
       <common:name>com.ibm.streamsx.hdfs</common:name>
-      <common:version>[3.5.0, 4.0.0)</common:version>
+      <common:version>[3.5.0,4.0.0)</common:version>
     </info:toolkit>
   </info:dependencies>
 </info:toolkitInfoModel>
