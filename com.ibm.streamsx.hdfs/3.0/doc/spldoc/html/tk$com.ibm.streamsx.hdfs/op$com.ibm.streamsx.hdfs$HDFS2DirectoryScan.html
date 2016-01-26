@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="reference"/>
+<meta name="DC.Title" content="Operator HDFS2DirectoryScan"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="spldoc_operator"/>
+<link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
+<link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
+<title>Operator HDFS2DirectoryScan</title>
+</head>
+<body id="spldoc_operator">
+
+
+<h1 class="title topictitle1">Operator <tt class="ph tt">HDFS2DirectoryScan</tt></h1>
+
+<div class="body refbody">
+<div class="section">
+<p class="p">
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2DirectoryScan</p>
+
+</div>
+
+<div class="section splprimop">
+  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.svg" width="672" height="112"/>
+</div>
+
+<div class="section">
+
+<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> operator scans a Hadoop Distributed File System directory for new or modified files.
+</p>
+
+<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> is similar to the <tt class="ph tt">DirectoryScan</tt> operator.  The <tt class="ph tt">HDFS2DirectoryScan</tt> operator repeatedly scans an HDFS directory and writes the names of new or modified files  that are found in the directory to the output port. The operator sleeps between scans.
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Behavior in a consistent region
+</h2>
+
+<p class="p"> The <tt class="ph tt">HDFS2DirectoryScan</tt> operator can participate in a consistent region.  The operator can be at the start of a consistent region if there is no input port.  The operator supports periodic and operator-driven consistent region policies.
+</p>
+
+<p class="p"> If consistent region policy is set as operator driven, the operator initiates a drain after each tuple is submitted.  This allows for a consistent state to be established after a file is fully processed.  If consistent region policy is set as periodic, the operator respects the period setting and establishes consistent states accordingly.  This means that multiple files can be processed before a consistent state is established.
+</p>
+
+<p class="p"> At checkpoint, the operator saves the last submitted filename and its modification timestamp to the checkpoint.  Upon application failures, the operator resubmits all files that are newer than the last submitted file at checkpoint.
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Exceptions
+</h2>
+
+<div class="p">The operator terminates in the following cases:
+<ul class="ul">
+<li class="li"> The operator cannot connect to HDFS.</li>
+
+<li class="li"> The <strong class="ph b">strictMode</strong> parameter is true but the directory is not found.</li>
+
+<li class="li"> The path that is given by the directory name exists, but is an ordinary file and not a directory.</li>
+
+<li class="li"> HDFS failed to give a list of files in the directory.</li>
+
+<li class="li"> The pattern that is specified in the pattern parameter fails to compile.</li>
+
+</ul>
+
+</div>
+
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan$1.html">Examples</a>
+</dt>
+<dd class="dd">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory every two seconds.
+</dd>
+</dl>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Summary</h2>
+
+<dl class="dl" compact="compact">
+ 
+  <dt class="dt dlterm">Ports</dt>
+
+  <dd class="dd">This operator has 1 input port and 1 output port.</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Windowing</dt>
+
+  <dd class="dd">This operator does not accept any windowing configurations.</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Parameters</dt>
+
+  <dd class="dd">This operator supports 11 parameters. (<tt class="ph tt">directory, initDelay, sleepTime, pattern, strictMode, hdfsUri, hdfsUser, authPrincipal, authKeytab, credFile, configPath</tt>)
+</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Metrics</dt>
+
+  <dd class="dd">This operator reports 1 metrics.</dd>
+
+ 
+</dl>
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Properties</h2>
+
+<dl class="dl" compact="compact">
+ 
+  <dt class="dt dlterm">Implementation</dt>
+
+  <dd class="dd">Java</dd>
+
+ 
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set">Input Ports</a></strong></p>
+<dl class="dl">
+  
+   <dt class="dt dlterm">Ports (0)</dt>
+
+   <dd class="dd">
+
+<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> operator has an optional control input port. You can use this port to change the directory  that the operator scans at run time without restarting or recompiling the application.   The expected schema for the input port is of tuple&lt;rstring directory&gt;, a schema containing a single attribute of type rstring.   If a directory scan is in progress when a tuple is received, the scan completes and a new scan starts immediately after  and uses the new directory that was specified.   If the operator is sleeping, the operator starts scanning the new directory immediately after it receives an input tuple.
+</p>
+   </dd>
+
+  
+    
+      <dt class="dt dlterm">Windowing</dt>
+
+      <dd class="dd">
+
+<p class="p">This operator does not support any window configurations.
+</p>
+      </dd>
+
+    
+    
+      <dt class="dt dlterm">Properties</dt>
+
+      <dd class="dd">
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__optional">Optional</a>: true
+     </li>
+
+   </ul>
+
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__controlport">ControlPort</a>: true
+</li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__windowingmode">WindowingMode</a>: NonWindowed
+</li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__windowpunctuationinputmode">WindowPunctuationInputMode</a>: Oblivious
+</li>
+
+   </ul>
+
+      </dd>
+
+    
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set">Output Ports</a></strong></p>
+<dl class="dl">
+  
+     <dt class="dt dlterm">Assignments</dt>
+
+       <dd class="dd">Java operators do not support output assignments.
+       </dd>
+
+  
+</dl>
+
+<dl class="dl">
+  
+   <dt class="dt dlterm">Ports (0)</dt>
+
+   <dd class="dd">
+
+<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> operator has one output port.  This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory,  one file name per tuple.  The file names do not occur in any particular order.  The port is non-mutating and punctuation free.
+</p>
+
+<p class="p"/>
+
+   <dl class="dl">
+    
+      <dt class="dt dlterm">Properties</dt>
+
+      <dd class="dd">
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__optional">Optional</a>: false
+     </li>
+
+   </ul>
+
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__windowpunctuationoutputmode">WindowPunctuationOutputMode</a>: Free
+     </li>
+
+   </ul>
+
+      </dd>
+
+    
+   </dl>
+
+   <p class="p"/>
+
+   </dd>
+
+  
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters">Parameters</a></strong></p>
+
+<dl class="dl">
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_directory"><tt class="ph tt">directory</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the name of the directory to be scanned. If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/<em class="ph i">userid</em>/ directory. This parameter is mandatory if the input port is not specified.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_initDelay"><tt class="ph tt">initDelay</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the time to wait in seconds before the operator scans the directory for the first time. The default value is 0.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: float64
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_sleepTime"><tt class="ph tt">sleepTime</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the minimum time between directory scans. The default value is 5.0 seconds. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: float64
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_pattern"><tt class="ph tt">pattern</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter limits the file names that are listed to the names that match the specified regular expression.  The <tt class="ph tt">HDFS2DirectoryScan</tt> operator ignores file names that do not match the specified regular expression. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_strictMode"><tt class="ph tt">strictMode</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: boolean
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_hdfsUri"><tt class="ph tt">hdfsUri</tt></dt>
+
+<dd class="dd">
+<div class="p">This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS. The URI has the following format:
+<ul class="ul">
+<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://hdfshost:hdfsport</tt> </li>
+
+<li class="li"> To access GPFS locally, use <tt class="ph tt">gpfs:///</tt> </li>
+
+<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> </li>
+
+</ul>
+
+</div>
+
+<div class="p">If this parameter is not specified, the operator finds the HDFS URI from the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> HDFS configuration file. The <tt class="ph tt">core-site.xml</tt> is expected to be located in one of the following locations:
+<ul class="ul">
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/conf</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/hdfs/*</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/*</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/lib/*</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/lib/*</tt> </li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/*</tt> </li>
+
+</ul>
+You can use the <strong class="ph b">hdfsUri</strong> parameter to override the value that is specified for the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file.
+</div>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_hdfsUser"><tt class="ph tt">hdfsUser</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the user ID to use when you connect to HDFS. If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
+</p>
+
+<p class="p">When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> parameters. After successful authentication, the operator uses the user ID that is specified by the <strong class="ph b">hdfsUser</strong> parameter to perform all other operations on the file system.
+</p>
+
+<p class="p">Note: When using Kerberos authentication, to perform operations as the user specified by the <strong class="ph b">hdfsUser</strong> parameter, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_authPrincipal"><tt class="ph tt">authPrincipal</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the InfoSphere Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_authKeytab"><tt class="ph tt">authKeytab</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the file that contains the encrypted keys for the user that is specified by the <strong class="ph b">authPrincipal</strong> parameter. The operator uses this keytab file to authenticate the user. The keytab file is generated by the administrator. You must specify this parameter to use Kerberos authentication.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_credFile"><tt class="ph tt">credFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_configPath"><tt class="ph tt">configPath</tt></dt>
+
+<dd class="dd">
+<div class="p">This optional parameter specifies the absolute path to the directory that contains the HDFS configuration files. If this parameter is not specified, by default the operator looks for the <tt class="ph tt">core-site.xml</tt> file in the following locations:
+<ul class="ul">
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/conf</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/hdfs/*</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/*</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/lib/*</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/lib/*</tt></li>
+
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/*</tt> </li>
+
+</ul>
+
+</div>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__codetemplate">Code Templates</a></strong></p>
+  <dl class="dl">
+    
+     <dt class="dt dlterm">HDFS2DirectoryScan</dt>
+
+     <dd class="dd">
+       <pre class="pre codeblock">
+stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
+            param
+                directory: "${directoryToScan}";
+        } 
+      </pre>
+
+     <p class="p"/>
+
+     </dd>
+
+    
+    
+     <dt class="dt dlterm">HDFS2DirectoryScan with hdfsUser and hdfsUri</dt>
+
+     <dd class="dd">
+       <pre class="pre codeblock">
+stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
+            param
+                directory: "${directoryToScan}"
+                hdfsUser: "${hdfsUser}";
+                hdfsUri: "${hdfsUri}";
+        } 
+      </pre>
+
+     <p class="p"/>
+
+     </dd>
+
+    
+    
+     <dt class="dt dlterm">HDFS2DirectoryScan with HDFS2FileSource</dt>
+
+     <dd class="dd">
+       <pre class="pre codeblock">
+stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
+            param
+                directory: "${directoryToScan}";
+        }
+        
+        stream&lt;${schema}&gt; ${fileSourceStream} = HDFS2FileSource(${outputStream})   {
+        }
+      </pre>
+
+     <p class="p"/>
+
+     </dd>
+
+    
+  </dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__metrics">Metrics</a></strong></p>
+<dl class="dl">
+  
+    <dt class="dt dlterm"><tt class="ph tt">nScans</tt> - <a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__metrics_kind_counter">Counter</a></dt>
+
+    <dd class="dd">
+
+<p class="p">The number of times the operator scanned the directory.
+</p>
+
+     <p class="p"/>
+
+     </dd>
+
+  
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies">Libraries</a></strong></p>
+
+ <dl class="dl">
+ 
+  <dt class="dt dlterm">Java operator class library
+  </dt>
+
+  <dd class="dd"/>
+
+  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">../../impl/java/bin, ../../impl/lib/BigData.jar</tt></dd>
+
+ 
+ 
+  <dt class="dt dlterm">apache library
+  </dt>
+
+  <dd class="dd"/>
+
+  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">@HADOOP_HOME@/../hadoop-conf, @HADOOP_HOME@/etc/hadoop, @HADOOP_HOME@/conf, @HADOOP_HOME@/share/hadoop/hdfs/*, @HADOOP_HOME@/share/hadoop/common/*, @HADOOP_HOME@/share/hadoop/common/lib/*, @HADOOP_HOME@/lib/*, @HADOOP_HOME@/client/*, @HADOOP_HOME@/*, @HADOOP_HOME@/../hadoop-hdfs/*</tt></dd>
+
+ 
+ </dl>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

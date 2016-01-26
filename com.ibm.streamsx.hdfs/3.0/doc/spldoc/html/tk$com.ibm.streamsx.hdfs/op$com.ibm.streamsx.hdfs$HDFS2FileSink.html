@@ -1,0 +1,786 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="reference"/>
+<meta name="DC.Title" content="Operator HDFS2FileSink"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="spldoc_operator"/>
+<link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
+<link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
+<title>Operator HDFS2FileSink</title>
+</head>
+<body id="spldoc_operator">
+
+
+<h1 class="title topictitle1">Operator <tt class="ph tt">HDFS2FileSink</tt></h1>
+
+<div class="body refbody">
+<div class="section">
+<p class="p">
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSink</p>
+
+</div>
+
+<div class="section splprimop">
+  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileSink.svg" width="672" height="112"/>
+</div>
+
+<div class="section">
+
+<p class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator writes files to a Hadoop Distributed File System. 
+</p>
+
+<p class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator is similar to the <tt class="ph tt">FileSink</tt> operator.   This operator writes tuples that arrive on its input port to the output file that is named by the <strong class="ph b">file</strong> parameter.   You can optionally control whether the operator closes the current output file and creates a new file for writing based on the size  of the file in bytes, the number of tuples that are written to the file, or the time in seconds that the file is open for writing,  or when the operator receives a punctuation marker.
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Behavior in a consistent region
+</h2>
+
+<p class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator can participate in a consistent region. The operator can be part of a consistent region, but cannot be at the start of a consistent region. The operator guarantees that tuples are written to a file in HDFS at least once, but duplicated tuples can be written to the file if application failure occurs.
+</p>
+
+<p class="p">For the operator to support consistent region, the Hadoop Distributed File System must be configured with file append enabled. For information about how to properly enable this feature, refer to the documentation of your Hadoop distribution.
+</p>
+
+<p class="p">On drain, the operator flushes its internal buffer to the file. On checkpoint, the operator stores the current file name, file size, tuple count, and file number to the checkpoint. On reset, the operator closes the current file, and opens the file from checkpoint. File states like file size and tuple count are reset to the file. The file is opened in append mode, and data is written to the end of the file. 
+</p>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Exceptions
+</h2>
+
+<div class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator terminates in the following cases:
+<ul class="ul">
+<li class="li"> The operator cannot connect to HDFS.</li>
+
+<li class="li"> The file cannot be written.     </li>
+
+</ul>
+
+</div>
+
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink$1.html">Examples</a>
+</dt>
+<dd class="dd">This example uses the <tt class="ph tt">HDFS2FileSink</tt> operator to write tuples to output files that have names like <tt class="ph tt">output0.txt</tt>. stream&lt;PersonSchema&gt; In = FileSource(){
+  param
+    file : "Input.txt" ;
+}
+stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
+  output
+    SingleStringIn : PersonSchemString =(rstring) In ;
+}
+() as txtSink = HDFS2FileSink(SingleStringIn){
+  param
+    file : "output%FILENUM.txt" ;
+    bytesPerFile: (int64)(16*1024);
+}
+
+</dd>
+</dl>
+
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Summary</h2>
+
+<dl class="dl" compact="compact">
+ 
+  <dt class="dt dlterm">Ports</dt>
+
+  <dd class="dd">This operator has 1 input port and 1 output port.</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Windowing</dt>
+
+  <dd class="dd">This operator does not accept any windowing configurations.</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Parameters</dt>
+
+  <dd class="dd">This operator supports 14 parameters. (<tt class="ph tt">file, timeFormat, hdfsUri, bytesPerFile, tuplesPerFile, closeOnPunct, fileAttributeName, timePerFile, hdfsUser, authPrincipal, authKeytab, credFile, configPath, encoding</tt>)
+</dd>
+
+ 
+ 
+  <dt class="dt dlterm">Metrics</dt>
+
+  <dd class="dd">This operator does not report any metrics.</dd>
+
+ 
+</dl>
+</div>
+
+<div class="section"><h2 class="title sectiontitle splhead-1">Properties</h2>
+
+<dl class="dl" compact="compact">
+ 
+  <dt class="dt dlterm">Implementation</dt>
+
+  <dd class="dd">Java</dd>
+
+ 
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set">Input Ports</a></strong></p>
+<dl class="dl">
+  
+   <dt class="dt dlterm">Ports (0)</dt>
+
+   <dd class="dd">
+
+<p class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator has one input port, which writes the contents of the input stream to the file that you specified. The input port is non-mutating, and its punctuation mode is <tt class="ph tt">Oblivious</tt>.  The HDFS2FileSink supports writing data into HDFS in two formats. For line format, the schema of the input port is tuple&lt;rstring line&gt; or tuple&lt;ustring line&gt;, which specifies a single rstring or ustring attribute that represents  a line to be written to the file. For binary format, the schema of the input port is tuple&lt;blob data&gt;, which specifies a block of data to be written to the file. 
+</p>
+   </dd>
+
+  
+    
+      <dt class="dt dlterm">Properties</dt>
+
+      <dd class="dd">
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__optional">Optional</a>: false
+     </li>
+
+   </ul>
+
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__controlport">ControlPort</a>: false
+</li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__windowingmode">WindowingMode</a>: NonWindowed
+</li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__windowpunctuationinputmode">WindowPunctuationInputMode</a>: Oblivious
+</li>
+
+   </ul>
+
+      </dd>
+
+    
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set">Output Ports</a></strong></p>
+<dl class="dl">
+  
+     <dt class="dt dlterm">Assignments</dt>
+
+       <dd class="dd">Java operators do not support output assignments.
+       </dd>
+
+  
+</dl>
+
+<dl class="dl">
+  
+   <dt class="dt dlterm">Ports (0)</dt>
+
+   <dd class="dd">
+
+<p class="p">The <tt class="ph tt">HDFS2FileSink</tt> operator is configurable with an optional output port.   The output port is non-mutating and its punctuation mode is <tt class="ph tt">Free</tt>. The schema of the output port is &lt;string fileName, uint64 fileSize&gt;, which specifies the name and size of files that are written to HDFS.
+</p>
+
+<p class="p"/>
+
+   <dl class="dl">
+    
+      <dt class="dt dlterm">Properties</dt>
+
+      <dd class="dd">
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__optional">Optional</a>: true
+     </li>
+
+   </ul>
+
+   <ul class="sl simple">
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__windowpunctuationoutputmode">WindowPunctuationOutputMode</a>: Free
+     </li>
+
+   </ul>
+
+      </dd>
+
+    
+   </dl>
+
+   <p class="p"/>
+
+   </dd>
+
+  
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters">Parameters</a></strong></p>
+
+<dl class="dl">
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_file"><tt class="ph tt">file</tt></dt>
+
+<dd class="dd">
+<div class="p">This parameter specifies the name of the file that the operator writes to.            The <strong class="ph b">file</strong> parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:
+<ul class="ul">
+<li class="li"> %HOST 		The host that is running the processing element (PE) of this operator.</li>
+
+<li class="li"> %FILENUM		The file number, which starts at 0 and counts up as a new file is created for writing.</li>
+
+<li class="li"> %PROCID		The process ID of the processing element.</li>
+
+<li class="li"> %PEID 		The processing element ID.</li>
+
+<li class="li"> %PELAUNCHNUM	The PE launch count.</li>
+
+<li class="li"> %TIME 		The time when the file is created.  If the <strong class="ph b">timeFormat</strong> parameter is not specified, the default time format is <tt class="ph tt">yyyyMMdd_HHmmss</tt>.</li>
+
+</ul>
+
+</div>
+
+<p class="p">For example, if you specify a <strong class="ph b">file</strong> parameter of <tt class="ph tt">myFile%FILENUM%TIME.txt</tt>, and the first three files are created in the afternoon on November 30, 2014,  the file names are <tt class="ph tt">myFile020141130_132443.txt</tt>, <tt class="ph tt">myfile120141130_132443.txt</tt>, and <tt class="ph tt">myFile220141130_132443.txt</tt>.
+</p>
+
+<p class="p"><strong class="ph b">Important:</strong> If the %FILENUM specification is not included, the file is overwritten every time a new file is created.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_timeFormat"><tt class="ph tt">timeFormat</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the time format to use when the <strong class="ph b">file</strong> parameter value contains <tt class="ph tt">%TIME</tt>.   The parameter value must contain conversion specifications that are supported by the java.text.SimpleDateFormat.  The default format is <tt class="ph tt">yyyyMMdd_HHmmss</tt>.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_hdfsUri"><tt class="ph tt">hdfsUri</tt></dt>
+
+<dd class="dd">
+<div class="p">This parameter specifies the uniform resource identifier (URI) that you can use to connect to the HDFS file system.   The URI has the following format:
+<ul class="ul">
+<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://<em class="ph i">hdfshost</em>:<em class="ph i">hdfsport</em></tt>.</li>
+
+<li class="li"> To access GPFS locally, use <tt class="ph tt">gpfs:///</tt>.</li>
+
+<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://<em class="ph i">hdfshost</em>:<em class="ph i">webhdfsport</em></tt>.</li>
+
+</ul>
+
+</div>
+
+<p class="p">If this parameter is not specified, the operator expects that the HDFS URI is specified as the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt>  property in the <tt class="ph tt">core-site.xml</tt> HDFS configuration file.  The operator expects the <tt class="ph tt">core-site.xml</tt> file to be located in  <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt> or <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt>. 
+</p>
+
+<p class="p">You can use the <strong class="ph b">hdfsUri</strong> parameter to override the value that is specified for the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_bytesPerFile"><tt class="ph tt">bytesPerFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the approximate size of the output file, in bytes.  When the file size exceeds the specified number of bytes, the current output file is closed and a new file is opened.   The <strong class="ph b">bytesPerFile</strong>, <strong class="ph b">timePerFile</strong>, and <strong class="ph b">tuplesPerFile</strong> parameters are mutually exclusive; you can specify only one of these parameters at a time.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: int64
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_tuplesPerFile"><tt class="ph tt">tuplesPerFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the maximum number of tuples that can be received for each output file.  When the specified number of tuples are received, the current output file is closed and a new file is opened for writing.  The <strong class="ph b">bytesPerFile</strong>, <strong class="ph b">timePerFile</strong>, and <strong class="ph b">tuplesPerFile</strong> parameters are mutually exclusive; you can specify only one of these parameters at a time.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: int64
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_closeOnPunct"><tt class="ph tt">closeOnPunct</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies whether the operator closes the current output file and creates a new file when a punctuation marker is received.  The default value is <tt class="ph tt">false</tt>.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: boolean
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_fileAttributeName"><tt class="ph tt">fileAttributeName</tt></dt>
+
+<dd class="dd">
+<p class="p">If set, this points to an attribute containing the filename.  The operator will close a file when value of this attribute changes.  If the string contains substitutions, the check for a change happens before substituations, and the filename contains the substitutions based on the first tuple.    
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_timePerFile"><tt class="ph tt">timePerFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the approximate time, in seconds, after which the current output file is closed and a new file is opened for writing.   The <strong class="ph b">bytesPerFile</strong>, <strong class="ph b">timePerFile</strong>, and <strong class="ph b">tuplesPerFile</strong> parameters are mutually exclusive; you can specify only one of these parameters.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: float64
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_hdfsUser"><tt class="ph tt">hdfsUser</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the user ID to use when you connect to the HDFS file system.   If this parameter is not specified, the operator uses the instance owner ID to connect to the HDFS file system.
+</p>
+
+<p class="p">When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by  using the values that are specified in the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> parameters.  After successful authentication, the operator uses the user ID that is specified in the <strong class="ph b">hdfsUser</strong> parameter to perform all other operations on the file system.
+</p>
+
+<p class="p"><strong class="ph b">NOTE:</strong> When you use Kerberos authentication, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS to perform operations as the user that is specified by the <strong class="ph b">hdfsUser</strong> parameter.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_authPrincipal"><tt class="ph tt">authPrincipal</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the Kerberos principal that you use for authentication.  This value is set to the principal that is created for the InfoSphere Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_authKeytab"><tt class="ph tt">authKeytab</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the file that contains the encrypted keys for the user that is specified by the <strong class="ph b">authPrincipal</strong> parameter. The operator uses this keytab file to authenticate the user.  The keytab file is generated by the administrator. You must specify this parameter to use Kerberos authentication.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_credFile"><tt class="ph tt">credFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the file that contains the login credentials.  These credentials are used when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://<em class="ph i">hdfshost</em>:<em class="ph i">hdfsport</em></tt> schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_configPath"><tt class="ph tt">configPath</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the absolute path to the configuration directory that contains the <tt class="ph tt">core-site.xml</tt> file.  If this parameter is not specified, the operator searches the default location for the <tt class="ph tt">core-site.xml</tt>.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_encoding"><tt class="ph tt">encoding</tt></dt>
+
+<dd class="dd">
+<p class="p">This parameter specifies the character set encoding that is used in the output ﬁle.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+</dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__codetemplate">Code Templates</a></strong></p>
+  <dl class="dl">
+    
+     <dt class="dt dlterm">HDFS2FileSink</dt>
+
+     <dd class="dd">
+       <pre class="pre codeblock">
+() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
+            param
+                file: "${filename}";
+        }
+      </pre>
+
+     <p class="p"/>
+
+     </dd>
+
+    
+    
+     <dt class="dt dlterm">HDFS2FileSink with hdfsUser and hdfsUri</dt>
+
+     <dd class="dd">
+       <pre class="pre codeblock">
+() as ${operatorName} = HDFS2FileSink(${inputStream} ) {
+            param
+                file: "${filename}";
+                hdfsUser: "${hdfsUser}";
+                hdfsUri: "${hdfsUri}";
+        }
+      </pre>
+
+     <p class="p"/>
+
+     </dd>
+
+    
+  </dl>
+
+</div>
+
+<div class="section">
+<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies">Libraries</a></strong></p>
+
+ <dl class="dl">
+ 
+  <dt class="dt dlterm">Java operator class library
+  </dt>
+
+  <dd class="dd"/>
+
+  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">../../impl/java/bin, ../../impl/lib/BigData.jar</tt></dd>
+
+ 
+ 
+  <dt class="dt dlterm">apache library
+  </dt>
+
+  <dd class="dd"/>
+
+  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">@HADOOP_HOME@/../hadoop-conf, @HADOOP_HOME@/etc/hadoop, @HADOOP_HOME@/conf, @HADOOP_HOME@/share/hadoop/hdfs/*, @HADOOP_HOME@/share/hadoop/common/*, @HADOOP_HOME@/share/hadoop/common/lib/*, @HADOOP_HOME@/lib/*, @HADOOP_HOME@/client/*, @HADOOP_HOME@/*, @HADOOP_HOME@/../hadoop-hdfs/*</tt></dd>
+
+ 
+ </dl>
+
+</div>
+
+</div>
+
+
+</body>
+</html>
