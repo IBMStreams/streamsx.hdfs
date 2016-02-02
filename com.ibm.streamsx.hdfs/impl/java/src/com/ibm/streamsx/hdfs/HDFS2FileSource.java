@@ -12,7 +12,9 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -115,6 +117,13 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 
 		super.initialize(context);
+		
+		// register for data governance
+		TRACE.log(TraceLevel.INFO,
+				"HDFS2FileSource - Data Governance - file: " + fFileName + " and HdfsUri: " + getHdfsUri());
+		if (fFileName != null && getHdfsUri() != null) {
+			registerForDataGovernance(getHdfsUri(), fFileName);
+		}
 
 		// Associate the aspect Log with messages from the SPL log
 		// logger.
@@ -150,6 +159,23 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		fCrContext = context.getOptionalContext(ConsistentRegionContext.class);
 	}
 
+	private void registerForDataGovernance(String serverURL, String file) {
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Registering for data governance with server URL: " + serverURL + " and file: " + file);						
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(IGovernanceConstants.TAG_REGISTER_TYPE, IGovernanceConstants.TAG_REGISTER_TYPE_INPUT);
+		properties.put(IGovernanceConstants.PROPERTY_INPUT_OPERATOR_TYPE, "HDFS2FileSource");
+		properties.put(IGovernanceConstants.PROPERTY_SRC_NAME, file);
+		properties.put(IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_FILE_TYPE);
+		properties.put(IGovernanceConstants.PROPERTY_SRC_PARENT_PREFIX, "p1");
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_NAME, serverURL);
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE);
+		properties.put("p1" + IGovernanceConstants.PROPERTY_PARENT_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE_SHORT);
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Data governance: " + properties.toString());
+		
+		setTagData(IGovernanceConstants.TAG_OPERATOR_IGC, properties);				
+	}
+	
 	@ContextCheck(compile = true)
 	public static void validateParameters(OperatorContextChecker checker)
 			throws Exception {
