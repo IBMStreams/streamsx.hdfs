@@ -8,6 +8,6 @@ Download the latest releaes of the HDFS Toolkit for Bluemix supporting Streams v
 
 ## Getting started with development:
  
-* See the [sample](https://github.com/natashadsilva/streamsx.hdfs/tree/master/samples/HDFSBluemixDemo) for usage examples.
+* See the [sample](https://github.com/IBMStreams/streamsx.hdfs/tree/bluemix/samples/HDFSBluemixDemo) for usage examples.
 
 
