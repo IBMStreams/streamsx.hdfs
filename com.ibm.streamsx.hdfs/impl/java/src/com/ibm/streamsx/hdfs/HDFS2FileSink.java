@@ -839,13 +839,13 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 						target = currentFileName;
 						if (getHdfsClient().exists(target)) {
 							if (getHdfsClient().delete(target, false)) {
-								TRACE.log(TraceLevel.DEBUG, "Sucessfully removed file: " + target);
+								TRACE.log(TraceLevel.DEBUG, "Successfully removed file: " + target);
 							} else {
 								TRACE.log(TraceLevel.ERROR, "Failed to removed file: " + target);
 							}
 						}
 						if (getHdfsClient().rename(currentTempFileName, target)) {
-							TRACE.log(TraceLevel.DEBUG, "Sucessfully renamed file: " + currentTempFileName +" to: " + target);
+							TRACE.log(TraceLevel.DEBUG, "Successfully renamed file: " + currentTempFileName +" to: " + target);
 						} else {
 							success = false;
 							TRACE.log(TraceLevel.ERROR, "Failed to rename file: " + currentTempFileName +" to: " + target);
@@ -1053,16 +1053,9 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 				"Reset to checkpoint " + checkpoint.getSequenceId(),
 				CONSISTEN_ASPECT);	
 
-		//Interrupt timer if running
-		if (fFileTimerThread != null) {
-			TRACE.log(TraceLevel.DEBUG, "Stop file timer thread");
-			fFileTimerThread.interrupt();
-			fFileTimerThread = null;
-		}
-
 		// close current file
 		if (fFileToWrite != null)
-			fFileToWrite.close();
+			closeFile();
 				
 		String path = (String)checkpoint.getInputStream().readObject();
 		long tupleCnt = checkpoint.getInputStream().readLong();
@@ -1095,16 +1088,9 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	public void resetToInitialState() throws Exception {
 		TRACE.log(TraceLevel.DEBUG, "Reset to initial state", CONSISTEN_ASPECT);
 
-		//Interrupt timer if running
-		if (fFileTimerThread != null) {
-			TRACE.log(TraceLevel.DEBUG, "Stop file timer thread");
-			fFileTimerThread.interrupt();
-			fFileTimerThread = null;
-		}
-
 		// close current file
 		if (fFileToWrite != null)
-			fFileToWrite.close();
+			closeFile();
 				
 		String path = initState.path;
 		fileNum = 0;
