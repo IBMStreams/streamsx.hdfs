@@ -1,12 +1,12 @@
-#Fri Mar 13 10:33:11 EDT 2015
+#Wed Jan 27 11:49:50 EST 2016
 copytosourcelist=
-hreftargetslist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,toolkits/toolkits.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
+hreftargetslist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,tk$HDFSFileSourceSamples/ix$Namespace.xml,toolkits/toolkits.xml,toolkits/ix$Namespace.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
 fullditatopicfile=fullditatopic.list
 fullditamapandtopicfile=fullditamapandtopic.list
-fullditatopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,toolkits/toolkits.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
-fullditamapandtopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,toolkits.ditamap,toolkits/toolkits.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
+fullditatopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,tk$HDFSFileSourceSamples/ix$Namespace.xml,toolkits/toolkits.xml,toolkits/ix$Namespace.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
+fullditamapandtopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,tk$HDFSFileSourceSamples/ix$Namespace.xml,toolkits.ditamap,toolkits/toolkits.xml,toolkits/ix$Namespace.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
 hrefditatopicfile=hrefditatopic.list
-hrefditatopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,toolkits/toolkits.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
+hrefditatopiclist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,tk$HDFSFileSourceSamples/ix$Namespace.xml,toolkits/toolkits.xml,toolkits/ix$Namespace.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
 user.input.file=toolkits.ditamap
 subtargetsfile=subtargets.list
 fullditamapfile=fullditamap.list
@@ -27,7 +27,7 @@ imagelist=
 htmlfile=html.list
 htmllist=
 canditopicsfile=canditopics.list
-canditopicslist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,toolkits/toolkits.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
+canditopicslist=tk$HDFSFileSourceSamples/ns$hdfsexample.xml,tk$HDFSFileSourceSamples/ix$Namespace.xml,toolkits/toolkits.xml,toolkits/ix$Namespace.xml,tk$HDFSFileSourceSamples/tk$HDFSFileSourceSamples.xml
 keyreffile=keyref.list
 subjectschemefile=subjectscheme.list
 keyreflist=
@@ -38,7 +38,7 @@ codereffile=coderef.list
 codereflist=
 user.input.file.listfile=usr.input.file.list
 uplevels=
-user.input.dir=/homes/hny7/chanskw/gitspreeRelease/streamsx.hdfs/samples/HDFSFileSourceSamples/doc/spldoc/dita
+user.input.dir=/home/streamsadmin/git/master/streamsx.hdfs/samples/HDFSFileSourceSamples/doc/spldoc/dita
 conrefpushfile=conrefpush.list
 tempdirToinputmapdir.relative.value=
 flagimagefile=flagimage.list

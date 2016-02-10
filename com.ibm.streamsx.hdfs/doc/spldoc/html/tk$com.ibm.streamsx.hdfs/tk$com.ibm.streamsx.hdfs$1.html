@@ -22,7 +22,7 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 2.0.0</a> &gt; Developing and running applications that use the HDFS Toolkit</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.0</a> &gt; Developing and running applications that use the HDFS Toolkit</p>
 
 </div>
 
@@ -66,6 +66,11 @@
 <div class="section"><h2 class="title sectiontitle">Procedure
 </h2>
 
+</div>
+
+<div class="section"><h2 class="title sectiontitle">Procedure
+</h2>
+
 <div class="p">
 <ol class="ol">
 <li class="li"> If InfoSphere Streams has access to the location where Hadoop is installed,     set the following environment variables:
@@ -79,13 +84,22 @@
 </ul>
 </li>
 
-<li class="li"> For IBM InfoSphere BigInsights:
+<li class="li"> For IBM InfoSphere BigInsights 3.x:
 <ul class="ul">
 <li class="li"> Set <strong class="ph b">BIGINSIGHTS_HOME</strong> to <tt class="ph tt">BigInsights_Install_Directory</tt>. For example, <tt class="ph tt">/opt/ibm/biginsights</tt>.</li>
 
 <li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">BigInsights_Install_Directory/IHC</tt>. For example, <tt class="ph tt">/opt/ibm/biginsights/IHC</tt>.</li>
 
 <li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.</li>
+
+</ul>
+</li>
+
+<li class="li"> For IBM InfoSphere BigInsights 4.x:
+<ul class="ul">
+<li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">BigInsights_Install_Directory/hadoop</tt>. For example, <tt class="ph tt">/usr/iop/4.0.0.0/hadoop</tt>.</li>
+
+<li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.   </li>
 
 </ul>
 </li>
@@ -109,7 +123,7 @@
 </ol>
 </li>
 
-<li class="li"> For IBM InfoSphere BigInsights:
+<li class="li"> For IBM InfoSphere BigInsights 3.x:
 <ol class="ol" type="a">
 <li class="li"> Copy <tt class="ph tt">BigInsights_Install_Directory/IHC</tt> to the InfoSphere Streams cluster and place it under a directory         on the cluster, which is accessible to InfoSphere Streams. For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory/IHC</tt>.</li>
 
@@ -118,7 +132,16 @@
 </ol>
 </li>
 
-<li class="li"> For IBM InfoSphere BigInsights installed on GPFS:
+<li class="li"> For IBM InfoSphere BigInsights 4.x:
+<ol class="ol" type="a">
+<li class="li"> Copy <tt class="ph tt">BigInsights_Install_Directory/hadoop</tt> to the InfoSphere Streams cluster and place it under a directory         on the cluster, which is accessible to InfoSphere Streams. For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory/hadoop</tt>.</li>
+
+<li class="li"> Copy the <tt class="ph tt">BigInsights_Install_Directory/hadoop-hdfs</tt> directory to the InfoSphere Streams cluster         and place it under a directory on the cluster, which is accessible to InfoSphere Streams.         For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory/hadoop-hdfs</tt>        </li>
+
+</ol>
+</li>
+
+<li class="li"> For IBM InfoSphere BigInsights 3.x installed on GPFS:
 <ul class="ul">
 <li class="li"> <strong class="ph b">Important</strong>: If IBM InfoSphere BigInsights is installed on GPFS, you do not need to install InfoSphere Streams        on an IBM InfoSphere BigInsights data node. Use the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI        that you use to connect to GPFS.</li>
 
@@ -129,9 +152,16 @@
 
 <li class="li"> Copy the <tt class="ph tt">BigInsights_Install_Directory/hadoop-conf</tt> directory to the InfoSphere Streams cluster         and place it under a directory on the cluster, which is accessible to InfoSphere Streams.         For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory/hadoop-conf</tt></li>
 
-<li class="li"> Copy <tt class="ph tt">BigInsights_Install_Directory/lib/biginsights-gpfs.jar</tt> to the InfoSphere Streams cluster         and place it under a directory on the cluster, which is accessible to InfoSphere Streams.         For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory</tt>.</li>
+<li class="li"> Copy <tt class="ph tt">BigInsights_Install_Directory/lib/biginsights-gpfs.jar</tt> to the InfoSphere Streams cluster         and place it under a directory on the cluster, which is accessible to InfoSphere Streams.         For example, <tt class="ph tt">/home/Streams/BigInsights_Install_Directory</tt>.       </li>
 
 </ol>
+</li>
+
+<li class="li"> For IBM InfoSphere BigInsights 4.0.0.0 installed on GPFS:
+<ul class="ul">
+<li class="li"> The com.ibm.streamsx.hdfs toolkit does not support remote connections to a BigInsight 4.0.0.0 GPFS cluster. </li>
+
+</ul>
 </li>
 
 </ul>
@@ -139,14 +169,14 @@
 <ul class="ul">
 <li class="li"> For Apache HDFS, Cloudera, or Hortonworks Data Platform:
 <ul class="ul">
-<li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">/home/Streams/hadoop</tt>.</li>
+<li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">/home/Streams/hadoop</tt>.l</li>
 
 <li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.</li>
 
 </ul>
 </li>
 
-<li class="li"> For IBM InfoSphere BigInsights:
+<li class="li"> For IBM InfoSphere BigInsights 3.x:
 <ul class="ul">
 <li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">/home/Streams/biginsights/IHC</tt>.</li>
 
@@ -157,13 +187,22 @@
 </ul>
 </li>
 
-<li class="li"> IBM InfoSphere BigInsights installed on GPFS:
+<li class="li"> For IBM InfoSphere BigInsights 4.x:
+<ul class="ul">
+<li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">/home/Streams/biginsights/hadoop</tt>.</li>
+
+<li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.     </li>
+
+</ul>
+</li>
+
+<li class="li"> IBM InfoSphere BigInsights 3.x installed on GPFS:
 <ul class="ul">
 <li class="li"> Set <strong class="ph b">HADOOP_HOME</strong> to <tt class="ph tt">/opt/ibm/biginsights/IHC/</tt>.</li>
 
 <li class="li"> Set <strong class="ph b">BIGINSIGHTS_HOME</strong> to <tt class="ph tt">/opt/ibm/biginsights</tt>.</li>
 
-<li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.</li>
+<li class="li"> Set <strong class="ph b">JAVA_HOME</strong> to the location where Java is installed.        </li>
 
 </ul>
 </li>
@@ -171,8 +210,7 @@
 </ul>
 </li>
 
-<li class="li">
-<div class="p"> Configure the SPL compiler to find the toolkit root directory. Use one of the following methods:
+<li class="li"> Configure the SPL compiler to find the toolkit root directory. Use one of the following methods:
 <ul class="ul">
 <li class="li"> Set the <strong class="ph b">STREAMS_SPLPATH</strong> environment variable to the root directory of a toolkit     or multiple toolkits (with : as a separator).  For example:
 <pre class="pre codeblock">
@@ -191,8 +229,6 @@ sc -t $STREAMS_INSTALL/toolkits/com.ibm.streamsx.hdfs -M MyMain
 <li class="li"> Add the toolkit location in InfoSphere Streams Studio.</li>
 
 </ul>
-
-</div>
 </li>
 
 <li class="li"> Develop your application. To avoid the need to fully qualify the operators, add a use directive in your application. 
@@ -212,11 +248,11 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink;
 </ul>
 </li>
 
-<li class="li"> If IBM InfoSphere BigInsights is installed on GPFS:
+<li class="li"> If IBM InfoSphere BigInsights 3.x or 4.x is installed on GPFS:
 <ul class="ul">
 <li class="li"> To access GPFS locally, set the <tt class="ph tt">fs.defaultFS</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file to <tt class="ph tt">gpfs:///</tt>.</li>
 
-<li class="li"> To access GPFS remotely, modify the <tt class="ph tt">core-site.xml</tt> that you have copied over from the remote system.       Set the <tt class="ph tt">fs.default.FS</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file to <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt>.       For example, <tt class="ph tt">webhdfs://myhdfshost:14000</tt>.       Ensure that the user is set up to access the file system by using the webhdfs schema.</li>
+<li class="li"> To access GPFS remotely (<strong class="ph b">only applies to BigInsights 3.x</strong>), modify the <tt class="ph tt">core-site.xml</tt> that you have copied over from the remote system.       Set the <tt class="ph tt">fs.default.FS</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file to <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt>.       For example, <tt class="ph tt">webhdfs://myhdfshost:14000</tt>.      Ensure that the user is set up to access the file system by using the webhdfs schema.</li>
 
 </ul>
 </li>
@@ -253,7 +289,7 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink;
 
 <li class="li"> Start the InfoSphere Streams instance. </li>
 
-<li class="li"> Run the application. You can submit the application as a job by using the <strong class="ph b">streamtool submitjob</strong> command or by using Streams Studio.  </li>
+<li class="li"> Run the application. You can submit the application as a job by using the <strong class="ph b">streamtool submitjob</strong> command or by using Streams Studio. </li>
 
 </ol>
 

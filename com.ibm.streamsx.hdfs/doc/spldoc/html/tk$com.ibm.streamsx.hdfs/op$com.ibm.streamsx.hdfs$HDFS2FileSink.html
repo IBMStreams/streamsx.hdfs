@@ -22,8 +22,12 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 2.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSink</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSink</p>
 
+</div>
+
+<div class="section splprimop">
+  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileSink.svg" width="672" height="112"/>
 </div>
 
 <div class="section">
@@ -65,14 +69,23 @@
 
   <dl class="dl"><dt class="dt dlterm"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink$1.html">Examples</a>
 </dt>
-<dd class="dd">This example uses the <tt class="ph tt">HDFS2FileSink</tt> operator to write tuples to output files that have names like <tt class="ph tt">output0.txt</tt>.
+<dd class="dd">This example uses the <tt class="ph tt">HDFS2FileSink</tt> operator to write tuples to output files that have names like <tt class="ph tt">output0.txt</tt>. stream&lt;PersonSchema&gt; In = FileSource(){
+  param
+    file : "Input.txt" ;
+}
+stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
+  output
+    SingleStringIn : PersonSchemString =(rstring) In ;
+}
+() as txtSink = HDFS2FileSink(SingleStringIn){
+  param
+    file : "output%FILENUM.txt" ;
+    bytesPerFile: (int64)(16*1024);
+}
+
 </dd>
 </dl>
 
-</div>
-
-<div class="section splprimop">
-  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileSink.svg" width="672" height="112"/>
 </div>
 
 <div class="section"><h2 class="title sectiontitle splhead-1">Summary</h2>
@@ -308,11 +321,11 @@
 <dd class="dd">
 <div class="p">This parameter specifies the uniform resource identifier (URI) that you can use to connect to the HDFS file system.   The URI has the following format:
 <ul class="ul">
-<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://*hdfshost*:*hdfsport*</tt>.</li>
+<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://<em class="ph i">hdfshost</em>:<em class="ph i">hdfsport</em></tt>.</li>
 
 <li class="li"> To access GPFS locally, use <tt class="ph tt">gpfs:///</tt>.</li>
 
-<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://*hdfshost*:*webhdfsport*</tt>.</li>
+<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://<em class="ph i">hdfshost</em>:<em class="ph i">webhdfsport</em></tt>.</li>
 
 </ul>
 
@@ -606,7 +619,7 @@
 <dt class="dt dlterm" id="spldoc_operator__parameter_credFile"><tt class="ph tt">credFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the file that contains the login credentials.  These credentials are used when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://*hdfshost*:*hdfsport*</tt> schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.
+<p class="p">This parameter specifies the file that contains the login credentials.  These credentials are used when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://<em class="ph i">hdfshost</em>:<em class="ph i">hdfsport</em></tt> schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.
 </p>
 <dl class="dl">
 
