@@ -16,6 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -619,6 +621,12 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 
 		super.initialize(context);
 		
+		// register for data governance
+		// only register if static filename mode
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSink - Data Governance - file: " + file + " and HdfsUri: " + getHdfsUri());
+		if (fileAttrName == null && file != null && getHdfsUri() != null) {
+			registerForDataGovernance(getHdfsUri(), file);
+		}
 		
 		/*
 		 * Set appropriate variables if the optional output port is
@@ -688,6 +696,23 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		initState = new InitialState();
 	}
 
+	private void registerForDataGovernance(String serverURL, String file) {
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSink - Registering for data governance with server URL: " + serverURL + " and file: " + file);						
+		
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(IGovernanceConstants.TAG_REGISTER_TYPE, IGovernanceConstants.TAG_REGISTER_TYPE_OUTPUT);
+		properties.put(IGovernanceConstants.PROPERTY_OUTPUT_OPERATOR_TYPE, "HDFS2FileSink");
+		properties.put(IGovernanceConstants.PROPERTY_SRC_NAME, file);
+		properties.put(IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_FILE_TYPE);
+		properties.put(IGovernanceConstants.PROPERTY_SRC_PARENT_PREFIX, "p1");
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_NAME, serverURL);
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE);
+		properties.put("p1" + IGovernanceConstants.PROPERTY_PARENT_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE_SHORT);
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSink - Data governance: " + properties.toString());
+		
+		setTagData(IGovernanceConstants.TAG_OPERATOR_IGC, properties);				
+	}
+	
 	private void createFile(String filename) {
 		
 		if (TRACE.isLoggable(TraceLevel.DEBUG)) {

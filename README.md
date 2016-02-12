@@ -2,10 +2,13 @@ streamsx.hdfs
 =============
 This toolkit provides operators and functions for interacting with Hadoop File System.
 
-HDFS Toolkit v2.0 is officially released to support InfoSphere Streams v4.0:
+HDFS Toolkit v3.0 is officially released to support InfoSphere Streams v4.1:
 * https://github.com/IBMStreams/streamsx.hdfs/releases
 
-Check out the new binary read / write support!
+Check out what's new with Streams 4.1:
+ * https://developer.ibm.com/streamsdev/2015/11/20/whats-new-streams-v4-1/
+
+Check out the binary read / write support!
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/HDFSBinary
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CompressedHdfsFiles
 
@@ -14,3 +17,9 @@ Getting started with development:
 
 Main Site:
 * http://ibmstreams.github.io/streamsx.hdfs/
+
+To learn more about Streams:
+* [IBM Streams on Github](http://ibmstreams.github.io)
+* [Introduction to Streams Quick Start Edition](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-intro/)
+* [Streams Getting Started Guide](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-getting-started/)
+* [StreamsDev](https://developer.ibm.com/streamsdev/)
