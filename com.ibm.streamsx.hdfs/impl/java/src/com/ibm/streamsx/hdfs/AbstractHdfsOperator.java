@@ -52,14 +52,24 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private String fKeyStorePath;
 	private String fKeyStorePassword;
 	private String fLibPath; //Used to allow the user to override the hadoop home environment variable
+	private String fPolicyFilePath;
 
 	@Override
 	public synchronized void initialize(OperatorContext context)
 			throws Exception {
 		super.initialize(context);
 		setupClassPaths(context);
+		processPolicyFilePath();
 		fHdfsClient = createHdfsClient();
 		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
+	}
+
+	private void processPolicyFilePath() {
+		String policyFilePath = getAbsolutePath(getPolicyFilePath());
+		if (policyFilePath != null) {
+			TRACE.log(TraceLevel.INFO, "Policy file path: " + policyFilePath);
+			System.setProperty("com.ibm.security.jurisdictionPolicyDir", policyFilePath);
+		}
 	}
 
 	private  void setupClassPaths(OperatorContext context) {
@@ -246,6 +256,11 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	public String getKeyStorePassword() {
 		return fKeyStorePassword;
 	}
+
+	public String getPolicyFilePath() {
+		return fPolicyFilePath;
+	}
+
 	@Parameter(optional=true)	
 	public void setHdfsPassword(String pass) {
 		fHdfsPassword = pass;
@@ -263,5 +278,10 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	@Parameter(optional=true) 
 	public void setLibPath(String libPath) {
 		fLibPath = libPath;
+	}
+
+	@Parameter(optional=true)
+	public void setPolicyFilePath(String policyFilePath) {
+		fPolicyFilePath = policyFilePath;
 	}
 }

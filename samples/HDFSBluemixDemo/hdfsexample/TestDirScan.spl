@@ -20,6 +20,8 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  *
  * 
  * Setup:
+ * Download the Unrestricted SDK JCE policy files from https://www-01.ibm.com/marketing/iwm/iwm/web/preLogin.do?source=jcesdk
+ * Place downloaded local_policy.jar and US_export_policy.jar in <application directory>/etc/policyfiles/
  * You will need to create new directory for the HDFS2DirectoryScan operator to scan.
  * if you have SSH access to the system where Hadoop is installed:
  * 1. Create a new directory in HDFS by running this command at the command line, 
@@ -51,6 +53,7 @@ public composite TestDirScan
 				hdfsUri : $hdfsUri ;
 				hdfsUser:$hdfsUser;
 				hdfsPassword: $hdfsPassword;
+				policyFilePath: "etc/policyfiles";
 		}
 
 		// use the file name from directory scan to read the file
@@ -60,6 +63,7 @@ public composite TestDirScan
 				hdfsUri : $hdfsUri ;
 				hdfsUser:$hdfsUser;
 				hdfsPassword: $hdfsPassword;
+				policyFilePath: "etc/policyfiles";
 		} 
 
 		//print out the names of each file found in the directory
