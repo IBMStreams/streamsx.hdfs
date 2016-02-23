@@ -110,6 +110,32 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 	}
 
 	@Override
+	public boolean rename(String src, String dst) throws IOException {
+
+		if (fIsDisconnected)
+			return false;
+
+		Path srcPath = new Path(src);
+		Path dstPath = new Path(dst);
+		Path parentPath = dstPath.getParent();
+		if (parentPath != null) {
+			if ( ! fFileSystem.mkdirs(parentPath)) {
+				return false;
+			}
+		}
+		return fFileSystem.rename(srcPath, dstPath);
+	}
+
+	@Override
+	public boolean delete(String filePath, boolean recursive) throws IOException {
+		if (fIsDisconnected)
+			return false;
+		
+		Path f = new Path(filePath);
+		return fFileSystem.delete(f, recursive);
+	}
+
+	@Override
 	public boolean isDirectory(String filePath) throws IOException {
 
 		if (fIsDisconnected)
