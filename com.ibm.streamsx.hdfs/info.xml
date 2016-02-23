@@ -77,10 +77,25 @@ If the  **HADOOP_HOME** environment variable is set, attempts to connect to a HD
 		      hdfsPassword: "bi_password";
 		      hdfsUser:"bi_user";
 		   }
-4. To read and write to HDFS, specify a uniform resource identifier (URI) to connect to HDFS using the **hdfsUri** operator parameter.
-5. Build your application.  You can use the **sc** command or Streams Studio.  
-6. Start the InfoSphere Streams instance. 
-7. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. You can also submit the application to run in the cloud using the Streaming Analytics service on Bluemix.
+5. Policy file configuration
+
+   BigInsights on Bluemix uses encryption keys larger than what is supported by the default IBM JDK. To connect to BigInsights, complete the following steps.
+   * Download and extract the [https://www-01.ibm.com/marketing/iwm/iwm/web/preLogin.do?source=jcesdk|Unrestricted SDK JCE policy files]. You have two options when deciding where to put the US_export_policy.jar and local_policy.jar:
+     * If you have access to the Streams cluster file system, you can replace the default policy files in &lt;JAVA_HOME>/jre/lib/security/ with the ones you downloaded.
+     * If you cannot access the file system, put them somewhere in the application's etc directory - for example, &lt;application_directory>/etc/policyfiles/ .
+   * If you placed the policy files in your application's etc directory, set the **policyFilePath** parameter in your application to the relative path to the directory containing your policy files. For example:
+		 () as HDFS2FileSink_2 = HDFS2FileSink(In) {
+		     param
+		      file: "output_file.txt";
+		      hdfsUri: "webhdfs://server_host_name:8443";
+		      hdfsPassword: "bi_password";
+		      hdfsUser: "bi_user";
+		      policyFilePath: "etc/policyfiles/"
+		 }
+6. To read and write to HDFS, specify a uniform resource identifier (URI) to connect to HDFS using the **hdfsUri** operator parameter.
+7. Build your application.  You can use the **sc** command or Streams Studio.  
+8. Start the InfoSphere Streams instance. 
+9. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. You can also submit the application to run in the cloud using the Streaming Analytics service on Bluemix.
 
 + Using the toolkit to connect to HDFS outside of Bluemix
 
