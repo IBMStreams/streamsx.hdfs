@@ -65,7 +65,7 @@
 <p class="p">To see the effect of HDFS2DirectoryScan, let the application run for a few minutes, and then copy more files to the testDirectory.  You should see that the directory scan will discover the new files for the HDFS2FileSource operator to read.
 </p>
 
-<div class="p">Setup: You will need to create new directory for the HDFS2DirectoryScan operator to scan. if you have SSH access to the system where Hadoop is installed:
+<div class="p">Setup: Download the Unrestricted SDK JCE policy files from https://www-01.ibm.com/marketing/iwm/iwm/web/preLogin.do?source=jcesdk Place downloaded local_policy.jar and US_export_policy.jar in &lt;application directory&gt;/etc/policyfiles/ You will need to create new directory for the HDFS2DirectoryScan operator to scan. if you have SSH access to the system where Hadoop is installed:
 <ol class="ol">
 <li class="li"> Create a new directory in HDFS by running this command at the command line, 
 <ul class="ul">

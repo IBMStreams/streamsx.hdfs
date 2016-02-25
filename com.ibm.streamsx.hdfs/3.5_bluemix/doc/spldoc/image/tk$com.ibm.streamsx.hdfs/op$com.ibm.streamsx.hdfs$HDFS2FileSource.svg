@@ -97,7 +97,7 @@ EXRSTlP/////////////////////ACWtmWIAAACFSURBVHjaRY+BDsMgCEQP4qzE
       ><text x="48.65" y="86.0"
       >authKeytab, credFile, configPath, encoding, blockSize, </text
       ><text x="48.65" y="101.0"
-      >libPath</text
+      >libPath, policyFilePath</text
       ><set attributeName="visibility" from="hidden" end="sdt2.mouseout" to="visible" begin="sdt2.mouseover"
     /></g
     ><g visibility="hidden" style="stroke:none;font-style:italic;font-size:12px;font-family:&apos;Helvetica&apos;,&apos;SansSerif&apos;;"

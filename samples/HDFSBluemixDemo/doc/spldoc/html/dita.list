@@ -1,4 +1,4 @@
-#Wed Jan 20 16:11:41 EST 2016
+#Thu Feb 25 13:45:32 EST 2016
 copytosourcelist=
 hreftargetslist=dita/tk$TestForBluemix/ix$Namespace.xml,dita/toolkits/toolkits.xml,dita/tk$TestForBluemix/ns$hdfsexample.xml,dita/tk$TestForBluemix/spl$hdfsexample$TestRead.xml,dita/toolkits/ix$Operator.xml,dita/toolkits/ix$Namespace.xml,dita/tk$TestForBluemix/tk$TestForBluemix.xml,dita/tk$TestForBluemix/ix$Operator.xml,dita/tk$TestForBluemix/spl$hdfsexample$TestDirScan.xml,dita/tk$TestForBluemix/spl$hdfsexample$TestWrite.xml
 fullditatopicfile=fullditatopic.list
@@ -38,7 +38,7 @@ codereffile=coderef.list
 codereflist=
 user.input.file.listfile=usr.input.file.list
 uplevels=../
-user.input.dir=/home/streamsadmin/git/bluemix/streamsx.hdfs/samples/HDFSBluemixDemo/doc/spldoc
+user.input.dir=/home/streamsadmin/git/policyFile/streamsx.hdfs/samples/HDFSBluemixDemo/doc/spldoc
 conrefpushfile=conrefpush.list
 tempdirToinputmapdir.relative.value=dita/
 flagimagefile=flagimage.list

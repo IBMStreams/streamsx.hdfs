@@ -22,7 +22,7 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.5.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSink</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.5.1</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSink</p>
 
 </div>
 
@@ -93,7 +93,7 @@
  
   <dt class="dt dlterm">Parameters</dt>
 
-  <dd class="dd">This operator supports 18 parameters. (<tt class="ph tt">file, timeFormat, hdfsUri, bytesPerFile, tuplesPerFile, closeOnPunct, fileAttributeName, timePerFile, hdfsUser, hdfsPassword, keyStorePath, keyStorePassword, authPrincipal, authKeytab, credFile, configPath, encoding, libPath</tt>)
+  <dd class="dd">This operator supports 19 parameters. (<tt class="ph tt">file, timeFormat, hdfsUri, bytesPerFile, tuplesPerFile, closeOnPunct, fileAttributeName, timePerFile, hdfsUser, hdfsPassword, keyStorePath, keyStorePassword, authPrincipal, authKeytab, credFile, configPath, encoding, libPath, policyFilePath</tt>)
 </dd>
 
  
@@ -808,6 +808,37 @@ You can use the <strong class="ph b">hdfsUri</strong> parameter to override the 
 
 <dd class="dd">
 <p class="p">This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and <tt class="ph tt">$HADOOP_HOME</tt> is not set, the Bluemix specific libraries within the <tt class="ph tt">impl/lib/ext</tt> folder of the toolkit will be used.  When specified, this parameter takes precedence over the <tt class="ph tt">$HADOOP_HOME</tt> environment variable and the libraries within the folder indicated by <tt class="ph tt">$HADOOP_HOME</tt> will not be used. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm" id="spldoc_operator__parameter_policyFilePath"><tt class="ph tt">policyFilePath</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter is relevant when connecting to BigInsights on Bluemix. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files. If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. <strong class="ph b">Note:</strong> This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.
 </p>
 <dl class="dl">
 
