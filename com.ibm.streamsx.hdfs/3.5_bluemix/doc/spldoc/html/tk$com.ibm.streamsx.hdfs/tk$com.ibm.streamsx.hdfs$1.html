@@ -22,7 +22,7 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.5.0</a> &gt; Using the toolkit to connect to HDFS in the BigInsights on Bluemix service</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.5.1</a> &gt; Using the toolkit to connect to HDFS in the BigInsights on Bluemix service</p>
 
 </div>
 
@@ -136,6 +136,37 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink;
 	      hdfsPassword: "bi_password";
 	      hdfsUser:"bi_user";
 	   }
+</pre>
+
+
+</div>
+</li>
+
+<li class="li"> Policy file configuration
+<div class="p">   BigInsights on Bluemix uses encryption keys larger than what is supported by the default IBM JDK. To connect to BigInsights, complete the following steps.
+<ul class="ul">
+<li class="li"> Download and extract the <a class="xref" href="https://www-01.ibm.com/marketing/iwm/iwm/web/preLogin.do?source=jcesdk">Unrestricted SDK JCE policy files</a>. You have two options when deciding where to put the US_export_policy.jar and local_policy.jar:
+<ul class="ul">
+<li class="li"> If you have access to the Streams cluster file system, you can replace the default policy files in &lt;JAVA_HOME&gt;/jre/lib/security/ with the ones you downloaded.</li>
+
+<li class="li"> If you cannot access the file system, put them somewhere in the application's etc directory - for example, &lt;application_directory&gt;/etc/policyfiles/ .</li>
+
+</ul>
+</li>
+
+<li class="li"> If you placed the policy files in your application's etc directory, set the <strong class="ph b">policyFilePath</strong> parameter in your application to the relative path to the directory containing your policy files. For example:</li>
+
+</ul>
+
+<pre class="pre codeblock">
+	 () as HDFS2FileSink_2 = HDFS2FileSink(In) {
+	     param
+	      file: "output_file.txt";
+	      hdfsUri: "webhdfs://server_host_name:8443";
+	      hdfsPassword: "bi_password";
+	      hdfsUser: "bi_user";
+	      policyFilePath: "etc/policyfiles/"
+	 }
 </pre>
 
 
