@@ -92,6 +92,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 	protected UserGroupInformation authenticateWithKerberos(final String hdfsUser,
 			final String kerberosPrincipal, final String kerberosKeytab)
 			throws Exception {
+		UserGroupInformation.setConfiguration(fConfiguration);
 		UserGroupInformation ugi;
 		if (HDFSOperatorUtils.isValidHdfsUser(hdfsUser)) {
 			UserGroupInformation.loginUserFromKeytab(kerberosPrincipal,
