@@ -17,7 +17,7 @@ The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The 
  * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
  * Hortonworks Data Platform (HDP) 2.2
 
-Note: The reference platforms that were used for testing are Hadoop 2.6.0, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
+Note: The reference platforms that were used for testing are Hadoop 2.7.2, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
 
 When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 
