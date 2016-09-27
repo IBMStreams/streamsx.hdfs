@@ -22,23 +22,29 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.100</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; <a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a> &gt; Examples</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 3.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; <a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink.html">HDFS2FileSink</a> &gt; Examples</p>
 
 </div>
 
 
 <div class="section">
-<p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory every two seconds.  The operator overrides the value that is specified by the <tt class="ph tt">fs.defaultFS</tt> option in the <tt class="ph tt">core-site.xml</tt>.
+<p class="p">This example uses the <tt class="ph tt">HDFS2FileSink</tt> operator to write tuples to output files that have names like <tt class="ph tt">output0.txt</tt>.
 </p>
 
 <div class="p">
 <pre class="pre codeblock">
-(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
-{
-	param
-		directory :"/user/myuser/";
-		hdfsUri   :"hdfs://hdfsServer:1883";
-		sleepTime : 2.0;
+stream&lt;PersonSchema&gt; In = FileSource(){
+  param
+    file : "Input.txt" ;
+}
+stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
+  output
+    SingleStringIn : PersonSchemString =(rstring) In ;
+}
+() as txtSink = HDFS2FileSink(SingleStringIn){
+  param
+    file : "output%FILENUM.txt" ;
+    bytesPerFile: (int64)(16*1024);
 }
 </pre>
 

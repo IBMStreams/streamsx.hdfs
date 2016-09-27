@@ -59,9 +59,9 @@ gg=="
       ><set attributeName="visibility" from="hidden" end="sdt0.mouseout" to="visible" begin="sdt0.mouseover"
     /></g
     ><g visibility="hidden" style="stroke:none;font-style:italic;font-size:12px;font-family:&apos;Helvetica&apos;,&apos;SansSerif&apos;;"
-    ><rect x="47.65" y="43.0" width="359.21997" style="fill:rgb(230,230,255);stroke:rgb(0,0,80);" rx="2.0" ry="2.0" height="62.0"
+    ><rect x="47.65" y="43.0" width="304.09998" style="fill:rgb(230,230,255);stroke:rgb(0,0,80);" rx="2.0" ry="2.0" height="62.0"
       /><text x="48.65" y="56.0"
-      >Optional: file, tempFile, timeFormat, hdfsUri, bytesPerFile, </text
+      >Optional: file, timeFormat, hdfsUri, bytesPerFile, </text
       ><text x="48.65" y="71.0"
       >tuplesPerFile, closeOnPunct, fileAttributeName, </text
       ><text x="48.65" y="86.0"
