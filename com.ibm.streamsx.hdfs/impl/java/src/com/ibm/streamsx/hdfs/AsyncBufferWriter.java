@@ -22,8 +22,8 @@ import com.ibm.streams.operator.logging.LoggerNames;
 
 public class AsyncBufferWriter extends Writer {
 	
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AsyncBufferWriter";
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AsyncBufferWriter"; 
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");  
 	
 	private static final int BUFFER_QUEUE_SIZE = 3;
 
@@ -71,7 +71,7 @@ public class AsyncBufferWriter extends Writer {
 					out.flush();
 				}
 			} catch (IOException e) {
-				LOGGER.log(LogLevel.ERROR, "Unable to write to HDFS output stream.", e);
+				LOGGER.log(LogLevel.ERROR, Messages.getString("HDFS_ASYNC_UNABLE_WRITE_TO_STREAMS"), e); 
 			}		
 			finally {
 				if (isAddBuffer)
@@ -84,7 +84,7 @@ public class AsyncBufferWriter extends Writer {
 				if (!isClosed && bufferQueue.size() <= BUFFER_QUEUE_SIZE)
 					bufferQueue.put(new byte[size]);
 			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.INFO, "Unable to add buffer to buffer queue", e);
+				LOGGER.log(LogLevel.INFO, Messages.getString("HDFS_ASYNC_UNABLE_ADD_TO_QUEUE"), e); 
 			}
 		}		
 	}
@@ -113,7 +113,7 @@ public class AsyncBufferWriter extends Writer {
 				buffer = bufferQueue.take();
 			} catch (InterruptedException e) {
 				LOGGER.log(LogLevel.ERROR,
-						"Error setting up the buffer queue.", e);
+						Messages.getString("HDFS_ASYNC_INVALID_BUFFER_QUEUE"), e); 
 			}
 		}
 	}
@@ -131,7 +131,7 @@ public class AsyncBufferWriter extends Writer {
 			try {
 				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.WARN, "Execution Service shutdown is interrupted.", e);
+				LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_ASYNC_SERVICE_SHUTDOWN_INTERRUPTED"), e); 
 			}finally {
 				
 				// do final flushing of buffer
@@ -158,7 +158,7 @@ public class AsyncBufferWriter extends Writer {
 					position = 0;
 				} catch (InterruptedException e) {
 					LOGGER.log(LogLevel.ERROR,
-							"Unable to retrieve buffer from buffer queue.", e);
+							Messages.getString("HDFS_ASYNC_UNABLE_GET_BUFFER_QUEUE"), e); 
 				}
 			}
 		}
@@ -182,7 +182,7 @@ public class AsyncBufferWriter extends Writer {
 			try {
 				exService.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.WARN, "Execution Service shutdown is interrupted.", e);
+				LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_ASYNC_SERVICE_SHUTDOWN_INTERRUPTED"), e); 
 			}finally {
 
 				// do final flushing of buffer

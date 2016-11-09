@@ -17,6 +17,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
+import com.ibm.streamsx.hdfs.Messages;
 
 public abstract class BaseAuthenticationHelper implements IAuthenticationHelper {
 	
@@ -69,7 +70,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 
 		setHdfsUri(new URI(uri));
-		logger.log(TraceLevel.DEBUG, "Attempting to connect to URI: " + getHdfsUri().toString());
+		logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT" , getHdfsUri().toString()));
 		
 		return null;
 	}
@@ -78,11 +79,10 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		FileSystem fs = null;
 		
 		if (HDFSOperatorUtils.isValidHdfsUser(hdfsUser)) {
-			logger.log(TraceLevel.DEBUG, "Connect to HDFS: " + hdfsUri
-					+ " " + hdfsUser);
+			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri + " " + hdfsUser));
 			fs = FileSystem.get(hdfsUri, fConfiguration, hdfsUser);
 		} else {
-			logger.log(TraceLevel.DEBUG, "Connect to HDFS: " + hdfsUri);
+			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri));
 			fs = FileSystem.get(hdfsUri, fConfiguration);
 		}
 		
@@ -99,12 +99,11 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 					kerberosKeytab);
 			ugi = UserGroupInformation.createProxyUser(hdfsUser,
 					UserGroupInformation.getLoginUser());
-			logger.log(TraceLevel.DEBUG, "Connecting as proxy user: " + hdfsUser);
+			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_PROXY_CONNECT" , hdfsUser));
 		} else {
 			ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
 					kerberosPrincipal, kerberosKeytab);
-			logger.log(TraceLevel.DEBUG, "Connecting using kerberosPrincipal: "
-					+ kerberosPrincipal);
+			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_USING_KERBOSER" , kerberosPrincipal));
 		}
 
 		return ugi;
