@@ -15,6 +15,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
 import com.ibm.streamsx.hdfs.Messages;
@@ -25,8 +26,9 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		SIMPLE, KERBEROS
 	}
 
-	private static Logger logger = Logger
-			.getLogger("BaseAuthenticationHelper.class");
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs..client.auth"; 
+
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
 	
 	public static final String SIMPLE_AUTH = "simple";
 	public static final String KERBEROS_AUTH = "kerberos";
@@ -47,7 +49,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 				URL url = new URL("file", null, configPath + "/core-site.xml");
 				fConfiguration.addResource(url);
 			} catch (MalformedURLException e) {
-				logger.log(TraceLevel.ERROR, e.getMessage(), e);
+				LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
 			}
 		}
 	}
@@ -70,7 +72,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 
 		setHdfsUri(new URI(uri));
-		logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT" , getHdfsUri().toString()));
+		LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT" , getHdfsUri().toString()));
 		
 		return null;
 	}
@@ -79,10 +81,10 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		FileSystem fs = null;
 		
 		if (HDFSOperatorUtils.isValidHdfsUser(hdfsUser)) {
-			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri + " " + hdfsUser));
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri + " " + hdfsUser));
 			fs = FileSystem.get(hdfsUri, fConfiguration, hdfsUser);
 		} else {
-			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri));
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri));
 			fs = FileSystem.get(hdfsUri, fConfiguration);
 		}
 		
@@ -99,11 +101,11 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 					kerberosKeytab);
 			ugi = UserGroupInformation.createProxyUser(hdfsUser,
 					UserGroupInformation.getLoginUser());
-			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_PROXY_CONNECT" , hdfsUser));
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_PROXY_CONNECT" , hdfsUser));
 		} else {
 			ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
 					kerberosPrincipal, kerberosKeytab);
-			logger.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_USING_KERBOSER" , kerberosPrincipal));
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_USING_KERBOSER" , kerberosPrincipal));
 		}
 
 		return ugi;

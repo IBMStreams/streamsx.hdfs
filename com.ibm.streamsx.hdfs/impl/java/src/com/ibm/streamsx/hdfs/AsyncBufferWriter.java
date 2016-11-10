@@ -23,7 +23,7 @@ import com.ibm.streams.operator.logging.LoggerNames;
 public class AsyncBufferWriter extends Writer {
 	
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AsyncBufferWriter"; 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");  
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
 	
 	private static final int BUFFER_QUEUE_SIZE = 3;
 

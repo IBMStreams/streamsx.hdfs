@@ -48,8 +48,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource"; 
 	private static final int BUFFER_SIZE = 1024*1024*8;
 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
-			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");  
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
 
 	private static Logger TRACE = Logger.getLogger(HDFS2FileSource.class
 			.getName());

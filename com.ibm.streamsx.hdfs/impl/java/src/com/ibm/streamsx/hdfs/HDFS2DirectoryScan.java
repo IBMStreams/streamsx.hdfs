@@ -53,9 +53,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	// file
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME, 
-			"com.ibm.streamsx.hdfs.BigDataMessages"); 
-
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
+ 
 	private final String NUM_SCANS_METRIC = "nScans"; 
 	private Metric nScans;
 
@@ -177,19 +176,19 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			StreamSchema inputSchema = streamingInputs.get(0).getStreamSchema();
 			if (inputSchema.getAttributeCount() > 1) {
 				checker.setInvalidContext(
-						Messages.getString("HDFS_SD_INVALID_INPUT_PORT"), 
+						Messages.getString("HDFS_DS_INVALID_INPUT_PORT"), 
 						null);
 			}
 
 			if (inputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING) {
-				checker.setInvalidContext(Messages.getString("HDFS_SD_INVALID_ATTRIBUTE") 
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE") 
 						+ inputSchema.getAttribute(0).getType().getMetaType(), null);
 			}
 
 			ConsistentRegionContext crContext = checker.getOperatorContext().getOptionalContext(
 					ConsistentRegionContext.class);
 			if (crContext != null) {
-				LOGGER.log( LogLevel.WARNING, Messages.getString("HDFS_SD_CONSISTENT_REGION_NOT_SUPPORTED")); 
+				LOGGER.log( LogLevel.WARNING, Messages.getString("HDFS_DS_CONSISTENT_REGION_NOT_SUPPORTED")); 
 			}
 		}
 
@@ -201,11 +200,11 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 		if (outputSchema.getAttributeCount() != 1) {
 			checker.setInvalidContext(
-					Messages.getString("HDFS_SD_INVALID_OUTPUT_PORT"), 
+					Messages.getString("HDFS_DS_INVALID_OUTPUT_PORT"), 
 					null);
 		}
 		if (outputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING) {
-			checker.setInvalidContext(Messages.getString("HDFS_SD_INVALID_ATTRIBUTE") 
+			checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE") 
 					+ outputSchema.getAttribute(0).getType().getMetaType(), null);
 		}
 	}
@@ -217,7 +216,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			Set<String> paramNames = checker.getOperatorContext().getParameterNames();
 			if (!paramNames.contains("directory")) { 
 				checker.setInvalidContext(
-						Messages.getString("HDFS_SD_INVALID_DIRECTORY_PARAM"), null); 
+						Messages.getString("HDFS_DS_INVALID_DIRECTORY_PARAM"), null); 
 			}
 		}
 	}
@@ -227,13 +226,13 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		if (!checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_SLEEP_TIME).isEmpty()) {
 			if (Integer
 					.valueOf(checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_SLEEP_TIME).get(0)) < 0) {
-				checker.setInvalidContext(Messages.getString("HDFS_SD_INVALID_SLEEP_TIMER_PARAM"), null); 
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_SLEEP_TIMER_PARAM"), null); 
 			}
 		}
 
 		if (!checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_INITDELAY).isEmpty()) {
 			if (Integer.valueOf(checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_INITDELAY).get(0)) < 0) {
-				checker.setInvalidContext(Messages.getString("HDFS_SD_INVALID_INIT_DELAY_PARAM"), null); 
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_INIT_DELAY_PARAM"), null); 
 			}
 		}
 
@@ -245,7 +244,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			try {
 				java.util.regex.Pattern.compile(pattern);
 			} catch (PatternSyntaxException e) {
-				checker.setInvalidContext(pattern + Messages.getString("HDFS_SD_INVALID_PATTERN_PARAM"), null); 
+				checker.setInvalidContext(pattern + Messages.getString("HDFS_DS_INVALID_PATTERN_PARAM"), null); 
 			}
 		}
 	}
@@ -271,21 +270,21 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			try {
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
-				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_SD_INVALID_URL_PARAM", "hdfsUri", hdfsUriValue)); 
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_INVALID_URL_PARAM", "hdfsUri", hdfsUriValue)); 
 				throw e;
 			}
 
 			try {
 				dirUri = new URI(dirValue);
 			} catch (URISyntaxException e) {
-				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_SD_INVALID_URL_PARAM", "dirValue", dirValue)); 
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_INVALID_URL_PARAM", "dirValue", dirValue)); 
 				throw e;
 			}
 
 			if (dirUri.getScheme() != null) {
 				// must have the same scheme
 				if (!hdfsUri.getScheme().equals(dirUri.getScheme())) {
-					checker.setInvalidContext(Messages.getString("HDFS_SD_INVALID_DIRECTORY_SCHEMA" ,dirUri.getScheme() , hdfsUri.getScheme()), null); 
+					checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_DIRECTORY_SCHEMA" ,dirUri.getScheme() , hdfsUri.getScheme()), null); 
 					return;
 				}
 
@@ -295,7 +294,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						|| (hdfsUri.getAuthority() != null && dirUri.getAuthority() != null && !hdfsUri.getAuthority()
 								.equals(dirUri.getAuthority()))) {
 					checker.setInvalidContext(
-							Messages.getString("HDFS_SD_INVALID_HOST_DIRECTORY_SCHEMA", dirUri.getAuthority() , hdfsUri.getAuthority()) , null);
+							Messages.getString("HDFS_DS_INVALID_HOST_DIRECTORY_SCHEMA", dirUri.getAuthority() , hdfsUri.getAuthority()) , null);
 					return;
 				}
 			}
@@ -316,41 +315,41 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			} else {
 				// warn user that this may be a problem.
 				LOGGER.log(LogLevel.WARN,
-						Messages.getString("HDFS_SD_NOT_SPECIFIED_DIR_PARAM")); 
+						Messages.getString("HDFS_DS_NOT_SPECIFIED_DIR_PARAM")); 
 				checked = true;
 			}
 		}
 		if (isStrictMode) {
 			if (!checked) {
 				if (directory.isEmpty()) {
-					throw new Exception(Messages.getString("HDFS_SD_EMPTY_DIRECTORY_STRICT_MODE")); 
+					throw new Exception(Messages.getString("HDFS_DS_EMPTY_DIRECTORY_STRICT_MODE")); 
 				} else if (!getHdfsClient().exists(directory)) {
-					throw new Exception(Messages.getString("HDFS_SD_DIRECTORY_NOT_EXIST_STRICT_MODE", directory));
+					throw new Exception(Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST_STRICT_MODE", directory));
 				} else if (!getHdfsClient().isDirectory(directory)) {
-					throw new Exception(Messages.getString("HDFS_SD_IS_NOT_A_DIRECTORY", directory));
+					throw new Exception(Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory));
 				}
 			}
 		} else {
 			if (!checked) {
 				if (directory.isEmpty()) {
 					if (context.getNumberOfStreamingInputs() == 1) {
-						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SD_EMPTY_DIRECTORY_PARAM")); 
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_EMPTY_DIRECTORY_PARAM")); 
 						directory = ""; 
 					} else {
-						throw new Exception(Messages.getString("HDFS_SD_EMPTY_DIRECTORY_NOT_CONTROL_PORT")); 
+						throw new Exception(Messages.getString("HDFS_DS_EMPTY_DIRECTORY_NOT_CONTROL_PORT")); 
 					}
 				} else if (!getHdfsClient().exists(directory)) {
 					// TRACE.warning("Directory specified does not exist: " +
 					// directory);
-					LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SD_DIRECTORY_NOT_EXIST", directory)); 
+					LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST", directory)); 
 				} else if (!getHdfsClient().isDirectory(directory)) {
 					if (context.getNumberOfStreamingInputs() == 1) {
 						// throw new
 						// Exception("directory parameter value "+directory+" does not refer to a valid directory");
-						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SD_IS_NOT_A_DIRECTORY", directory)); 
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory)); 
 						directory = "";// so that it does not break in process 
 					} else {
-						throw new Exception(Messages.getString("HDFS_SD_IS_NOT_A_DIRECTORY", directory));
+						throw new Exception(Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory));
 					}
 				} else {
 					try {
@@ -460,14 +459,14 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						// if directory is empty and number of input port is
 						// zero, throw exception
 						// warn user that this may be a problem.
-						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SD_EMPTY_DIRECTORY_INPUT_PORT")); 
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_EMPTY_DIRECTORY_INPUT_PORT")); 
 					} else if (newDir != null && !getHdfsClient().exists(newDir)) {
 						dirExists = false;
-						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SD_DIRECTORY_NOT_EXIST_INPUT_PORT", newDir));
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST_INPUT_PORT", newDir));
 									} else if (newDir != null && !getHdfsClient().isDirectory(newDir)) {
 						dirExists = false;
 						LOGGER.log(LogLevel.WARN,
-								Messages.getString("HDFS_SD_INVALID_DIRECTORY_INPUT_PORT", newDir)); 
+								Messages.getString("HDFS_DS_INVALID_DIRECTORY_INPUT_PORT", newDir)); 
 					} else if (newDir != null) {
 						try {
 							scanDirectory(newDir);
@@ -721,7 +720,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		try {
 			getOutput(0).punctuate(Punctuation.FINAL_MARKER);
 		} catch (Exception e) {
-			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_SD_PUNCTUATION_FAILED") + e); 
+			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_PUNCTUATION_FAILED") + e); 
 		}
 	}
 
@@ -772,7 +771,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 								try {
 									getOutput(0).submit(outputTuple);
 								} catch (Exception e) {
-									LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_SD_SUBMITTING_FAILED", e));
+									LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_SUBMITTING_FAILED", e));
 								}
 							}
 						}
@@ -816,7 +815,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		try {
 			getOutput(0).punctuate(Punctuation.FINAL_MARKER);
 		} catch (Exception e) {
-			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_SD_PUNCTUATION_FAILED", e)); 
+			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_PUNCTUATION_FAILED", e)); 
 		}
 
 	}

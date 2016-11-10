@@ -51,8 +51,8 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	/**
 	 * Create a logger specific to this class
 	 */
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
-			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");  
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
+
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
 	// do not set as null as it can cause complication for checkpoing
