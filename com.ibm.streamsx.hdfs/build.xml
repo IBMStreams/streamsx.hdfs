@@ -103,7 +103,14 @@
 		</copy>
 	</target>
 
-	<target name="jar" depends="compile, copy">
+	<!-- copy properties into the created jar file  -->
+	 <target name="properties">
+		<copy todir="${build.dir}">
+		    <fileset dir="${src.dir}" includes="**/*.properties" />
+		</copy>
+	  </target>
+
+	<target name="jar" depends="compile, copy, properties">
 	<jar destfile="${impl.lib.dir}/${jarfile}" basedir="${build.dir}" includes="com/ibm/streamsx/hdfs/**" filesonly="true" >
 		</jar>
 		<delete dir="${build.dir}" />		
