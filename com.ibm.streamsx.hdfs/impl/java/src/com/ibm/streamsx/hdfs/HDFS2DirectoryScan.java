@@ -181,8 +181,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			}
 
 			if (inputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING) {
-				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE") 
-						+ inputSchema.getAttribute(0).getType().getMetaType(), null);
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE", 
+						 inputSchema.getAttribute(0).getType().getMetaType()), null);
 			}
 
 			ConsistentRegionContext crContext = checker.getOperatorContext().getOptionalContext(
