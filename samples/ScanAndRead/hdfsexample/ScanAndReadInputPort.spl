@@ -51,6 +51,10 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  */
 composite ScanAndReadWithInputPort
 {
+	param
+		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://10.6.25.164:8020"); //format hdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "hbase"); 
+
 	graph
 
 		//Custom operator that sends a control signal to HDFS2DirectoryScan operator
@@ -82,13 +86,18 @@ composite ScanAndReadWithInputPort
 			HDFS2DirectoryScan(ControlSignalStream)
 		{
 			param
-				directory : "TestDirectory" ;
-		}
+				directory	: "testDirectory" ;
+				hdfsUri		: $hdfsUri;
+				hdfsUser	: $hdfsUser;
+	}
 		
 		// read file discovered by directory scan
 		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
-		}
+			param
+				hdfsUri		: $hdfsUri;
+				hdfsUser	: $hdfsUser;
+		} 
 
 		// write content of files to "FileContentsInputPort.txt" in sample's data directory
 		() as LineSink1 = FileSink(LineStream)

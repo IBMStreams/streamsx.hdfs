@@ -55,18 +55,27 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  */
 composite ScanAndRead
 {
+	param 
+		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://10.6.25.164:8020"); //format hdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "hbase"); 
+ 
 	graph
-
+ 
 		// scan /user/<userid>/testDirectory from HDFS
 		stream<rstring fileNames> FileNameStream1 = HDFS2DirectoryScan()
 		{
 			param
-				directory : "testDirectory" ;
+				directory	: "testDirectory" ;
+				hdfsUri		: $hdfsUri;
+				hdfsUser	: $hdfsUser;
 		}
 
 		// use the file name from directory scan to read the file
 		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
+			param
+				hdfsUri		: $hdfsUri;
+				hdfsUser	: $hdfsUser;
 		} 
 
 		// write out content of file in the "FileContents.txt" file in data directory
