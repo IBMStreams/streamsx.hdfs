@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import java.text.MessageFormat;
 
 public class Messages {
-    private static final String BUNDLE_NAME = "com.ibm.streamsx.jdbc.messages.messages"; 
+    private static final String BUNDLE_NAME = "com.ibm.streamsx.hdfs.messages.messages"; 
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
