@@ -30,8 +30,8 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	/**
 	 * Create a logger specific to this class
 	 */
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
-			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
+
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
 	// Common parameters and variables for connection

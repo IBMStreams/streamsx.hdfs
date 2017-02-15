@@ -42,9 +42,9 @@ import com.ibm.streams.operator.state.StateHandler;
 @SharedLoader
 public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHandler {
 
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSDirectoryScan";
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSDirectoryScan"; 
 
-	private static final Object CONSISTEN_ASPECT = HDFS2DirectoryScan.class.getName() + ".consistent";
+	private static final Object CONSISTEN_ASPECT = HDFS2DirectoryScan.class.getName() + ".consistent"; 
 
 	// should use logger not tied to LOG_FACILITY to send to trace file instead
 	// of log file
@@ -53,10 +53,9 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	// file
 	private static Logger TRACE = Logger.getLogger(CLASS_NAME);
 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME,
-			"com.ibm.streamsx.hdfs.BigDataMessages");
-
-	private final String NUM_SCANS_METRIC = "nScans";
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
+ 
+	private final String NUM_SCANS_METRIC = "nScans"; 
 	private Metric nScans;
 
 	long initDelayMil = 0;
@@ -64,7 +63,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	private long sleepTimeMil = 5000;
 
 	private String pattern;
-	private String directory = "";
+	private String directory = ""; 
 	private boolean isStrictMode;
 	private double initDelay;
 	private double sleepTime = 5;
@@ -83,7 +82,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	
 	// timestamp and filename to reset to.  Only initialized if reset is called
 	private long fResetToTs = -1;
-	private String fResetToFilename = "";
+	private String fResetToFilename = ""; 
 
 	private class ModTimeComparator implements Comparator {
 
@@ -120,7 +119,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 	@Parameter(optional = true)
 	public void setDirectory(String directory) {
-		TRACE.entering(CLASS_NAME, "setDirectory", directory);
+		TRACE.entering(CLASS_NAME, "setDirectory", directory); 
 		this.directory = directory;
 	}
 
@@ -165,7 +164,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		{
 			if (crContext.isStartOfRegion() && opContext.getNumberOfStreamingInputs()>0)
 			{
-				checker.setInvalidContext("The following operator cannot be the start of a consistent region when an input port is present: HDFS2DirectoryScan.", null);
+				checker.setInvalidContext(Messages.getString("HDFS_NOT_CONSISTENT_REGION", "HDFS2DirectoryScan"), null); 
 			}
 		}
 	}
@@ -177,22 +176,19 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			StreamSchema inputSchema = streamingInputs.get(0).getStreamSchema();
 			if (inputSchema.getAttributeCount() > 1) {
 				checker.setInvalidContext(
-						"The control input port of HDFSDirectoryScan expects a single attribute. The type of this attribute has to be rstring.",
+						Messages.getString("HDFS_DS_INVALID_INPUT_PORT"), 
 						null);
 			}
 
 			if (inputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING) {
-				checker.setInvalidContext("Expected attribute of type rstring, found attribute of type "
-						+ inputSchema.getAttribute(0).getType().getMetaType(), null);
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE", 
+						 inputSchema.getAttribute(0).getType().getMetaType()), null);
 			}
 
 			ConsistentRegionContext crContext = checker.getOperatorContext().getOptionalContext(
 					ConsistentRegionContext.class);
 			if (crContext != null) {
-				LOGGER.log(
-						LogLevel.WARNING,
-						"It is not supported to have a control port in a consistent region. The control information might not be replayed, persisted, and restored correctly. You might need to manually replay the control signals to bring the operator back to a consistent state.");
-
+				LOGGER.log( LogLevel.WARNING, Messages.getString("HDFS_DS_CONSISTENT_REGION_NOT_SUPPORTED")); 
 			}
 		}
 
@@ -204,11 +200,11 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 		if (outputSchema.getAttributeCount() != 1) {
 			checker.setInvalidContext(
-					"The output port of HDFSDirectoryScan operator expects a single attribute. The type of this attribute has to be rstring.",
+					Messages.getString("HDFS_DS_INVALID_OUTPUT_PORT"), 
 					null);
 		}
 		if (outputSchema.getAttribute(0).getType().getMetaType() != MetaType.RSTRING) {
-			checker.setInvalidContext("Expected attribute of type rstring, found attribute of type "
+			checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_ATTRIBUTE") 
 					+ outputSchema.getAttribute(0).getType().getMetaType(), null);
 		}
 	}
@@ -218,9 +214,9 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		int numInputPorts = checker.getOperatorContext().getNumberOfStreamingInputs();
 		if (numInputPorts == 0) {
 			Set<String> paramNames = checker.getOperatorContext().getParameterNames();
-			if (!paramNames.contains("directory")) {
+			if (!paramNames.contains("directory")) { 
 				checker.setInvalidContext(
-						"The directory parameter must be specified if the operator does not have any input port.", null);
+						Messages.getString("HDFS_DS_INVALID_DIRECTORY_PARAM"), null); 
 			}
 		}
 	}
@@ -230,33 +226,33 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		if (!checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_SLEEP_TIME).isEmpty()) {
 			if (Integer
 					.valueOf(checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_SLEEP_TIME).get(0)) < 0) {
-				checker.setInvalidContext("Operator parameter sleepTime value should not be less than 0.", null);
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_SLEEP_TIMER_PARAM"), null); 
 			}
 		}
 
 		if (!checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_INITDELAY).isEmpty()) {
 			if (Integer.valueOf(checker.getOperatorContext().getParameterValues(IHdfsConstants.PARAM_INITDELAY).get(0)) < 0) {
-				checker.setInvalidContext("Operator parameter initDelay value should not be less than 0.", null);
+				checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_INIT_DELAY_PARAM"), null); 
 			}
 		}
 
 		/*
 		 * Check if the pattern is valid. Set invalid context otherwise.
 		 */
-		if (checker.getOperatorContext().getParameterNames().contains("pattern")) {
-			String pattern = checker.getOperatorContext().getParameterValues("pattern").get(0);
+		if (checker.getOperatorContext().getParameterNames().contains("pattern")) { 
+			String pattern = checker.getOperatorContext().getParameterValues("pattern").get(0); 
 			try {
 				java.util.regex.Pattern.compile(pattern);
 			} catch (PatternSyntaxException e) {
-				checker.setInvalidContext(pattern + " is a invalid pattern", null);
+				checker.setInvalidContext(pattern + Messages.getString("HDFS_DS_INVALID_PATTERN_PARAM"), null); 
 			}
 		}
 	}
 
 	@ContextCheck(compile = false)
 	public static void checkUriMatch(OperatorContextChecker checker) throws Exception {
-		List<String> hdfsUriParamValues = checker.getOperatorContext().getParameterValues("hdfsUri");
-		List<String> dirParamValues = checker.getOperatorContext().getParameterValues("directory");
+		List<String> hdfsUriParamValues = checker.getOperatorContext().getParameterValues("hdfsUri"); 
+		List<String> dirParamValues = checker.getOperatorContext().getParameterValues("directory"); 
 
 		String hdfsUriValue = null;
 		if (hdfsUriParamValues.size() == 1)
@@ -274,22 +270,21 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			try {
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
-				TRACE.log(TraceLevel.ERROR, "'hdfsUri' parameter contains an invalid URI: " + hdfsUriValue);
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_INVALID_URL_PARAM", "hdfsUri", hdfsUriValue)); 
 				throw e;
 			}
 
 			try {
 				dirUri = new URI(dirValue);
 			} catch (URISyntaxException e) {
-				TRACE.log(TraceLevel.ERROR, "'dirValue' parameter contains an invalid URI: " + dirValue);
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_INVALID_URL_PARAM", "dirValue", dirValue)); 
 				throw e;
 			}
 
 			if (dirUri.getScheme() != null) {
 				// must have the same scheme
 				if (!hdfsUri.getScheme().equals(dirUri.getScheme())) {
-					checker.setInvalidContext("The 'directory' scheme (" + dirUri.getScheme()
-							+ ") must match the 'hdfsUri' scheme (" + hdfsUri.getScheme() + ")", null);
+					checker.setInvalidContext(Messages.getString("HDFS_DS_INVALID_DIRECTORY_SCHEMA" ,dirUri.getScheme() , hdfsUri.getScheme()), null); 
 					return;
 				}
 
@@ -299,9 +294,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						|| (hdfsUri.getAuthority() != null && dirUri.getAuthority() != null && !hdfsUri.getAuthority()
 								.equals(dirUri.getAuthority()))) {
 					checker.setInvalidContext(
-							"The host and port specified by the 'directory' parameter (" + dirUri.getAuthority()
-									+ ") must match the host and port specified by the 'hdfsUri' parameter ("
-									+ hdfsUri.getAuthority() + ")", null);
+							Messages.getString("HDFS_DS_INVALID_HOST_DIRECTORY_SCHEMA", dirUri.getAuthority() , hdfsUri.getAuthority()) , null);
 					return;
 				}
 			}
@@ -315,53 +308,48 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		// When a directory parameter is not specified, check if control input
 		// port
 		// is present. Warn if so, else throw an exception
-		if (!context.getParameterNames().contains("directory")) {
+		if (!context.getParameterNames().contains("directory")) { 
 			// if strict mode, directory can be empty if we have an input stream
 			if (context.getNumberOfStreamingInputs() == 0) {
 				throw new Exception("directory parameter needs to be specified when control input port is not present.");
 			} else {
 				// warn user that this may be a problem.
 				LOGGER.log(LogLevel.WARN,
-						"directory parameter is not specified. Scanning based on input from control port.");
+						Messages.getString("HDFS_DS_NOT_SPECIFIED_DIR_PARAM")); 
 				checked = true;
 			}
 		}
 		if (isStrictMode) {
 			if (!checked) {
 				if (directory.isEmpty()) {
-					throw new Exception("strictMode parameter is set to true but directory parameter is empty");
+					throw new Exception(Messages.getString("HDFS_DS_EMPTY_DIRECTORY_STRICT_MODE")); 
 				} else if (!getHdfsClient().exists(directory)) {
-					throw new Exception("strictMode parameter is set to true but directory " + directory
-							+ " does not exist.");
+					throw new Exception(Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST_STRICT_MODE", directory));
 				} else if (!getHdfsClient().isDirectory(directory)) {
-					throw new Exception("directory parameter value " + directory
-							+ " does not refer to a valid directory");
+					throw new Exception(Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory));
 				}
 			}
 		} else {
 			if (!checked) {
 				if (directory.isEmpty()) {
 					if (context.getNumberOfStreamingInputs() == 1) {
-						LOGGER.log(LogLevel.WARN, "Directory parameter value is empty");
-						directory = "";
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_EMPTY_DIRECTORY_PARAM")); 
+						directory = ""; 
 					} else {
-						throw new Exception(
-								"Directory parameter value is empty and control input port is not specified");
+						throw new Exception(Messages.getString("HDFS_DS_EMPTY_DIRECTORY_NOT_CONTROL_PORT")); 
 					}
 				} else if (!getHdfsClient().exists(directory)) {
 					// TRACE.warning("Directory specified does not exist: " +
 					// directory);
-					LOGGER.log(LogLevel.WARN, "Directory specified does not exist: " + directory);
+					LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST", directory)); 
 				} else if (!getHdfsClient().isDirectory(directory)) {
 					if (context.getNumberOfStreamingInputs() == 1) {
 						// throw new
 						// Exception("directory parameter value "+directory+" does not refer to a valid directory");
-						LOGGER.log(LogLevel.WARN, "Directory parameter value " + directory
-								+ " does not refer to a valid directory");
-						directory = "";// so that it does not break in process
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory)); 
+						directory = "";// so that it does not break in process 
 					} else {
-						throw new Exception("Directory parameter value " + directory
-								+ " does not refer to a valid directory");
+						throw new Exception(Messages.getString("HDFS_DS_IS_NOT_A_DIRECTORY", directory));
 					}
 				} else {
 					try {
@@ -369,7 +357,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 					} catch (IOException ex) {
 						if (context.getNumberOfStreamingInputs() == 1) {
 							LOGGER.log(LogLevel.WARN, ex.getMessage());
-							directory = "";
+							directory = ""; 
 						} else {
 							throw ex;
 						}
@@ -384,30 +372,30 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		if (directory != null) {
 			try {
 				URI uri = new URI(directory);
-				TRACE.log(TraceLevel.DEBUG, "uri: " + uri.toString());
+				TRACE.log(TraceLevel.DEBUG, "uri: " + uri.toString()); 
 
 				String scheme = uri.getScheme();
 				if (scheme != null) {
 					String fs;
 					if (uri.getAuthority() != null)
-						fs = scheme + "://" + uri.getAuthority();
+						fs = scheme + "://" + uri.getAuthority(); 
 					else
-						fs = scheme + ":///";
+						fs = scheme + ":///"; 
 
 					if (getHdfsUri() == null)
 						setHdfsUri(fs);
 
-					TRACE.log(TraceLevel.DEBUG, "fileSystemUri: " + getHdfsUri());
+					TRACE.log(TraceLevel.DEBUG, "fileSystemUri: " + getHdfsUri()); 
 
 					String path = directory.substring(fs.length());
 
-					if (!path.startsWith("/"))
-						path = "/" + path;
+					if (!path.startsWith("/")) 
+						path = "/" + path; 
 
 					setDirectory(path);
 				}
 			} catch (URISyntaxException e) {
-				TRACE.log(TraceLevel.DEBUG, "Unable to construct URI: " + e.getMessage());
+				TRACE.log(TraceLevel.DEBUG, "Unable to construct URI: " + e.getMessage()); 
 
 				throw e;
 			}
@@ -445,7 +433,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		boolean dirExists = true;
 
 		if (TRACE.isLoggable(TraceLevel.INFO))
-			TRACE.log(TraceLevel.INFO, "Control signal received: " + newDir);
+			TRACE.log(TraceLevel.INFO, "Control signal received: " + newDir); 
 
 		if (newDir != null) {
 			synchronized (dirLock) {
@@ -471,15 +459,14 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						// if directory is empty and number of input port is
 						// zero, throw exception
 						// warn user that this may be a problem.
-						LOGGER.log(LogLevel.WARN, "Directory received from input port is empty.");
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_EMPTY_DIRECTORY_INPUT_PORT")); 
 					} else if (newDir != null && !getHdfsClient().exists(newDir)) {
 						dirExists = false;
-						LOGGER.log(LogLevel.WARN, "Directory specified from control input port does not exist: "
-								+ newDir);
-					} else if (newDir != null && !getHdfsClient().isDirectory(newDir)) {
+						LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_DS_DIRECTORY_NOT_EXIST_INPUT_PORT", newDir));
+									} else if (newDir != null && !getHdfsClient().isDirectory(newDir)) {
 						dirExists = false;
 						LOGGER.log(LogLevel.WARN,
-								"Directory specified from control input port is not a valid directory: " + newDir);
+								Messages.getString("HDFS_DS_INVALID_DIRECTORY_INPUT_PORT", newDir)); 
 					} else if (newDir != null) {
 						try {
 							scanDirectory(newDir);
@@ -505,7 +492,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		// if final marker
 		if (arg1 == Punctuation.FINAL_MARKER) {
 			if (TRACE.isLoggable(TraceLevel.DEBUG))
-				TRACE.log(TraceLevel.DEBUG, "Received final punctuation");
+				TRACE.log(TraceLevel.DEBUG, "Received final punctuation"); 
 			// wake up the process thread
 			// cause the process loop to terminate so we do not keep scanning
 			synchronized (dirLock) {
@@ -524,7 +511,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		// timestamp
 		// also disallow changing directory once this has started
 		long latestTimeFromLastCycle = 0;
-		String latestFilenameFromLastCycle = "";
+		String latestFilenameFromLastCycle = ""; 
 		try {
 			if (crContext != null) {
 				crContext.acquirePermit();
@@ -541,7 +528,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 				// unset these variables as we are about
 				// to actually scan the directory again
 				fResetToTs = -1;
-				fResetToFilename = "";
+				fResetToFilename = ""; 
 			}
 			else {
 				latestTimeFromLastCycle = fLastSubmittedTs;
@@ -550,7 +537,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		
 			
 			if (TRACE.isLoggable(TraceLevel.DEBUG))
-				debug("latestTimeFromLastCycle: " + latestTimeFromLastCycle, null);
+				debug("latestTimeFromLastCycle: " + latestTimeFromLastCycle, null); 
 
 		} finally {
 			if (crContext != null) {
@@ -582,7 +569,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 				}
 
 				if (TRACE.isLoggable(TraceLevel.DEBUG))
-					debug("Found File: " + currentFile.getPath().toString() + " " + currentFile.getModificationTime(), CONSISTEN_ASPECT);
+					debug("Found File: " + currentFile.getPath().toString() + " " + currentFile.getModificationTime(), CONSISTEN_ASPECT);  
 
 				List<FileStatus> currentSet = new ArrayList<FileStatus>();
 				currentSet.add(currentFile);
@@ -616,7 +603,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 							&& fileToSubmit.getModificationTime() > latestTimeFromLastCycle) {
 						OutputTuple outputTuple = getOutput(0).newTuple();
 						if (TRACE.isLoggable(TraceLevel.DEBUG))
-							debug("Submit File: " + fileToSubmit.getPath().toString() + " "
+							debug("Submit File: " + fileToSubmit.getPath().toString() + " "  
 									+ fileToSubmit.getModificationTime(),CONSISTEN_ASPECT);
 						outputTuple.setString(0, filePath);
 
@@ -646,7 +633,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 						{						
 							OutputTuple outputTuple = getOutput(0).newTuple();
 							if (TRACE.isLoggable(TraceLevel.DEBUG))
-								debug("Submit File: " + fileToSubmit.getPath().toString() + " "
+								debug("Submit File: " + fileToSubmit.getPath().toString() + " "  
 										+ fileToSubmit.getModificationTime(), CONSISTEN_ASPECT);
 							outputTuple.setString(0, filePath);
 	
@@ -680,7 +667,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		toReturn.add(currentFile);
 
 		if (TRACE.isLoggable(TraceLevel.INFO))
-			TRACE.log(TraceLevel.INFO, "Collect files with same timestamp: " + currentFile.getPath() + ":"
+			TRACE.log(TraceLevel.INFO, "Collect files with same timestamp: " + currentFile.getPath() + ":"  
 					+ currentFile.getModificationTime());
 
 		for (int j = index + 1; j < files.length; j++) {
@@ -688,7 +675,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			if (nextFile.getModificationTime() == currentFile.getModificationTime()) {
 				toReturn.add(nextFile);
 				if (TRACE.isLoggable(TraceLevel.INFO))
-					TRACE.log(TraceLevel.INFO, "Collect files with same timestamp: " + nextFile.getPath() + ":"
+					TRACE.log(TraceLevel.INFO, "Collect files with same timestamp: " + nextFile.getPath() + ":"  
 							+ nextFile.getModificationTime());
 			} else {
 				break;
@@ -713,7 +700,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			try {
 				Thread.sleep(initDelayMil);
 			} catch (InterruptedException e) {
-				TRACE.info("Initial delay interrupted");
+				TRACE.info("Initial delay interrupted"); 
 			}
 		}
 
@@ -728,12 +715,12 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		}
 
 		if (TRACE.isLoggable(TraceLevel.DEBUG))
-			TRACE.log(TraceLevel.DEBUG, "Exited directory scan loop");
+			TRACE.log(TraceLevel.DEBUG, "Exited directory scan loop"); 
 
 		try {
 			getOutput(0).punctuate(Punctuation.FINAL_MARKER);
 		} catch (Exception e) {
-			LOGGER.log(TraceLevel.ERROR, "Problem sending final punctuation " + e);
+			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_PUNCTUATION_FAILED") + e); 
 		}
 	}
 
@@ -743,17 +730,17 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			try {
 				Thread.sleep(initDelayMil);
 			} catch (InterruptedException e) {
-				TRACE.info("Initial delay interrupted");
+				TRACE.info("Initial delay interrupted"); 
 			}
 		}
 		long lastTimestamp = 0;
 		while (!shutdownRequested && !finalPunct) {
 			long scanStartTime = System.currentTimeMillis();
 			FileStatus[] files = new FileStatus[0];
-			String currentDir = "";
+			String currentDir = ""; 
 			synchronized (dirLock) {
 				if (TRACE.isLoggable(TraceLevel.DEBUG))
-					TRACE.log(TraceLevel.DEBUG, "Acquired dirLock for scanDirectory");
+					TRACE.log(TraceLevel.DEBUG, "Acquired dirLock for scanDirectory"); 
 				currentDir = getDirectory();
 				// only scan if a directory is specified
 				if (!currentDir.isEmpty()) {
@@ -765,12 +752,12 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 				for (FileStatus file : files) {
 					if (file.isDirectory()) {
 						if (TRACE.isLoggable(LogLevel.INFO)) {
-							TRACE.log(TraceLevel.INFO, "Skipping " + file.toString() + " because it is a directory.");
+							TRACE.log(TraceLevel.INFO, "Skipping " + file.toString() + " because it is a directory.");  
 						}
 					} else {
 						long fileTimestamp = file.getModificationTime();
 						if (TRACE.isLoggable(TraceLevel.DEBUG))
-							TRACE.log(TraceLevel.DEBUG, "File: " + file.getPath().toString() + " " + fileTimestamp);
+							TRACE.log(TraceLevel.DEBUG, "File: " + file.getPath().toString() + " " + fileTimestamp);  
 						if (fileTimestamp > lastTimestamp) {
 							lastTimestampInThisScan = Math.max(fileTimestamp, lastTimestampInThisScan);
 							// file path can be retrieved from URI without
@@ -779,12 +766,12 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 							if (filePath != null) {
 								OutputTuple outputTuple = getOutput(0).newTuple();
 								if (TRACE.isLoggable(TraceLevel.INFO))
-									TRACE.log(TraceLevel.INFO, "Submit File: " + file.getPath().toString());
+									TRACE.log(TraceLevel.INFO, "Submit File: " + file.getPath().toString()); 
 								outputTuple.setString(0, filePath);
 								try {
 									getOutput(0).submit(outputTuple);
 								} catch (Exception e) {
-									LOGGER.log(TraceLevel.ERROR, "Problem submitting tuple " + e);
+									LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_SUBMITTING_FAILED", e));
 								}
 							}
 						}
@@ -796,39 +783,39 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			// to finish, and we start again immediately?
 			synchronized (dirLock) {
 				if (TRACE.isLoggable(TraceLevel.DEBUG))
-					TRACE.log(TraceLevel.DEBUG, "Acquire dir lock to detect changes in process method");
+					TRACE.log(TraceLevel.DEBUG, "Acquire dir lock to detect changes in process method"); 
 				// if no control signal has come in, wait...
 				if (getDirectory().equals(currentDir)) {
 					if (TRACE.isLoggable(TraceLevel.DEBUG))
-						TRACE.log(TraceLevel.DEBUG, "Directory not changed, check if we need to sleep.");
+						TRACE.log(TraceLevel.DEBUG, "Directory not changed, check if we need to sleep."); 
 					long currentTime = System.currentTimeMillis();
 					long timeBeforeNextScan = sleepTimeMil - (currentTime - scanStartTime);
 					if (timeBeforeNextScan > 0) {
 						try {
 							if (TRACE.isLoggable(TraceLevel.INFO))
-								TRACE.log(TraceLevel.INFO, "Sleeping for..." + timeBeforeNextScan);
+								TRACE.log(TraceLevel.INFO, "Sleeping for..." + timeBeforeNextScan); 
 							dirLock.wait(timeBeforeNextScan);
 						} catch (Exception e) {
-							TRACE.log(TraceLevel.DEBUG, "Sleep time interrupted");
+							TRACE.log(TraceLevel.DEBUG, "Sleep time interrupted"); 
 						} finally {
 							if (!getDirectory().equals(currentDir)) {
-								TRACE.log(TraceLevel.DEBUG, "Directory changed, reset lastTimestamp");
+								TRACE.log(TraceLevel.DEBUG, "Directory changed, reset lastTimestamp"); 
 								lastTimestamp = 0;
 							}
 						}
 					}
 				} else {
-					TRACE.log(TraceLevel.DEBUG, "Directory changed, reset lastTimestamp");
+					TRACE.log(TraceLevel.DEBUG, "Directory changed, reset lastTimestamp"); 
 					lastTimestamp = 0;
 				}
 			}
 		}
 		if (TRACE.isLoggable(TraceLevel.DEBUG))
-			TRACE.log(TraceLevel.DEBUG, "Exited directory scan loop");
+			TRACE.log(TraceLevel.DEBUG, "Exited directory scan loop"); 
 		try {
 			getOutput(0).punctuate(Punctuation.FINAL_MARKER);
 		} catch (Exception e) {
-			LOGGER.log(TraceLevel.ERROR, "Problem sending final punctuation " + e);
+			LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_DS_PUNCTUATION_FAILED", e)); 
 		}
 
 	}
@@ -836,7 +823,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 	private FileStatus[] scanDirectory(String directory) throws IOException {
 
 		if (TRACE.isLoggable(TraceLevel.INFO))
-			TRACE.log(TraceLevel.INFO, "scanDirectory: " + directory);
+			TRACE.log(TraceLevel.INFO, "scanDirectory: " + directory); 
 
 		FileStatus[] files = new FileStatus[0];
 
@@ -854,8 +841,8 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 			processThread = null;
 		}
 		OperatorContext context = getOperatorContext();
-		TRACE.log(TraceLevel.DEBUG, "Operator " + context.getName() + " shutting down in PE: "
-				+ context.getPE().getPEId() + " in Job: " + context.getPE().getJobId());
+		TRACE.log(TraceLevel.DEBUG, "Operator " + context.getName() + " shutting down in PE: "  
+				+ context.getPE().getPEId() + " in Job: " + context.getPE().getJobId()); 
 
 		// Must call super.shutdown()
 		super.shutdown();
@@ -869,7 +856,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 	@Override
 	public void checkpoint(Checkpoint checkpoint) throws Exception {
-		debug("Checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
+		debug("Checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT); 
 
 		// checkpoint scan time and directory
 		checkpoint.getOutputStream().writeObject(getDirectory());
@@ -878,22 +865,22 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		// as we are always looking for file that is larger that the last
 		// timestamp
 		checkpoint.getOutputStream().writeLong(fLastSubmittedTs);		
-		debug( "Checkpoint timestamp " + fLastSubmittedTs, CONSISTEN_ASPECT);
+		debug( "Checkpoint timestamp " + fLastSubmittedTs, CONSISTEN_ASPECT); 
 		
 		checkpoint.getOutputStream().writeObject(fLastSubmittedFilename);
-		debug("Checkpoint filename " + fLastSubmittedFilename, CONSISTEN_ASPECT);
+		debug("Checkpoint filename " + fLastSubmittedFilename, CONSISTEN_ASPECT); 
 
 	}
 
 	@Override
 	public void drain() throws Exception {
-		debug("Drain", CONSISTEN_ASPECT);
+		debug("Drain", CONSISTEN_ASPECT); 
 
 	}
 
 	@Override
 	public void reset(Checkpoint checkpoint) throws Exception {
-		debug("Reset to checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
+		debug("Reset to checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT); 
 
 		String ckptDir = (String) checkpoint.getInputStream().readObject();
 
@@ -902,28 +889,27 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		}
 
 		fResetToTs = checkpoint.getInputStream().readLong();
-		debug("Reset timestamp " + fResetToTs, CONSISTEN_ASPECT);
+		debug("Reset timestamp " + fResetToTs, CONSISTEN_ASPECT); 
 		
 		fResetToFilename = (String)checkpoint.getInputStream().readObject();
-		debug("Reset filename " + fResetToFilename, CONSISTEN_ASPECT);
+		debug("Reset filename " + fResetToFilename, CONSISTEN_ASPECT); 
 	}
 
 	@Override
 	public void resetToInitialState() throws Exception {
-		debug("Reset to initial state", CONSISTEN_ASPECT);
+		debug("Reset to initial state", CONSISTEN_ASPECT); 
 
 		synchronized (dirLock) {
 			setDirectory(fInitialDir);
 		}
 		fResetToTs = 0;
-		fResetToFilename = "";
+		fResetToFilename = ""; 
 
 	}
 
 	@Override
 	public void retireCheckpoint(long id) throws Exception {
 		debug("Retire checkpoint " + id, CONSISTEN_ASPECT);
-
 	}
 	
 	private void debug(String message, Object aspect)
