@@ -14,7 +14,7 @@ Check out the binary read / write support!
 
 Getting started with development:
 * https://github.com/IBMStreams/streamsx.hdfs/wiki/Getting-Started-with-Developing-HDFS-Toolkit
-* [The messages and the NLS for toolkits](https://github.com/IBMStreams/administration/wiki/The-messages-and-the-NLS-for-toolkits)
+* [Messages and National Language Support for toolkits](https://github.com/IBMStreams/administration/wiki/Messages-and-National-Language-Support-for-toolkits)
 
 Main Site:
 * http://ibmstreams.github.io/streamsx.hdfs/
