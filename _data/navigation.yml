@@ -6,6 +6,9 @@ main:
     url: /docs/user/overview
   - title: "Developer Documentation"
     url: /docs/developer/overview
+  - title: "HDFS for Bluemix"
+    url: /docs/bluemix/overview
+
 
 # knowledge documentation links
 knowledgedocs:
