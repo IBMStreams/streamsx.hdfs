@@ -19,6 +19,7 @@ import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
 import com.ibm.streamsx.hdfs.Messages;
+import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public abstract class BaseAuthenticationHelper implements IAuthenticationHelper {
 	
@@ -72,10 +73,33 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 
 		setHdfsUri(new URI(uri));
+		
+		if (isConnectionToBluemix(hdfsUser, connectionProperties)) {
+			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
+			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
+			String keyStore = connectionProperties.get(IHdfsConstants.KEYSTORE);
+			if (keyStore != null) {
+				fConfiguration.set(IHdfsConstants.KEYSTORE, keyStore);
+				String keyStorePass = connectionProperties.get(IHdfsConstants.KEYSTORE_PASSWORD);
+				if (keyStorePass == null) {
+					keyStorePass = "";
+				}
+				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
+			} else {
+//				LOGGER.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
+				LOGGER.log(TraceLevel.DEBUG, Messages.getString("INSECURE_SSL_CONNECTION"));
+			}
+			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
+		} 		
 		LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT" , getHdfsUri().toString()));
 		
 		return null;
 	}
+	
+	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties){
+		return hdfsUser != null && connectionProperties.get(IHdfsConstants.HDFS_PASSWORD) != null;
+	}
+	
 	
 	protected FileSystem internalGetFileSystem(URI hdfsUri, String hdfsUser) throws Exception {
 		FileSystem fs = null;

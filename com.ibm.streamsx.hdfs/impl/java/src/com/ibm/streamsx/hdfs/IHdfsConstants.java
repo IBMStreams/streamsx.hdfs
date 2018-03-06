@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
+* Copyright (C) 2017, International Business Machines Corporation
 * All Rights Reserved
 *******************************************************************************/
 
@@ -23,6 +23,7 @@ public interface IHdfsConstants {
 	public static final String FILE_VAR_PROCID = "%PROCID";
 	public static final String FILE_VAR_HOST = "%HOST";
 
+	public final static String HDFS_PASSWORD = "password";
 	public final static String AUTH_PRINCIPAL = "authPrincipal";
 	public final static String AUTH_KEYTAB = "authKeytab";
 	public final static String CRED_FILE = "credFile";
@@ -30,6 +31,9 @@ public interface IHdfsConstants {
 	public final static String FS_HDFS = "hdfs";
 	public final static String FS_GPFS = "gpfs";
 	public final static String FS_WEBHDFS = "webhdfs";
-	
+	public static final String KNOX_PASSWORD = "knox.password";
+	public static final String KNOX_USER = "knox.user";
+	public static final String KEYSTORE = "keystore_path";
+	public static final String KEYSTORE_PASSWORD = "keystore_password";
 	
 }
