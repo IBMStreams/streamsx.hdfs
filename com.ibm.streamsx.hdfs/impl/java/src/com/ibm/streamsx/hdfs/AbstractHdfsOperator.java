@@ -1,11 +1,13 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
+* Copyright (C) 2017, International Business Machines Corporation
 * All Rights Reserved
 *******************************************************************************/
 
 package com.ibm.streamsx.hdfs;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.Path;
@@ -38,6 +40,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private IHdfsClient fHdfsClient;
 	private String fHdfsUri;
 	private String fHdfsUser;
+	private String fHdfsPassword;
 	private String fAuthPrincipal;
 	private String fAuthKeytab;
 	private String fCredFile;
@@ -46,16 +49,61 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	// Other variables
 	protected Thread processThread = null;
 	protected boolean shutdownRequested = false;
+	private String fKeyStorePath;
+	private String fKeyStorePassword;
+	private String fLibPath; //Used to allow the user to override the hadoop home environment variable
+	private String fPolicyFilePath;
 
 	@Override
 	public synchronized void initialize(OperatorContext context)
 			throws Exception {
 		super.initialize(context);
-
+		setupClassPaths(context);
+		processPolicyFilePath();
 		fHdfsClient = createHdfsClient();
 		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 	}
 
+	private void processPolicyFilePath() {
+		String policyFilePath = getAbsolutePath(getPolicyFilePath());
+		if (policyFilePath != null) {
+			TRACE.log(TraceLevel.INFO, "Policy file path: " + policyFilePath);
+			System.setProperty("com.ibm.security.jurisdictionPolicyDir", policyFilePath);
+		}
+	}
+
+	private  void setupClassPaths(OperatorContext context) {
+		String HADOOP_HOME = System.getenv("HADOOP_HOME");
+		ArrayList<String> libList = new ArrayList<>();
+		
+		if (getLibPath() != null) {
+			String user_defined_path = getLibPath()+ "/*";
+			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
+			libList.add(user_defined_path);
+		} else if (HADOOP_HOME != null) {
+			libList.add(HADOOP_HOME + "/../hadoop-conf");
+			libList.add(HADOOP_HOME + "/etc/hadoop");
+			libList.add(HADOOP_HOME + "/conf");
+			libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
+			libList.add(HADOOP_HOME + "/share/hadoop/common/*");
+			libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+			libList.add(HADOOP_HOME + "/lib/*");
+			libList.add(HADOOP_HOME + "/client/*");
+			libList.add(HADOOP_HOME + "/*");
+			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+		} else {
+			String default_dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
+			libList.add(default_dir);
+		}
+
+		try {
+			context.addClassLibraries(libList.toArray(new String[0]));
+
+		} catch (MalformedURLException e) {
+			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR",  e);
+		}
+	}
+	
 	@Override
 	public void allPortsReady() throws Exception {
 		super.allPortsReady();
@@ -109,17 +157,21 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	protected IHdfsClient createHdfsClient() throws Exception {
 		IHdfsClient client = new HdfsJavaClient();
 
+		client.setConnectionProperty(IHdfsConstants.KEYSTORE, getAbsolutePath(getKeyStorePath()));
+		client.setConnectionProperty(IHdfsConstants.KEYSTORE_PASSWORD, getKeyStorePassword());
+
+		client.setConnectionProperty(IHdfsConstants.HDFS_PASSWORD, getHdfsPassword());
 		client.setConnectionProperty(IHdfsConstants.AUTH_PRINCIPAL, getAuthPrincipal());
 		client.setConnectionProperty(IHdfsConstants.AUTH_KEYTAB, getAbsolutePath(getAuthKeytab()));
 		client.setConnectionProperty(IHdfsConstants.CRED_FILE, getAbsolutePath(getCredFile()));
 
 		return client;
 	}
-	
+
 	protected String getAbsolutePath(String filePath) {
 		if(filePath == null) 
 			return null;
-		
+
 		Path p = new Path(filePath);
 		if(p.isAbsolute()) {
 			return filePath;
@@ -128,7 +180,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 			return f.getAbsolutePath();
 		}
 	}
-	
+
 	protected IHdfsClient getHdfsClient() {
 		return fHdfsClient;
 	}
@@ -186,5 +238,48 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 	public String getConfigPath() {
 		return fConfigPath;
+	}
+	
+	public String getLibPath() {
+		return fLibPath;
+	}
+
+	public String getHdfsPassword() {
+		return fHdfsPassword;
+	}
+
+	public String getKeyStorePath() {
+		return fKeyStorePath;
+	}
+	public String getKeyStorePassword() {
+		return fKeyStorePassword;
+	}
+
+	public String getPolicyFilePath() {
+		return fPolicyFilePath;
+	}
+
+	@Parameter(optional=true)	
+	public void setHdfsPassword(String pass) {
+		fHdfsPassword = pass;
+	}
+
+	@Parameter(optional=true)	
+	public void setKeyStorePath(String path) {
+		fKeyStorePath = path;
+	}
+	@Parameter(optional=true)	
+	public void setKeyStorePassword(String pass) {
+		fKeyStorePassword = pass;
+	}
+	
+	@Parameter(optional=true) 
+	public void setLibPath(String libPath) {
+		fLibPath = libPath;
+	}
+
+	@Parameter(optional=true)
+	public void setPolicyFilePath(String policyFilePath) {
+		fPolicyFilePath = policyFilePath;
 	}
 }
