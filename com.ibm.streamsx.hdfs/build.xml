@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 // *******************************************************************************
-// * Copyright (C)2014, International Business Machines Corporation and *
+// * Copyright (C)2014 2018, International Business Machines Corporation and *
 // * others. All Rights Reserved. *
 // *******************************************************************************
 -->
 <project name="com.ibm.streamsx.hdfs" basedir="." default="all">
+
 
 	<property environment="env" />
 	<property name="streams.install" value="${env.STREAMS_INSTALL}" />
@@ -20,6 +21,9 @@
 	<property name="gensrc.dir" value="${basedir}/impl/java/src-gen" />
 	<property name="jarfile" value="BigData.jar" />
 	<property name="spl-mt" value="${streams.install}/bin/spl-make-toolkit" />
+	<property name="maven.bin" value="${env.M2_HOME}/bin/mvn" />
+
+	<available file="${basedir}/pom.xml" property="pomset"/> 
 	
 	<target name="init">
 		<fail unless="env.M2_HOME" 
@@ -74,7 +78,7 @@
 
 
 
-	<target name="compile" depends="init">
+	<target name="compile" depends="init,maven-deps">
 		<javac compiler="modern" srcdir="${src.dir}" destdir="${build.dir}" debug="true"
 			includeantruntime="no"
 			excludes="com/ibm/streamsx/hdfs/**/*$StreamsModel.java" >
@@ -92,6 +96,24 @@
 		    </fileset>
 		</copy>
 	</target>
+
+
+	<!-- Downloads libraries using maven -->
+	<target name="maven-deps" depends="init,nomaven" if="env.M2_HOME">
+		<fail unless="pomset" message="There must be a pom.xml file in com.ibm.streamsx.hdfs in order to use maven to download necessary dependencies."/> 
+		<exec executable="${maven.bin}"  failonerror="true">
+			<arg value="dependency:copy-dependencies"/>
+			<arg value="-DoutputDirectory=${ext.downloads.dir}"/>
+	    </exec>
+		
+	</target>
+
+	<!-- Prints a message if no maven is found. -->
+	<target name="nomaven" unless="env.M2_HOME">
+	  <echo message="M2_HOME not found in environment; expect to find all needed libraries in /opt/downloaded already"/>
+	</target>
+
+
 
 	<target name="jar" depends="compile, copy">
 	<jar destfile="${impl.lib.dir}/${jarfile}" basedir="${build.dir}" includes="com/ibm/streamsx/hdfs/**" filesonly="true" >
