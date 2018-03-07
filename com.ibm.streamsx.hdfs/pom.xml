@@ -29,7 +29,7 @@
 				<exclusion>
 					<groupId>*</groupId>
 					<artifactId>*</artifactId>
-				</exclusion>
+				</exclusion> 
 			</exclusions>
 		</dependency>
 		<dependency>
