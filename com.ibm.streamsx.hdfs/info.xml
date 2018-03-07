@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 // *******************************************************************************
-// * Copyright (C)2014, International Business Machines Corporation and *
+// * Copyright (C)2014 2018, International Business Machines Corporation and *
 // * others. All Rights Reserved. *
 // *******************************************************************************
 -->
@@ -13,17 +13,16 @@ The HDFS Toolkit provides operators that can read and write data from Hadoop Dis
 
 The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
  * Apache Hadoop versions 2.x 
- * InfoSphere BigInsights 2.1.2, 3.0.0.x, 4.x
+ * HDP 2.7.x
  * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
  * Hortonworks Data Platform (HDP) 2.2
 
-Note: The reference platforms that were used for testing are Hadoop 2.7.2, InfoSphere BigInsights 3.0.0.2 and CDH 5.2.0.
+Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 
-When you use the operators to access GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
+You can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 
 For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
 
-Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x.
 
 + Developing and running applications that use the HDFS Toolkit
 
@@ -54,90 +53,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
    * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
      * Set **HADOOP_HOME** to `Hadoop_Install_Directory`. For example, `/usr/lib/hadoop`.
      * Set **JAVA_HOME** to the location where Java is installed.
-   * For IBM InfoSphere BigInsights 3.x:
-     * Set **BIGINSIGHTS_HOME** to `BigInsights_Install_Directory`. For example, `/opt/ibm/biginsights`.
-     * Set **HADOOP_HOME** to `BigInsights_Install_Directory/IHC`. For example, `/opt/ibm/biginsights/IHC`.
-     * Set **JAVA_HOME** to the location where Java is installed.
-   * For IBM InfoSphere BigInsights 4.x:
-     * Set **HADOOP_HOME** to `BigInsights_Install_Directory/hadoop`. For example, `/usr/iop/4.0.0.0/hadoop`.
-     * Set **JAVA_HOME** to the location where Java is installed.   
-2. If InfoSphere Streams does not have access to the location where Hadoop is installed,
-   copy the Hadoop library files to a location that is accessible to InfoSphere Streams
-   and set the appropriate environment variables.
-   The following list describes the Hadoop library files to copy:
-   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
-     1. Copy `/usr/lib/hadoop` to the InfoSphere Streams cluster and place it in a directory on the cluster,
-        which is accessible to InfoSphere Streams.
-        **Note**: When copying the directories, you must ensure that symbolic links are dereferenced,
-        otherwise the directory containing the `core-site.xml` file might not get copied to the InfoSphere Streams cluster.
-        On Linux, you can dereference a symbolic link by using the **-L** flag. For example:
-            cp -Lr /usr/lib/hadoop /usr/lib/hadoop-hdfs /path-on-cluster
-     2. Copy `/usr/lib/hadoop-hdfs` to the InfoSphere Streams cluster and place it in a directory on the cluster,
-        which is accessible to InfoSphere Streams.
-   * For IBM InfoSphere BigInsights 3.x:
-     1. Copy `BigInsights_Install_Directory/IHC` to the InfoSphere Streams cluster and place it under a directory
-        on the cluster, which is accessible to InfoSphere Streams. For example, `/home/Streams/BigInsights_Install_Directory/IHC`.
-     2. Copy the`BigInsights_Install_Directory/hadoop-conf` directory to the InfoSphere Streams cluster
-        and place it under a directory on the cluster, which is accessible to InfoSphere Streams.
-        For example, `/home/Streams/BigInsights_Install_Directory/hadoop-conf`
-   * For IBM InfoSphere BigInsights 4.x:
-     1. Copy `BigInsights_Install_Directory/hadoop` to the InfoSphere Streams cluster and place it under a directory
-        on the cluster, which is accessible to InfoSphere Streams. For example, `/home/Streams/BigInsights_Install_Directory/hadoop`.
-     2. Copy the `BigInsights_Install_Directory/hadoop-hdfs` directory to the InfoSphere Streams cluster
-        and place it under a directory on the cluster, which is accessible to InfoSphere Streams.
-        For example, `/home/Streams/BigInsights_Install_Directory/hadoop-hdfs`        
-   * For IBM InfoSphere BigInsights 3.x installed on GPFS:
-     * **Important**: If IBM InfoSphere BigInsights is installed on GPFS, you do not need to install InfoSphere Streams
-       on an IBM InfoSphere BigInsights data node. Use the `webhdfs://hdfshost:webhdfsport` schema in the URI
-       that you use to connect to GPFS.
-     1. Copy `BigInsights_Install_Directory/IHC` to the InfoSphere Streams cluster
-        and place it under a directory on the cluster, which is accessible to InfoSphere Streams.
-        For example, `/home/Streams/BigInsights_Install_Directory/IHC`.
-     2. Copy the `BigInsights_Install_Directory/hadoop-conf` directory to the InfoSphere Streams cluster
-        and place it under a directory on the cluster, which is accessible to InfoSphere Streams.
-        For example, `/home/Streams/BigInsights_Install_Directory/hadoop-conf`
-     3. Copy `BigInsights_Install_Directory/lib/biginsights-gpfs.jar` to the InfoSphere Streams cluster
-        and place it under a directory on the cluster, which is accessible to InfoSphere Streams.
-        For example, `/home/Streams/BigInsights_Install_Directory`.       
-   * For IBM InfoSphere BigInsights 4.0.0.0 installed on GPFS:
-     * The com.ibm.streamsx.hdfs toolkit does not support remote connections to a BigInsight 4.0.0.0 GPFS cluster. 
-   The following list describes the environment variables to set when Hadoop and IBM InfoSphere BigInsights
-   libraries are copied to location that is accessible to InfoSphere Streams:
-   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
-     * Set **HADOOP_HOME** to `/home/Streams/hadoop`.l
-     * Set **JAVA_HOME** to the location where Java is installed.
-   * For IBM InfoSphere BigInsights 3.x:
-     * Set **HADOOP_HOME** to `/home/Streams/biginsights/IHC`.
-     * Set **BIGINSIGHTS_HOME** to `/home/Streams/biginsights`.
-     * Set **JAVA_HOME** to the location where Java is installed.
-   * For IBM InfoSphere BigInsights 4.x:
-     * Set **HADOOP_HOME** to `/home/Streams/biginsights/hadoop`.
-     * Set **JAVA_HOME** to the location where Java is installed.     
-   * IBM InfoSphere BigInsights 3.x installed on GPFS:
-     * Set **HADOOP_HOME** to `/opt/ibm/biginsights/IHC/`.
-     * Set **BIGINSIGHTS_HOME** to `/opt/ibm/biginsights`.
-     * Set **JAVA_HOME** to the location where Java is installed.        
-3. Configure the SPL compiler to find the toolkit root directory. Use one of the following methods:
-  * Set the **STREAMS_SPLPATH** environment variable to the root directory of a toolkit
-    or multiple toolkits (with : as a separator).  For example:
-      export STREAMS_SPLPATH=$STREAMS_INSTALL/toolkits/com.ibm.streamsx.hdfs
-  * Specify the **-t** or **--spl-path** command parameter when you run the **sc** command. For example:
-      sc -t $STREAMS_INSTALL/toolkits/com.ibm.streamsx.hdfs -M MyMain
-    where MyMain is the name of the SPL main composite.
-    **Note**: These command parameters override the **STREAMS_SPLPATH** environment variable.
-  * Add the toolkit location in InfoSphere Streams Studio.
-4. Develop your application. To avoid the need to fully qualify the operators, add a use directive in your application. 
-  * For example, you can add the following clause in your SPL source file:
-      use com.ibm.streamsx.hdfs::*;
-    You can also specify a use clause for individual operators by replacing the asterisk (\*) with the operator name. For example: 
-      use com.ibm.streamsx.hdfs::HDFS2FileSink;
-5. If IBM InfoSphere BigInsights 3.x or 4.x is installed on GPFS:
-   * To access GPFS locally, set the `fs.defaultFS` option in the `core-site.xml` configuration file to `gpfs:///`.
-   * To access GPFS remotely (**only applies to BigInsights 3.x**), modify the `core-site.xml` that you have copied over from the remote system. 
-     Set the `fs.default.FS` option in the `core-site.xml` configuration file to `webhdfs://hdfshost:webhdfsport`. 
-     For example, `webhdfs://myhdfshost:14000`.
-     Ensure that the user is set up to access the file system by using the webhdfs schema.
-6. To read and write to HDFS, specify a uniform resource identifier (URI) to connect to HDFS.
+2. To read and write to HDFS, specify a uniform resource identifier (URI) to connect to HDFS.
    You can specify the URI in one of the following ways:
    * Specify a value for the `fs.defautlFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file.
      By default, the operators look for the `core-site.xml` file in the following directories:
