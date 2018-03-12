@@ -22,22 +22,20 @@ Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 You can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 for example
  
-      stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) 
       {  
 		     param
 			      hdfsUri "clsadmin": 
-			      hdfsUser: "webhdfs://<your-hdfs-host-ip-address>:8443";
+			      hdfsUser: "webhdfs://your-hdfs-host-ip-address:8443";
 			      hdfsPassword: "PASSWORD";
 	 		      fileAttributeName : "filename" ;
       }
     
  Or "hdfs://hdfs1.fyre.ibm.com:8020" as hdfsUri
               
-       stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) 
       {  
 		     param
 			      hdfsUri "clsadmin": 
-			      hdfsUser: "hdfs://hdfs1.fyre.ibm.com:8020"
+			      hdfsUser: "hdfs://your-hdfs-host-ip-address:8020"
       }
              
               
