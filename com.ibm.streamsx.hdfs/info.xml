@@ -20,7 +20,28 @@ The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The 
 Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 
 You can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
-
+for example
+ 
+      stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) 
+      {  
+		     param
+			      hdfsUri "clsadmin": 
+			      hdfsUser: "webhdfs://<your-hdfs-host-ip-address>:8443";
+			      hdfsPassword: "PASSWORD";
+	 		      fileAttributeName : "filename" ;
+      }
+    
+ Or "hdfs://hdfs1.fyre.ibm.com:8020" as hdfsUri
+              
+       stream<rstring out_file_name, uint64 size>  Sink = HDFS2FileSink(Input) 
+      {  
+		     param
+			      hdfsUri "clsadmin": 
+			      hdfsUser: "hdfs://hdfs1.fyre.ibm.com:8020"
+      }
+             
+              
+              
 For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
 
 
@@ -32,10 +53,7 @@ or the SPL compiler to be aware of the location of the toolkit.
 # Before you begin
 
 * Install IBM InfoSphere Streams.  Configure the product environment variables by entering the following command: 
-      source product-installation-root-directory/4.2.0.0/bin/streamsprofile.sh
-* Install a supported version of Hadoop.
-* Ensure that InfoSphere Streams has access to Hadoop libraries and configuration files
-  to allow streams processing applications to read and write to HDFS.
+      source product-installation-root-directory/4.2.4.0/bin/streamsprofile.sh
 
 # About this task
 
@@ -46,30 +64,13 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 
 # Procedure
 
-# Procedure
+1. If InfoSphere Streams has access to the impl/lib/ext where Hadoop librarires located.
+   The JAR laibraries will be download will be downloaded via maven. 
+   The new version of HDFS tookit doesn'nt need any Hadoop client installation.
 
-1. If InfoSphere Streams has access to the location where Hadoop is installed, 
-   set the following environment variables:
-   * For Apache HDFS, Cloudera, or Hortonworks Data Platform:
-     * Set **HADOOP_HOME** to `Hadoop_Install_Directory`. For example, `/usr/lib/hadoop`.
-     * Set **JAVA_HOME** to the location where Java is installed.
-2. To read and write to HDFS, specify a uniform resource identifier (URI) to connect to HDFS.
-   You can specify the URI in one of the following ways:
-   * Specify a value for the `fs.defautlFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file.
-     By default, the operators look for the `core-site.xml` file in the following directories:
-     * `$HADOOP_HOME/../hadoop-conf`
-     * `$HADOOP_HOME/etc/hadoop`
-     * `$HADOOP_HOME/conf`
-     * `$HADOOP_HOME/share/hadoop/hdfs/\*`
-     * `$HADOOP_HOME/share/hadoop/common/\*`
-     * `$HADOOP_HOME/share/hadoop/common/lib/\*`
-     * `$HADOOP_HOME/lib/\*`
-     * `$HADOOP_HOME/\*`
-     Tip: To specify a different location for the HDFS configuration files, set the **configPath** operator parameter.
-   * Specify a value for the **hdfsUri** operator parameter.
-7. Build your application.  You can use the **sc** command or Streams Studio.  
-8. Start the InfoSphere Streams instance. 
-9. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
+2. Build your application.  You can use the **sc** command or Streams Studio.  
+3. Start the InfoSphere Streams instance. 
+4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
 
 </description>
     <version>4.0.0</version>
