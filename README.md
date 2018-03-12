@@ -24,3 +24,9 @@ To learn more about Streams:
 * [Introduction to Streams Quick Start Edition](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-intro/)
 * [Streams Getting Started Guide](http://ibmstreams.github.io/streamsx.documentation/docs/4.1/qse-getting-started/)
 * [StreamsDev](https://developer.ibm.com/streamsdev/)
+
+To learn more about Apache HDFS and Hadoop WebHDFS REST API:
+* [Apache HDFS User Guide](https://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html)
+* [Hadoop WebHDFS REST API](https://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)
+
+
