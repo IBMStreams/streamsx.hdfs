@@ -30,7 +30,7 @@ for example
 	 		      fileAttributeName : "filename" ;
       }
     
- Or "hdfs://hdfs1.fyre.ibm.com:8020" as hdfsUri
+ Or "hdfs://your-hdfs-host-ip-address:8020" as hdfsUri
               
       {  
 		     param
