@@ -1,0 +1,158 @@
+/**
+ * This application shows how to connect to a Hadoop instance running on Cloud via webhdfs
+ * Specify the name of a file to read from  HDFS as a submission time parameter.
+ * Additional required parameters are the hdfsUri of the HDFS server and the username and password information for authentication.
+ * To get these credentials:
+ * Create a Analytics Engine service on IBM cloud.
+ * https://console.bluemix.net/catalog/?search=Analytics%20Engine
+ * IBM Analytics Engine documentation 
+ * https://console.bluemix.net/docs/services/AnalyticsEngine/index.html#introduction
+ * Create a service credential for Analytics Engine service on IBM cloud.
+ * And replace the value of hdfsUser and hdfsPassword in this spl file with values 
+ * from user and password in IAE credential
+ * The value of $hdfsUri is  webhdfs://<host>:<port>
+ * 
+ * It is also possible to set the value of these parameters during the submission.
+ * 
+ * If you want to run this sample in on-perm Streams server, you have to unset 
+ * The HADOOP_HOME environment variable
+ * unset HADOOP_HOME   
+ * 
+ * The CloudSample composite first creates some files in directory via HDFS2FileSink.
+ * Then HDFS2DirectoryScan reads the file names located in the test directory.
+ * The HDFS2FileSource reads lines from files located in the test directory
+ * See the toolkit's documentation for compile and run instructions.
+ * @param hdfsUri HDFS URI to connect to, of the form  webhdfs://<host>:<port>
+ * @param hdfsUser User to connect to HDFS.
+ * @param hdfsPassword Password to connect to HDFS.
+ * @param directory directory to read and write files.
+ */
+
+use com.ibm.streamsx.hdfs::* ;
+
+composite CloudSample
+{
+    param
+        expression<rstring> $hdfsUri      : getSubmissionTimeValue("hdfsUri", "webhdfs://169.73.137.126:8443") ;
+        expression<rstring> $hdfsUser     : getSubmissionTimeValue("hdfsUser", "clsadmin") ;
+        expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword", "IAE-Password") ;
+        expression<rstring> $directory : getSubmissionTimeValue("directory", "testDirectory") ;
+
+    graph
+
+
+        // The pulse is a Beacon operator that generates counter.
+        stream<int32 counter> pulse = Beacon()
+        {
+            logic
+                state : mutable int32 i = 0 ;
+            param
+                initDelay    : 1.0 ;
+                iterations   : 25u ;
+            output
+                pulse : counter = i ++ ;
+        }
+
+        // creates lines and file names for HDFS2FileSink
+        stream<rstring line, rstring filename> CreateLinesFileNames= Custom(pulse)
+        {
+            logic
+                state :
+                {
+                    mutable int32 count = 0 ;
+                    mutable timestamp ts = getTimestamp() ;
+                    mutable rstring strTimestamp = "" ;
+                }
+
+                onTuple pulse :
+                {
+                    // every 5 lines in a new file
+                    if ( (counter % 5) == 0)
+                    {
+                        ts = getTimestamp() ;
+                    }
+                    // create date time in yyyymmdd-hhMMss format
+                    strTimestamp =  (rstring) year(ts) +((month(ts) < 9u) ? "0" : "") 
+                                  + (rstring)(month(ts) + 1u) +((day(ts) < 10u) ? "0": "") 
+                                  + (rstring) day(ts) + "-" +((hour(ts) < 10u) ? "0" : "") 
+                                  + (rstring) hour(ts) +((minute(ts) < 10u) ? "0" :"") 
+                                  + (rstring) minute(ts) +((second(ts) < 10u) ? "0" : "") 
+                                  + (rstring) second(ts) ;
+                    submit({ line = "HDFS 4.0 and Streams test with webhdfs " + strTimestamp + " " +(rstring) counter, 
+                    filename = "/user/" + $hdfsUser + "/" + $directory + "/" + strTimestamp + "-hdfs.out" }, CreateLinesFileNames) ;
+                }
+
+        }
+
+        // writes tuples that arrive on input port from CreateLinesFileNames to the output file. 
+        // The file names created also by CreateLinesFileNames on input port
+        stream<rstring out_file_name, uint64 size> HdfsFileSink = HDFS2FileSink(CreateLinesFileNames)
+        {
+            logic
+                onTuple CreateLinesFileNames :
+                {
+                    printStringLn("HDFS2FileSink message : " + line) ;
+                }
+
+            param
+                hdfsUri           : $hdfsUri ;
+                hdfsUser          : $hdfsUser ;
+                hdfsPassword      : $hdfsPassword ;
+                fileAttributeName : "filename" ;
+        }
+
+        // print out the file name and the size of file
+        () as PrintHdfsSink = Custom(HdfsFileSink)
+        {
+            logic
+                onTuple HdfsFileSink :
+                {
+                    printStringLn("HDFS2FileSink  Wrote " +(rstring) size + " bytes to file " + out_file_name) ;
+                }
+
+        }
+
+       // scan the given directory from HDFS, default to . which is the user's home directory
+        stream<rstring fileNames> HdfsDirectoryScan = HDFS2DirectoryScan()
+        {
+            param
+                initDelay    : 10.0 ;
+                directory    : $directory ;
+                hdfsUri      : $hdfsUri ;
+                hdfsUser     : $hdfsUser ;
+                hdfsPassword : $hdfsPassword ;
+        }
+
+        //print out the names of each file found in the directory
+        () as PrintDirectoryScan = Custom(HdfsDirectoryScan)
+        {
+            logic
+                onTuple HdfsDirectoryScan :
+                {
+                    printStringLn("HDFS2DirectoryScan found file in directory: " + fileNames) ;
+                }
+
+        }
+
+        // use the file name from directory scan to read the file
+        stream<rstring lines> HdfsFileSource = HDFS2FileSource(HdfsDirectoryScan)
+        {
+            param
+                hdfsUri      : $hdfsUri ;
+                hdfsUser     : $hdfsUser ;
+                hdfsPassword : $hdfsPassword ;
+        }
+
+        //print out the lines from file found in the directory
+        () as PrintHdfsFileSource = Custom(HdfsFileSource)
+        {
+            logic
+                onTuple HdfsFileSource :
+                {
+                    printStringLn("HdfsFileSource line : " + lines) ;
+                }
+
+        }
+
+}
+

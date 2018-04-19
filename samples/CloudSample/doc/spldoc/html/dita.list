@@ -1,12 +1,12 @@
-#Thu Apr 19 16:27:56 CEST 2018
+#Thu Apr 19 16:27:38 CEST 2018
 copytosourcelist=
-hreftargetslist=tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
+hreftargetslist=tk$CloudSample/ix$Namespace.xml,toolkits/ix$Namespace.xml,tk$CloudSample/tk$CloudSample.xml,tk$CloudSample/ns$.xml,toolkits/toolkits.xml
 fullditatopicfile=fullditatopic.list
 fullditamapandtopicfile=fullditamapandtopic.list
-fullditatopiclist=tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
-fullditamapandtopiclist=toolkits.ditamap,tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
+fullditatopiclist=tk$CloudSample/ix$Namespace.xml,toolkits/ix$Namespace.xml,tk$CloudSample/tk$CloudSample.xml,tk$CloudSample/ns$.xml,toolkits/toolkits.xml
+fullditamapandtopiclist=toolkits.ditamap,tk$CloudSample/ix$Namespace.xml,toolkits/ix$Namespace.xml,tk$CloudSample/tk$CloudSample.xml,tk$CloudSample/ns$.xml,toolkits/toolkits.xml
 hrefditatopicfile=hrefditatopic.list
-hrefditatopiclist=tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
+hrefditatopiclist=tk$CloudSample/ix$Namespace.xml,toolkits/ix$Namespace.xml,tk$CloudSample/tk$CloudSample.xml,tk$CloudSample/ns$.xml,toolkits/toolkits.xml
 user.input.file=toolkits.ditamap
 subtargetsfile=subtargets.list
 fullditamapfile=fullditamap.list
@@ -27,7 +27,7 @@ imagelist=
 htmlfile=html.list
 htmllist=
 canditopicsfile=canditopics.list
-canditopicslist=tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
+canditopicslist=tk$CloudSample/ix$Namespace.xml,toolkits/ix$Namespace.xml,tk$CloudSample/tk$CloudSample.xml,tk$CloudSample/ns$.xml,toolkits/toolkits.xml
 keyreffile=keyref.list
 subjectschemefile=subjectscheme.list
 keyreflist=
@@ -37,7 +37,7 @@ codereffile=coderef.list
 keylist=
 codereflist=
 user.input.file.listfile=usr.input.file.list
-user.input.dir=/home/nouriahm/workspace/streamsx.hdfs/samples/HDFSFileSinkSamples/doc/spldoc/dita
+user.input.dir=/home/nouriahm/workspace/streamsx.hdfs/samples/CloudSample/doc/spldoc/dita
 uplevels=
 tempdirToinputmapdir.relative.value=
 conrefpushfile=conrefpush.list
