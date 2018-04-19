@@ -35,7 +35,7 @@ The operator terminates in the following cases:
 
 + Examples
 
-This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory on Bluemix.  The **hdfsUser** and **hdfsPassword** parameters are used to provide the username and password for authentication.
+This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The **hdfsUser** and **hdfsPassword** parameters are used to provide the username and password for authentication.
 	
 	(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan()
 	{
@@ -90,7 +90,7 @@ The **hdfsUri** parameter in this case overrides the value that is specified by 
                 directory: &quot;${directoryToScan}&quot;;
         } </template>
         </codeTemplate>
-        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource connecting to Bluemix">
+        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource connecting to IBM Analytics Engine on Cloud">
           <description>Read all the files in an HDFS directory using the HDFS2FileSource operator</description>
           <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
             param
@@ -154,7 +154,7 @@ The `HDFS2DirectoryScan` operator ignores file names that do not match the speci
  * To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` 
  * To access GPFS locally, use `gpfs:///` 
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` 
- * To access HDFS via a web connection for HDFS deployed on Bluemix, use `webhdfs://webhdfshost:webhdfsport`. 
+ * To access HDFS via a web connection for HDFS deployed On IBM Cloud, use `webhdfs://webhdfshost:webhdfsport`. 
 If this parameter is not specified, the operator finds the HDFS URI from the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` HDFS configuration file. The path to the folder containing the `core-site.xml` can be set using the **configPath** parameter.  Otherwise, the file is expected to be located in one of the following locations:
  * `$HADOOP_HOME/../hadoop-conf`
  * `$HADOOP_HOME/etc/hadoop` 
@@ -164,7 +164,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the `fs
  * `$HADOOP_HOME/share/hadoop/common/lib/\*` 
  * `$HADOOP_HOME/lib/\*` 
  * `$HADOOP_HOME/\*` 
-**Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and so either the **hdfsUri** or the **configPath** parameter must be specified.
+**Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and so either the **hdfsUri** or the **configPath** parameter must be specified.
 
 </description>
         <optional>true</optional>
@@ -174,8 +174,8 @@ If this parameter is not specified, the operator finds the HDFS URI from the `fs
       <parameter>
         <name>hdfsPassword</name>
         <description>
-This parameter specifies the password to use when you connecting to a Hadoop instance deployed on Bluemix.  
-If this parameter is not specified, attempts to connect to a Hadoop instance deployed on Bluemix will cause an exception.
+This parameter specifies the password to use when you connecting to a Hadoop instance deployed On IBM Cloud.  
+If this parameter is not specified, attempts to connect to a Hadoop instance deployed On IBM Cloud will cause an exception.
 </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -185,7 +185,7 @@ If this parameter is not specified, attempts to connect to a Hadoop instance dep
       <parameter>
         <name>hdfsUser</name>
         <description>This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
-When connecting to Hadoop instances on Bluemix, this parameter must be specified otherwise the connection will be unsuccessful.
+When connecting to Hadoop instances On IBM Cloud, this parameter must be specified otherwise the connection will be unsuccessful.
 When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the **authPrincipal** and **authKeytab** parameters. After successful authentication, the operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.
 
 Note: When using Kerberos authentication, to perform operations as the user specified by the **hdfsUser** parameter, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS.
@@ -196,7 +196,7 @@ Note: When using Kerberos authentication, to perform operations as the user spec
       </parameter>
         <parameter> 
         <name>keyStorePath</name>
-        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. 
+        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. 
 See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. **Note: If this parameter is omitted, invalid certificates for secure connections will be accepted**. If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. 
 The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.
         </description>
@@ -206,7 +206,7 @@ The location of the keystore file can be absolute path on the file system or a p
       </parameter>
         <parameter>
         <name>keyStorePassword</name>
-        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
+        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
         </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -228,8 +228,8 @@ The location of the keystore file can be absolute path on the file system or a p
       </parameter>
       <parameter>
         <name>credFile</name>
-        <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user. 
-When connecting to HDFS instances deployed on Bluemix, the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.</description>
+        <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM Analytics Engine when using the webhdfs schema. For example, the file must contain the user name and password for an IBM Analytics Engine user. 
+When connecting to HDFS instances deployed On IBM Cloud, the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.</description>
         <optional>true</optional>
         <type>rstring</type>
         <cardinality>1</cardinality>
@@ -237,7 +237,7 @@ When connecting to HDFS instances deployed on Bluemix, the credentials are provi
       <parameter>
         <name>policyFilePath</name>
         <description>
-This optional parameter is relevant when connecting to BigInsights on Bluemix. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files.
+This optional parameter is relevant when connecting to IBM Analytics Engine On IBM Cloud. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files.
 If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files.
 **Note:** This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.</description>
         <optional>true</optional>
@@ -257,7 +257,7 @@ If this parameter is omitted the JVM default policy files will be used. When spe
  * `$HADOOP_HOME/\*`
  
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
- **Note:** For connections to Hadoop instances deployed on Bluemix, the `$HADOOP_HOME` environment variable is not supported and should not be used.
+ **Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and should not be used.
 </description>
         <optional>true</optional>
         <type>rstring</type>
@@ -266,7 +266,7 @@ You can use the **hdfsUri** parameter to override the value that is specified fo
       
       <parameter>
         <name>libPath</name>
-        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the Bluemix specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
+        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the IBM Analytics Engine specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
 When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.
 </description>
         <optional>true</optional>

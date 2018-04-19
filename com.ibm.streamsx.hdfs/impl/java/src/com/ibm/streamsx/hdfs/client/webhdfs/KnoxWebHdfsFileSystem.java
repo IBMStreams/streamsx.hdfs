@@ -62,7 +62,7 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 
 @Override
 	public String getScheme() {
-	//even though we're using SSL the default Knox scheme for bluemix is still webhdfs
+	//even though we're using SSL the default Knox scheme for IBM Cloud is still webhdfs
 		return "webhdfs";
 	}
 @Override
