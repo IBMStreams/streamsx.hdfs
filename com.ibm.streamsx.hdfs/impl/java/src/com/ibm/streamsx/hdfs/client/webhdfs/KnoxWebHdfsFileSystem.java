@@ -57,8 +57,7 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 	if (LOG.isTraceEnabled()) {
 		LOG.trace("url=" + url);
 	}
-        System.out.println("****************************** url " + url);
-	return url;
+ 	return url;
 }
 
 @Override
