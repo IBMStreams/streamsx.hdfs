@@ -24,7 +24,7 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink ;
  * 1. Start Streams Studio
  * 1. In Streams Explorer view, add the "com.ibm.streams.bigdata" toolkit as one of the toolkit locations
  * 1. From the main menu, select File -> Import.
- * 1. Expand InfoSphere Streams Studio
+ * 1. Expand Streams Studio
  * 1. Select Sample SPL Application
  * 1. Select this sample from the Import SPL Sample Application dialog
  * 1. Once the sample is imported, wait for the build to finish.  If autobuild is turned off, select resulting project, right click -> Build Project
@@ -37,7 +37,7 @@ use com.ibm.streamsx.hdfs::HDFS2FileSink ;
  *   * cp -R $STREAMS_INSTALL/toolkits/com.ibm.streams.bigdata/samples/* $HOME/hdfssamples/
  *  1. Build one of the sample applications. Go to the appropriate subdirectory and run the make. By default, the sample is compiled as a distributed application. If you want to compile the application as a standalone application, run make standalone instead. Run make clean to return the samples back to their original state.
  *  1. Run the sample application. 
- *   * To run the HDFS2FileSinkSampleTxtFormat sample application in distributed mode, start your IBM InfoSphere Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
+ *   * To run the HDFS2FileSinkSampleTxtFormat sample application in distributed mode, start your IBM Streams instance, then use the streamtool command to submit the .adl files that were generated during the application build. 
  *    * streamtool submitjob -i <instance_name> output/Distributed/hdfsexample::HDFS2FileSinkSampleTxtFormat/hdfsexample.HDFS2FileSinkSampleTxtFormat.adl
  *   * To run the HDFS2FileSinkSampleTxtFormat sample application in standalone mode, issue the command:
  *    * ./output/Standalone/hdfsexample::HDFS2FileSinkSampleTxtFormat/bin/standalone

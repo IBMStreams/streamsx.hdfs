@@ -57,13 +57,12 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 	if (LOG.isTraceEnabled()) {
 		LOG.trace("url=" + url);
 	}
-        System.out.println("****************************** url " + url);
-	return url;
+ 	return url;
 }
 
 @Override
 	public String getScheme() {
-	//even though we're using SSL the default Knox scheme for bluemix is still webhdfs
+	//even though we're using SSL the default Knox scheme for IBM Cloud is still webhdfs
 		return "webhdfs";
 	}
 @Override

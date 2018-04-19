@@ -29,28 +29,62 @@
 <div class="section"><h2 class="title sectiontitle splhead-1">General Information</h2>
 
 
-<p class="p">The HDFS Toolkit for Bluemix enhances the operators in the standard HDFS toolkit to support read and write operations to HDFS running in the BigInsights service on Bluemix. The operators in this toolkit use Hadoop Java APIs to access HDFS and have been tested on IBM BigInsights 4.1.
+<p class="p">The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
 </p>
 
-<p class="p">This toolkit allows you to access remote HDFS servers on Bluemix, which require user authentication using a username and password.
+<div class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
+<ul class="ul">
+<li class="li"> Apache Hadoop versions 2.x </li>
+
+<li class="li"> HDP 2.7.x</li>
+
+<li class="li"> Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)</li>
+
+<li class="li"> Hortonworks Data Platform (HDP) 2.2</li>
+
+</ul>
+
+</div>
+
+<p class="p">Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 </p>
 
-<p class="p">If you are accessing GPFS, you do not need to install InfoSphere Streams on an InfoSphere BigInsights data node. Instead, you can access GPFS remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS.
+<p class="p">You can access GPFS remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS. for example
 </p>
+
+<div class="p">
+<pre class="pre codeblock">
+  {  
+	     param
+		      hdfsUri "clsadmin": 
+		      hdfsUser: "webhdfs://your-hdfs-host-ip-address:8443";
+		      hdfsPassword: "PASSWORD";
+ 		      fileAttributeName : "filename" ;
+  }
+</pre>
+
+
+</div>
+
+<p class="p"> Or "hdfs://your-hdfs-host-ip-address:8020" as hdfsUri
+</p>
+
+<div class="p">
+<pre class="pre codeblock">
+  {  
+	     param
+		      hdfsUri "clsadmin": 
+		      hdfsUser: "hdfs://your-hdfs-host-ip-address:8020"
+  }
+</pre>
+
+
+</div>
 
 <p class="p">For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> operator parameters at compile time. The <strong class="ph b">authPrincipal</strong> parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The <strong class="ph b">authKeytab</strong> parameter specifies the keytab file that is created for the principal.
 </p>
 
-<p class="p">Restriction: Kerberos authentication is not supported for InfoSphere BigInsights 2.1.2 and 3.0.0.x, 4.0.0.x or on BigInsights on Bluemix.
-</p>
-
-  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$1.html">Using the toolkit to connect to HDFS in the BigInsights on Bluemix service</a>
-</dt>
-<dd class="dd">
-</dd>
-</dl>
-
-  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$2.html">Using the toolkit to connect to HDFS outside of Bluemix</a>
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$1.html">Developing and running applications that use the HDFS Toolkit</a>
 </dt>
 <dd class="dd">
 </dd>

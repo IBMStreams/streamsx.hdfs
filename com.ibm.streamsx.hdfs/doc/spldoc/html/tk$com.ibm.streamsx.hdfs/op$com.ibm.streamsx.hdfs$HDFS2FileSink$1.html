@@ -28,14 +28,14 @@
 
 
 <div class="section">
-<div class="p">This is a basic example using the <tt class="ph tt">HDFS2FileSink</tt> operator to write output to a Hadoop filesystem deployed on Bluemix.
+<div class="p">This is a basic example using the <tt class="ph tt">HDFS2FileSink</tt> operator to write output to a Hadoop filesystem deployed on IBM Cloud (IBM Analytics Engine).
 <pre class="pre codeblock">
 () as Sink= HDFS2FileSink(Input){
   param
-    file   :"/user/biadmin/myfile.txt";
+    file   :"/user/clsadmin/myfile.txt";
     hdfsUri:"webhdfs://server_host_name:port";   
-    hdfsUser: "biadmin";
-    hdfsPassword: "BluemixPassword";
+    hdfsUser: "clsadmin";
+    hdfsPassword: "IAEPassword";
 }   
 </pre>
 
@@ -63,8 +63,8 @@ stream&lt;rstring PersonSchemString&gt; SingleStringIn = Functor(In){
 
  		hdfsUri: "webhdfs://server_host_name:port";   
 <pre class="pre codeblock">
-    hdfsUser: "biadmin";
-    hdfsPassword: "BluemixPassword";
+    hdfsUser: "clsadmin";
+    hdfsPassword: "IAEPassword";
     keyStorePassword: "storepass";
     keyStorePath: "etc/store.jks";        
 }

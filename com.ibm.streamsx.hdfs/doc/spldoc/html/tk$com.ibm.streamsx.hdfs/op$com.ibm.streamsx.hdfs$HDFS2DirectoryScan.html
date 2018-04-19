@@ -279,7 +279,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__authPrincipal"><!-- --></a><tt class="ph tt">authPrincipal</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the InfoSphere Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.
+<p class="p">This optional parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the IBM Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.
 </p>
 <dl class="dl">
 
@@ -332,7 +332,7 @@
 
 </div>
 
-<p class="p">You can use the <strong class="ph b">hdfsUri</strong> parameter to override the value that is specified for the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file.  <strong class="ph b">Note:</strong> For connections to Hadoop instances deployed on Bluemix, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and should not be used. 
+<p class="p">You can use the <strong class="ph b">hdfsUri</strong> parameter to override the value that is specified for the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> configuration file.  <strong class="ph b">Note:</strong> For connections to Hadoop instances deployed On IBM Cloud, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and should not be used. 
 </p>
 <dl class="dl">
 
@@ -363,7 +363,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__credFile"><!-- --></a><tt class="ph tt">credFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema. The credentials file must contain information on how to authenticate with IBM InfoSphere BigInsights when using the webhdfs schema. For example, the file must contain the user name and password for an IBM InfoSphere BigInsights user.  When connecting to HDFS instances deployed on Bluemix, the credentials are provided using the <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters.
+<p class="p">This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema. The credentials file must contain information on how to authenticate with IBM Analytics Engine when using the webhdfs schema. For example, the file must contain the user name and password for an IBM Analytics Engine user.  When connecting to HDFS instances deployed On IBM Cloud, the credentials are provided using the <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters.
 </p>
 <dl class="dl">
 
@@ -425,7 +425,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsPassword"><!-- --></a><tt class="ph tt">hdfsPassword</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the password to use when you connecting to a Hadoop instance deployed on Bluemix.   If this parameter is not specified, attempts to connect to a Hadoop instance deployed on Bluemix will cause an exception. 
+<p class="p">This parameter specifies the password to use when you connecting to a Hadoop instance deployed On IBM Cloud.   If this parameter is not specified, attempts to connect to a Hadoop instance deployed On IBM Cloud will cause an exception. 
 </p>
 <dl class="dl">
 
@@ -464,7 +464,7 @@
 
 <li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> </li>
 
-<li class="li"> To access HDFS via a web connection for HDFS deployed on Bluemix, use <tt class="ph tt">webhdfs://webhdfshost:webhdfsport</tt>. </li>
+<li class="li"> To access HDFS via a web connection for HDFS deployed On IBM Cloud, use <tt class="ph tt">webhdfs://webhdfshost:webhdfsport</tt>. </li>
 
 </ul>
 If this parameter is not specified, the operator finds the HDFS URI from the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> option in the <tt class="ph tt">core-site.xml</tt> HDFS configuration file. The path to the folder containing the <tt class="ph tt">core-site.xml</tt> can be set using the <strong class="ph b">configPath</strong> parameter.  Otherwise, the file is expected to be located in one of the following locations:
@@ -486,7 +486,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <li class="li"> <tt class="ph tt">$HADOOP_HOME/*</tt> </li>
 
 </ul>
-<strong class="ph b">Note:</strong> For connections to Hadoop instances deployed on Bluemix, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and so either the <strong class="ph b">hdfsUri</strong> or the <strong class="ph b">configPath</strong> parameter must be specified.
+<strong class="ph b">Note:</strong> For connections to Hadoop instances deployed On IBM Cloud, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and so either the <strong class="ph b">hdfsUri</strong> or the <strong class="ph b">configPath</strong> parameter must be specified.
 </div>
 <dl class="dl">
 
@@ -517,10 +517,10 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsUser"><!-- --></a><tt class="ph tt">hdfsUser</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS.  When connecting to Hadoop instances on Bluemix, this parameter must be specified otherwise the connection will be unsuccessful. When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> parameters. After successful authentication, the operator uses the user ID that is specified by the <strong class="ph b">hdfsUser</strong> parameter to perform all other operations on the file system.
+<p class="p">This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS.  When connecting to Hadoop instances On IBM Cloud, this parameter must be specified otherwise the connection will be unsuccessful. When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> parameters. After successful authentication, the operator uses the user ID that is specified by the <strong class="ph b">hdfsUser</strong> parameter to perform all other operations on the file system.
 </p>
 
-<p class="p">Note: When using Kerberos authentication, to perform operations as the user specified by the <strong class="ph b">hdfsUser</strong> parameter, the InfoSphere Streams instance owner must have super user privileges on HDFS or GPFS. 
+<p class="p">Note: When using Kerberos authentication, to perform operations as the user specified by the <strong class="ph b">hdfsUser</strong> parameter, the IBM Streams instance owner must have super user privileges on HDFS or GPFS. 
 </p>
 <dl class="dl">
 
@@ -582,7 +582,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__keyStorePassword"><!-- --></a><tt class="ph tt">keyStorePassword</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the password for the keystore file. This attribute is specified when the <strong class="ph b">keyStore</strong> attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
+<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the password for the keystore file. This attribute is specified when the <strong class="ph b">keyStore</strong> attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
 </p>
 <dl class="dl">
 
@@ -613,7 +613,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__keyStorePath"><!-- --></a><tt class="ph tt">keyStorePath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed on Bluemix. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to.  See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. <strong class="ph b">Note: If this parameter is omitted, invalid certificates for secure connections will be accepted</strong>. If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates.  The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.
+<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to.  See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. <strong class="ph b">Note: If this parameter is omitted, invalid certificates for secure connections will be accepted</strong>. If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates.  The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.
 </p>
 <dl class="dl">
 
@@ -644,7 +644,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__libPath"><!-- --></a><tt class="ph tt">libPath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and <tt class="ph tt">$HADOOP_HOME</tt> is not set, the Bluemix specific libraries within the <tt class="ph tt">impl/lib/ext</tt> folder of the toolkit will be used.  When specified, this parameter takes precedence over the <tt class="ph tt">$HADOOP_HOME</tt> environment variable and the libraries within the folder indicated by <tt class="ph tt">$HADOOP_HOME</tt> will not be used. 
+<p class="p">This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and <tt class="ph tt">$HADOOP_HOME</tt> is not set, the IBM Analytics Engine specific libraries within the <tt class="ph tt">impl/lib/ext</tt> folder of the toolkit will be used.  When specified, this parameter takes precedence over the <tt class="ph tt">$HADOOP_HOME</tt> environment variable and the libraries within the folder indicated by <tt class="ph tt">$HADOOP_HOME</tt> will not be used. 
 </p>
 <dl class="dl">
 
@@ -706,7 +706,7 @@ If this parameter is not specified, the operator finds the HDFS URI from the <tt
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__policyFilePath"><!-- --></a><tt class="ph tt">policyFilePath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter is relevant when connecting to BigInsights on Bluemix. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files. If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. <strong class="ph b">Note:</strong> This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.
+<p class="p">This optional parameter is relevant when connecting to IBM Analytics Engine On IBM Cloud. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files. If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. <strong class="ph b">Note:</strong> This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.
 </p>
 <dl class="dl">
 
@@ -819,7 +819,7 @@ stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
 
     
     
-     <dt class="dt dlterm">HDFS2DirectoryScan with HDFS2FileSource connecting to Bluemix</dt>
+     <dt class="dt dlterm">HDFS2DirectoryScan with HDFS2FileSource connecting to IBM Analytics Engine on Cloud</dt>
 
      <dd class="dd">
        <pre class="pre codeblock">
