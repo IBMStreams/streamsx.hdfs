@@ -34,9 +34,9 @@ use com.ibm.streamsx.hdfs::* ;
 composite CloudSample
 {
     param
-        expression<rstring> $hdfsUri      : getSubmissionTimeValue("hdfsUri", "webhdfs://169.60.137.126:8443") ;
+        expression<rstring> $hdfsUri      : getSubmissionTimeValue("hdfsUri", "webhdfs://129.60.137.126:8443") ;
         expression<rstring> $hdfsUser     : getSubmissionTimeValue("hdfsUser", "clsadmin") ;
-        expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword", "1BG9N3q6wOAz") ;
+        expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword", "IAE-Password") ;
         expression<rstring> $directory : getSubmissionTimeValue("directory", "testDirectory") ;
 
     graph
