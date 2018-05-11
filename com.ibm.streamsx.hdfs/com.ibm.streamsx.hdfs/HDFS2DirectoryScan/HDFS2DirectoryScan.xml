@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<operatorModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
-  <javaOperatorModel>
-    <context>
-      <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">
-The `HDFS2DirectoryScan` operator scans a Hadoop Distributed File System directory for new or modified files.
+<operatorModel xmlns="http://www.ibm.com/xmlns/prod/streams/spl/operator" xmlns:cmn="http://www.ibm.com/xmlns/prod/streams/spl/common" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ibm.com/xmlns/prod/streams/spl/operator operatorModel.xsd">
+    <javaOperatorModel>
+        <context>
+            <description docHref="doc/${nl}/spldoc/html/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">The `HDFS2DirectoryScan` operator scans a Hadoop Distributed File System directory for new or modified files.
 
 The `HDFS2DirectoryScan` is similar to the `DirectoryScan` operator. 
 The `HDFS2DirectoryScan` operator repeatedly scans an HDFS directory and writes the names of new or modified files 
@@ -57,100 +55,98 @@ The **hdfsUri** parameter in this case overrides the value that is specified by 
 			directory :"/user/myuser/";
 			hdfsUri   :"hdfs://hdfsServer:1883";
 			sleepTime : 2.0;
-	}	
- </description>
-      <iconUri size="32">HDFS2DirectoryScan_32.gif</iconUri>
-      <iconUri size="16">HDFS2DirectoryScan_16.gif</iconUri>
-      <metrics>
-        <metric>
-          <name>nScans</name>
-          <description sampleUri="">The number of times the operator scanned the directory.</description>
-          <kind>Counter</kind>
-        </metric>
-      </metrics>
-      <executionSettings>
-        <className>com.ibm.streamsx.hdfs.HDFS2DirectoryScan</className>
-        <vmArgs/>
-      </executionSettings>
-      <libraryDependencies>
-        <library>
-          <cmn:description>Java operator class library</cmn:description>
-          <cmn:managedLibrary>
-            <cmn:libPath>../../impl/java/bin</cmn:libPath>
-            <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
-            <cmn:command></cmn:command>
-          </cmn:managedLibrary>
-        </library>
-      </libraryDependencies>
-       <codeTemplates>
-       <codeTemplate name="HDFS2DirectoryScan">
-          <description>Basic use of HDFS Directory Scan</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
+	}</description>
+            <iconUri size="32">HDFS2DirectoryScan_32.gif</iconUri>
+            <iconUri size="16">HDFS2DirectoryScan_16.gif</iconUri>
+            <metrics>
+                <metric>
+                    <name>nScans</name>
+                    <description sampleUri="">The number of times the operator scanned the directory.</description>
+                    <kind>Counter</kind>
+                </metric>
+            </metrics>
+            <executionSettings>
+                <className>com.ibm.streamsx.hdfs.HDFS2DirectoryScan</className>
+                <vmArgs />
+            </executionSettings>
+            <libraryDependencies>
+                <library>
+                    <cmn:description>Java operator class library</cmn:description>
+                    <cmn:managedLibrary>
+                        <cmn:libPath>../../impl/java/bin</cmn:libPath>
+                        <cmn:libPath>../../impl/lib/BigData.jar</cmn:libPath>
+                        <cmn:command />
+                    </cmn:managedLibrary>
+                </library>
+            </libraryDependencies>
+            <codeTemplates>
+                <codeTemplate name="HDFS2DirectoryScan">
+                    <description>Basic use of HDFS Directory Scan</description>
+                    <template>stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
             param
-                directory: &quot;${directoryToScan}&quot;;
-        } </template>
-        </codeTemplate>
-        <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource connecting to IBM Analytics Engine on Cloud">
-          <description>Read all the files in an HDFS directory using the HDFS2FileSource operator</description>
-          <template>stream&lt;rstring name> ${outputStream} = HDFS2DirectoryScan()   {
+                directory: "${directoryToScan}";
+        }</template>
+                </codeTemplate>
+                <codeTemplate name="HDFS2DirectoryScan with HDFS2FileSource connecting to IBM Analytics Engine on Cloud">
+                    <description>Read all the files in an HDFS directory using the HDFS2FileSource operator</description>
+                    <template>stream&lt;rstring name&gt; ${outputStream} = HDFS2DirectoryScan()   {
             param
-                directory: &quot;${directoryToScan}&quot;;
-                hdfsUri   :&quot;{webhdfs://hdfsServer:8443&quot;};
-				hdfsPassword: &quot;{password&quot;};
-				hdfsUser: &quot;{biuser&quot;};
+                directory: "${directoryToScan}";
+                hdfsUri   :"{webhdfs://hdfsServer:8443"};
+				hdfsPassword: "{password"};
+				hdfsUser: "{biuser"};
         }
         
-        stream&lt;${schema}> ${fileSourceStream} = HDFS2FileSource(${outputStream})   {
+        stream&lt;${schema}&gt; ${fileSourceStream} = HDFS2FileSource(${outputStream})   {
         	param
-				hdfsUri	:&quot;{webhdfs://hdfsServer:8443}&quot;;
-				hdfsPassword	:&quot;{password}&quot;;
-				hdfsUser	:&quot;{user}&quot;;
+				hdfsUri	:"{webhdfs://hdfsServer:8443}";
+				hdfsPassword	:"{password}";
+				hdfsUser	:"{user}";
         }</template>
-        </codeTemplate>
-      </codeTemplates>
-    </context>
-    <parameters>
-      <description></description>
-      <parameter>
-        <name>directory</name>
-        <description>This optional parameter specifies the name of the directory to be scanned. If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/*userid*/ directory. This parameter is mandatory if the input port is not specified.</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>initDelay</name>
-        <description sampleUri="">This optional parameter specifies the time to wait in seconds before the operator scans the directory for the first time. The default value is 0.</description>
-        <optional>true</optional>
-        <type>float64</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>sleepTime</name>
-        <description sampleUri="">This optional parameter specifies the minimum time between directory scans. The default value is 5.0 seconds. </description>
-        <optional>true</optional>
-        <type>float64</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>pattern</name>
-        <description sampleUri="">
-This optional parameter limits the file names that are listed to the names that match the specified regular expression. 
-The `HDFS2DirectoryScan` operator ignores file names that do not match the specified regular expression. </description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>strictMode</name>
-        <description sampleUri="">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. </description>
-        <optional>true</optional>
-        <type>boolean</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>hdfsUri</name>
-        <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS.  The URI has the following format:
+                </codeTemplate>
+            </codeTemplates>
+        </context>
+        <parameters>
+            <description />
+            <parameter>
+                <name>directory</name>
+                <description>This optional parameter specifies the name of the directory to be scanned. If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/*userid*/ directory. This parameter is mandatory if the input port is not specified.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>initDelay</name>
+                <description sampleUri="">This optional parameter specifies the time to wait in seconds before the operator scans the directory for the first time. The default value is 0.</description>
+                <optional>true</optional>
+                <type>float64</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>sleepTime</name>
+                <description sampleUri="">This optional parameter specifies the minimum time between directory scans. The default value is 5.0 seconds.</description>
+                <optional>true</optional>
+                <type>float64</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>pattern</name>
+                <description sampleUri="">This optional parameter limits the file names that are listed to the names that match the specified regular expression. 
+The `HDFS2DirectoryScan` operator ignores file names that do not match the specified regular expression.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>strictMode</name>
+                <description sampleUri="">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error.</description>
+                <optional>true</optional>
+                <type>boolean</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>hdfsUri</name>
+                <description>This optional parameter of type rstring specifies the uniform resource identifier (URI) that you can use to connect to HDFS. The URI defines the host and the port that you can use to connect to HDFS.  The URI has the following format:
  * To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` 
  * To access GPFS locally, use `gpfs:///` 
  * To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` 
@@ -164,89 +160,101 @@ If this parameter is not specified, the operator finds the HDFS URI from the `fs
  * `$HADOOP_HOME/share/hadoop/common/lib/\*` 
  * `$HADOOP_HOME/lib/\*` 
  * `$HADOOP_HOME/\*` 
-**Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and so either the **hdfsUri** or the **configPath** parameter must be specified.
-
-</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>hdfsPassword</name>
-        <description>
-This parameter specifies the password to use when you connecting to a Hadoop instance deployed On IBM Cloud.  
-If this parameter is not specified, attempts to connect to a Hadoop instance deployed On IBM Cloud will cause an exception.
-</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-     
-      <parameter>
-        <name>hdfsUser</name>
-        <description>This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
+**Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and so either the **hdfsUri** or the **configPath** parameter must be specified.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>hdfsPassword</name>
+                <description>This parameter specifies the password to use when you connecting to a Hadoop instance deployed On IBM Cloud.  
+If this parameter is not specified, attempts to connect to a Hadoop instance deployed On IBM Cloud will cause an exception.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>hdfsUser</name>
+                <description>This optional parameter specifies the user ID to use when you connect to HDFS.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. 
 When connecting to Hadoop instances On IBM Cloud, this parameter must be specified otherwise the connection will be unsuccessful.
 When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the values specified by the **authPrincipal** and **authKeytab** parameters. After successful authentication, the operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.
 
-Note: When using Kerberos authentication, to perform operations as the user specified by the **hdfsUser** parameter, the IBM Streams instance owner must have super user privileges on HDFS or GPFS.
-</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-        <parameter> 
-        <name>keyStorePath</name>
-        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. 
+Note: When using Kerberos authentication, to perform operations as the user specified by the **hdfsUser** parameter, the IBM Streams instance owner must have super user privileges on HDFS or GPFS.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>reconnectionPolicy</name>
+                <description>This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures.  The valid values are: `NoRetry`, `InfiniteRetry`, and `BoundedRetry`. The default value is `BoundedRetry`. If `NoRetry` is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again.  The operator shuts down at startup time if the initial connection attempt fails. If `BoundedRetry` is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times. The maximum number of connection attempts is specified in the **reconnectionBound** parameter.  The sequence of connection attempts occurs at startup time. If a connection does not exist, the sequence of connection attempts also occurs before each operator is run.  If `InfiniteRetry` is specified, the operator continues to try and connect indefinitely until a connection is made.  This behavior blocks all other operator operations while a connection is not successful.  For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>reconnectionBound</name>
+                <description>This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs.  It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry`; otherwise, it is ignored. The default value is `5`.</description>
+                <optional>true</optional>
+                <type>int32</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>reconnectionInterval</name>
+                <description>This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts.  It is used only when the **reconnectionPolicy**  parameter is set to `BoundedRetry` or `InfiniteRetry`; othewise, it is ignored.  The default value is `10`.</description>
+                <optional>true</optional>
+                <type>float64</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>keyStorePath</name>
+                <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. 
 See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. **Note: If this parameter is omitted, invalid certificates for secure connections will be accepted**. If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. 
-The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.
-        </description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-        <parameter>
-        <name>keyStorePassword</name>
-        <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
-        </description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>  
-      <parameter>
-        <name>authPrincipal</name>
-        <description>This optional parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the IBM Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>authKeytab</name>
-        <description>This parameter specifies the file that contains the encrypted keys for the user that is specified by the **authPrincipal** parameter. The operator uses this keytab file to authenticate the user. The keytab file is generated by the administrator. You must specify this parameter to use Kerberos authentication.</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>credFile</name>
-        <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM Analytics Engine when using the webhdfs schema. For example, the file must contain the user name and password for an IBM Analytics Engine user. 
+The location of the keystore file can be absolute path on the file system or a path that is relative to the application directory.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>keyStorePassword</name>
+                <description>This optional attribute is only supported when connecting to a Hadoop instance deployed On IBM Cloud. It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>authPrincipal</name>
+                <description>This optional parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the IBM Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>authKeytab</name>
+                <description>This parameter specifies the file that contains the encrypted keys for the user that is specified by the **authPrincipal** parameter. The operator uses this keytab file to authenticate the user. The keytab file is generated by the administrator. You must specify this parameter to use Kerberos authentication.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>credFile</name>
+                <description>This optional parameter contains the login credentials to use when you connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema. The credentials file must contain information on how to authenticate with IBM Analytics Engine when using the webhdfs schema. For example, the file must contain the user name and password for an IBM Analytics Engine user. 
 When connecting to HDFS instances deployed On IBM Cloud, the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>policyFilePath</name>
-        <description>
-This optional parameter is relevant when connecting to IBM Analytics Engine On IBM Cloud. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files.
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>policyFilePath</name>
+                <description>This optional parameter is relevant when connecting to IBM Analytics Engine On IBM Cloud. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files.
 If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files.
 **Note:** This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      <parameter>
-        <name>configPath</name>
-        <description>This optional parameter specifies the absolute path to the directory that contains the HDFS configuration files. If this parameter is not specified, by default the operator looks for the `core-site.xml` file in the following locations:
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>configPath</name>
+                <description>This optional parameter specifies the absolute path to the directory that contains the HDFS configuration files. If this parameter is not specified, by default the operator looks for the `core-site.xml` file in the following locations:
  * `$HADOOP_HOME/../hadoop-conf`
  * `$HADOOP_HOME/etc/hadoop`
  * `$HADOOP_HOME/conf`
@@ -257,52 +265,48 @@ If this parameter is omitted the JVM default policy files will be used. When spe
  * `$HADOOP_HOME/\*`
  
 You can use the **hdfsUri** parameter to override the value that is specified for the `fs.defaultFS` or `fs.default.name` option in the `core-site.xml` configuration file.
- **Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and should not be used.
-</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-      
-      <parameter>
-        <name>libPath</name>
-        <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the IBM Analytics Engine specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
-When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.
-</description>
-        <optional>true</optional>
-        <type>rstring</type>
-        <cardinality>1</cardinality>
-      </parameter>
-    </parameters>
-    <inputPorts>
-      <inputPortSet>
-        <description>
-The `HDFS2DirectoryScan` operator has an optional control input port. You can use this port to change the directory 
+ **Note:** For connections to Hadoop instances deployed On IBM Cloud, the `$HADOOP_HOME` environment variable is not supported and should not be used.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+            <parameter>
+                <name>libPath</name>
+                <description>This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and `$HADOOP_HOME` is not set, the IBM Analytics Engine specific libraries within the `impl/lib/ext` folder of the toolkit will be used. 
+When specified, this parameter takes precedence over the `$HADOOP_HOME` environment variable and the libraries within the folder indicated by `$HADOOP_HOME` will not be used.</description>
+                <optional>true</optional>
+                <type>rstring</type>
+                <cardinality>1</cardinality>
+            </parameter>
+        </parameters>
+        <inputPorts>
+            <inputPortSet>
+                <description>The `HDFS2DirectoryScan` operator has an optional control input port. You can use this port to change the directory 
 that the operator scans at run time without restarting or recompiling the application.  
 The expected schema for the input port is of tuple&lt;rstring directory&gt;, a schema containing a single attribute of type rstring.  
 If a directory scan is in progress when a tuple is received, the scan completes and a new scan starts immediately after 
 and uses the new directory that was specified.  
 If the operator is sleeping, the operator starts scanning the new directory immediately after it receives an input tuple.</description>
-        <windowingDescription>This operator does not support any window configurations.</windowingDescription>
-        <windowingMode>NonWindowed</windowingMode>
-        <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
-        <controlPort>true</controlPort>
-        <cardinality>1</cardinality>
-        <optional>true</optional>
-      </inputPortSet>
-    </inputPorts>
-    <outputPorts>
-      <outputPortSet>
-        <description>
-The `HDFS2DirectoryScan` operator has one output port. 
+                <windowingDescription>This operator does not support any window configurations.</windowingDescription>
+                <windowingMode>NonWindowed</windowingMode>
+                <windowPunctuationInputMode>Oblivious</windowPunctuationInputMode>
+                <controlPort>true</controlPort>
+                <cardinality>1</cardinality>
+                <optional>true</optional>
+            </inputPortSet>
+        </inputPorts>
+        <outputPorts>
+            <outputPortSet>
+                <description>The `HDFS2DirectoryScan` operator has one output port. 
 This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, 
 one file name per tuple.  The file names do not occur in any particular order. 
 The port is non-mutating and punctuation free.</description>
-        <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
-        <windowPunctuationInputPort>-1</windowPunctuationInputPort>
-        <cardinality>1</cardinality>
-        <optional>false</optional>
-      </outputPortSet>
-    </outputPorts>
-  </javaOperatorModel>
+                <windowPunctuationOutputMode>Free</windowPunctuationOutputMode>
+                <windowPunctuationInputPort>-1</windowPunctuationInputPort>
+                <cardinality>1</cardinality>
+                <optional>false</optional>
+            </outputPortSet>
+        </outputPorts>
+    </javaOperatorModel>
 </operatorModel>
+
