@@ -6,7 +6,7 @@
 .PHONY: all clean
 
 STREAMS_SPLPATH ?=../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs  --data-directory data 
-SPLC_FLAGS = -a -z --spl-path $(STREAMS_SPLPATH)
+SPLC_FLAGS = -a  --spl-path $(STREAMS_SPLPATH)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
