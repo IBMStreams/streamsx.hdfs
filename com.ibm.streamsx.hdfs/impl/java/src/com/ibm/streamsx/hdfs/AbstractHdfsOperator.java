@@ -107,20 +107,18 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 		for(int nConnectionAttempts=0; nConnectionAttempts<fReconnectionBound; nConnectionAttempts++)
 		{
-			System.out.println("createConnection nConnectionAttempts is: " + nConnectionAttempts + " delay " + delay);
-
+			LOGGER.log(TraceLevel.INFO, "createConnection   nConnectionAttempts is: " + nConnectionAttempts + " delay " + delay);
 			try 
 			{
 				fHdfsClient = createHdfsClient();
 				fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
-				System.out.println("createConnection  connected to " +  fHdfsUri);
 				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
 
 				connected = true;
 				break;
 			} catch (Exception e) 
 			{
-				System.out.println("Connection failed " + e.toString());
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", e.toString()));
 				connected = false;
 				Thread.sleep(delay);
 			}
@@ -137,27 +135,38 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	}
 
 	private  void setupClassPaths(OperatorContext context) {
-		String HADOOP_HOME = System.getenv("HADOOP_HOME");
+
 		ArrayList<String> libList = new ArrayList<>();
-		
+		String HADOOP_HOME = System.getenv("HADOOP_HOME");
 		if (getLibPath() != null) {
 			String user_defined_path = getLibPath()+ "/*";
 			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
 			libList.add(user_defined_path);
-		} else if (HADOOP_HOME != null) {
-			libList.add(HADOOP_HOME + "/../hadoop-conf");
-			libList.add(HADOOP_HOME + "/etc/hadoop");
-			libList.add(HADOOP_HOME + "/conf");
-			libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
-			libList.add(HADOOP_HOME + "/share/hadoop/common/*");
-			libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
-			libList.add(HADOOP_HOME + "/lib/*");
-			libList.add(HADOOP_HOME + "/client/*");
-			libList.add(HADOOP_HOME + "/*");
-			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
-		} else {
+		} 
+		else
+		{ 
+			// add class path for delivered jar files from /impl/lib/ext/ directory
 			String default_dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
+			TRACE.log(TraceLevel.INFO, "Adding /impl/lib/ext/* to classpath");
 			libList.add(default_dir);
+
+			if (HADOOP_HOME != null) {
+				libList.add(HADOOP_HOME + "/../hadoop-conf");
+				libList.add(HADOOP_HOME + "/etc/hadoop");
+				libList.add(HADOOP_HOME + "/conf");
+				libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
+				libList.add(HADOOP_HOME + "/share/hadoop/common/*");
+				libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+				libList.add(HADOOP_HOME + "/lib/*");
+				libList.add(HADOOP_HOME + "/client/*");
+				libList.add(HADOOP_HOME + "/*");
+				libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+
+			}
+		} 
+		for (int i=0; i< libList.size(); i++)
+		{
+			TRACE.log(TraceLevel.INFO, "calss path list " + i + " : " + libList.get(i));
 		}
 
 		try {
