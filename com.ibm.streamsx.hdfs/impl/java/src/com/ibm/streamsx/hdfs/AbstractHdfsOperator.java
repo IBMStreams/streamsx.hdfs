@@ -9,6 +9,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hadoop.fs.Path;
 
@@ -28,7 +29,14 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private static final String SCHEME_HDFS = "hdfs";
 	private static final String SCHEME_GPFS = "gpfs";
 	private static final String SCHEME_WEBHDFS = "webhdfs";
+	public static final String RECONNPOLICY_NORETRY = "NoRetry";
+	public static final String RECONNPOLICY_BOUNDEDRETRY = "BoundedRetry";
+	public static final String RECONNPOLICY_INFINITERETRY = "InfiniteRetry";
+	public static final int RECONN_BOUND_DEFAULT = 5;
+	public static final double RECONN_INTERVAL_DEFAULT = 10;
 
+	
+	
 	/**
 	 * Create a logger specific to this class
 	 */
@@ -46,6 +54,20 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private String fCredFile;
 	private String fConfigPath;
 
+	private String fReconnectionPolicy = RECONNPOLICY_BOUNDEDRETRY;
+	// This optional parameter reconnectionBound specifies the number of successive connection
+	// that will be attempted for this operator.
+	// It can appear only when the reconnectionPolicy parameter is set to BoundedRetry
+	// and cannot appear otherwise.
+	// If not present the default value is 5
+	private int fReconnectionBound = RECONN_BOUND_DEFAULT;
+	// This optional parameter reconnectionInterval specifies the time period in seconds which
+	// the operator will be wait before trying to reconnect.
+	// If not specified, the default value is 10.0.
+	private double fReconnectionInterval = RECONN_INTERVAL_DEFAULT;
+
+	
+	
 	// Other variables
 	protected Thread processThread = null;
 	protected boolean shutdownRequested = false;
@@ -60,8 +82,48 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		super.initialize(context);
 		setupClassPaths(context);
 		processPolicyFilePath();
-		fHdfsClient = createHdfsClient();
-		fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
+		createConnection();
+	}
+
+
+	/** 
+         * createConnection creates a connection to thr hadoop file system.
+         *
+        */
+	private synchronized void createConnection() throws Exception {
+		boolean connected = false;
+		// Delay in miliseconds as specified in fReconnectionInterval parameter
+		final long delay = TimeUnit.MILLISECONDS.convert((long) fReconnectionInterval, TimeUnit.SECONDS);
+		System.out.println("createConnection  ReconnectionPolicy " +  fReconnectionPolicy 
+				+ "  ReconnectionBound " +  fReconnectionBound 
+				+ "  ReconnectionInterval " +  fReconnectionInterval);
+		if (fReconnectionPolicy == RECONNPOLICY_NORETRY) {
+			fReconnectionBound = 1;
+		}
+
+		if (fReconnectionPolicy == RECONNPOLICY_INFINITERETRY) {
+			fReconnectionBound = 9999;
+		}
+
+		for(int nConnectionAttempts=0; nConnectionAttempts<fReconnectionBound; nConnectionAttempts++)
+		{
+			LOGGER.log(TraceLevel.INFO, "createConnection   nConnectionAttempts is: " + nConnectionAttempts + " delay " + delay);
+			try 
+			{
+				fHdfsClient = createHdfsClient();
+				fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
+				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
+
+				connected = true;
+				break;
+			} catch (Exception e) 
+			{
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", e.toString()));
+				connected = false;
+				Thread.sleep(delay);
+			}
+		}
+
 	}
 
 	private void processPolicyFilePath() {
@@ -73,27 +135,38 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	}
 
 	private  void setupClassPaths(OperatorContext context) {
-		String HADOOP_HOME = System.getenv("HADOOP_HOME");
+
 		ArrayList<String> libList = new ArrayList<>();
-		
+		String HADOOP_HOME = System.getenv("HADOOP_HOME");
 		if (getLibPath() != null) {
 			String user_defined_path = getLibPath()+ "/*";
 			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
 			libList.add(user_defined_path);
-		} else if (HADOOP_HOME != null) {
-			libList.add(HADOOP_HOME + "/../hadoop-conf");
-			libList.add(HADOOP_HOME + "/etc/hadoop");
-			libList.add(HADOOP_HOME + "/conf");
-			libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
-			libList.add(HADOOP_HOME + "/share/hadoop/common/*");
-			libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
-			libList.add(HADOOP_HOME + "/lib/*");
-			libList.add(HADOOP_HOME + "/client/*");
-			libList.add(HADOOP_HOME + "/*");
-			libList.add(HADOOP_HOME + "/../hadoop-hdfs");
-		} else {
+		} 
+		else
+		{ 
+			// add class path for delivered jar files from /impl/lib/ext/ directory
 			String default_dir = context.getToolkitDirectory() +"/impl/lib/ext/*";
+			TRACE.log(TraceLevel.INFO, "Adding /impl/lib/ext/* to classpath");
 			libList.add(default_dir);
+
+			if (HADOOP_HOME != null) {
+				libList.add(HADOOP_HOME + "/../hadoop-conf");
+				libList.add(HADOOP_HOME + "/etc/hadoop");
+				libList.add(HADOOP_HOME + "/conf");
+				libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
+				libList.add(HADOOP_HOME + "/share/hadoop/common/*");
+				libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+				libList.add(HADOOP_HOME + "/lib/*");
+				libList.add(HADOOP_HOME + "/client/*");
+				libList.add(HADOOP_HOME + "/*");
+				libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+
+			}
+		} 
+		for (int i=0; i< libList.size(); i++)
+		{
+			TRACE.log(TraceLevel.INFO, "calss path list " + i + " : " + libList.get(i));
 		}
 
 		try {
@@ -204,6 +277,39 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fHdfsUser;
 	}
 
+	//Parameter reconnectionPolicy
+	@Parameter(optional = true, description="This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures.  The valid values are: `NoRetry`, `InfiniteRetry`, and `BoundedRetry`. The default value is `BoundedRetry`. If `NoRetry` is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again.  The operator shuts down at startup time if the initial connection attempt fails. If `BoundedRetry` is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times. The maximum number of connection attempts is specified in the **reconnectionBound** parameter.  The sequence of connection attempts occurs at startup time. If a connection does not exist, the sequence of connection attempts also occurs before each operator is run.  If `InfiniteRetry` is specified, the operator continues to try and connect indefinitely until a connection is made.  This behavior blocks all other operator operations while a connection is not successful.  For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.")
+	public void setReconnectionPolicy(String reconnectionPolicy){
+		this.fReconnectionPolicy = reconnectionPolicy;
+	}
+
+	public String getReconnectionPolicy() {
+		return fReconnectionPolicy;
+	}
+
+
+	//Parameter reconnectionBound
+	@Parameter(optional = true, description="This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs.  It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry`; otherwise, it is ignored. The default value is `5`.")
+	public void setReconnectionBound(int reconnectionBound){
+		this.fReconnectionBound = reconnectionBound;
+	}
+
+	public int getReconnectionBound() {
+		return fReconnectionBound;
+	}
+
+
+	//Parameter reconnectionInterval
+	@Parameter(optional = true, description="This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts.  It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry` or `InfiniteRetry`; othewise, it is ignored.  The default value is `10`.")
+	public void setReconnectionInterval(double reconnectionInterval){
+		this.fReconnectionInterval = reconnectionInterval;
+	}
+	
+	public double getReconnectionInterval() {
+		return fReconnectionInterval;
+	}
+	
+	
 	@Parameter(optional = true)
 	public void setAuthPrincipal(String authPrincipal) {
 		this.fAuthPrincipal = authPrincipal;
