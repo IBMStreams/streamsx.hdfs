@@ -5,7 +5,7 @@
                             
 .PHONY: all clean
 
-SPLC_FLAGS = -a -z -t ../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs  --data-directory data 
+SPLC_FLAGS = -a -t ../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs  --data-directory data 
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
