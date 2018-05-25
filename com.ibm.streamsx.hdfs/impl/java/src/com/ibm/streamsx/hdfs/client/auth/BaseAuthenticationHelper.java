@@ -10,9 +10,12 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.io.FileNotFoundException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import com.ibm.streams.operator.logging.LoggerNames;
@@ -111,7 +114,14 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri));
 			fs = FileSystem.get(hdfsUri, fConfiguration);
 		}
-		
+		// check if root path /user exist
+		try {
+			fs.exists(new Path( hdfsUri + "/user" ) );
+			throw new FileNotFoundException("Path not found.");
+		} catch (FileNotFoundException e) {
+			LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
+		}
+
 		return fs;
 	}
 	
