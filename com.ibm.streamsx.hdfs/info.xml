@@ -12,10 +12,9 @@
 The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
 
 The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
- * Apache Hadoop versions 2.x 
- * HDP 2.7.x
+ * Apache Hadoop versions 2.7 
  * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
- * Hortonworks Data Platform (HDP) 2.2
+ * Hortonworks Data Platform (HDP) Version 2.6 or higher
 
 Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 
