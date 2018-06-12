@@ -72,8 +72,8 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
  
 </description>
-    <version>4.0.0</version>
-    <requiredProductVersion>4.1.0.0</requiredProductVersion>
+    <version>4.1.0</version>
+    <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
 </toolkitInfoModel>
