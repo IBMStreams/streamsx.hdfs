@@ -19,22 +19,24 @@ The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The 
 Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 
 You can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
-for example
+for example:
  
       {  
 		     param
 			      hdfsUri "clsadmin": 
 			      hdfsUser: "webhdfs://your-hdfs-host-ip-address:8443";
 			      hdfsPassword: "PASSWORD";
-	 		      fileAttributeName : "filename" ;
+                  ...
+                  
       }
     
  Or "hdfs://your-hdfs-host-ip-address:8020" as hdfsUri
               
       {  
 		     param
-			      hdfsUri "clsadmin": 
+			      hdfsUri "hdfs": 
 			      hdfsUser: "hdfs://your-hdfs-host-ip-address:8020"
+                  ...
       }
              
               
@@ -50,7 +52,7 @@ or the SPL compiler to be aware of the location of the toolkit.
 # Before you begin
 
 * Install IBM InfoSphere Streams.  Configure the product environment variables by entering the following command: 
-      source product-installation-root-directory/4.2.4.0/bin/streamsprofile.sh
+      source product-installation-root-directory/streams-version/bin/streamsprofile.sh
 
 # About this task
 
@@ -61,17 +63,18 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 
 # Procedure
 
-1. If InfoSphere Streams has access to the impl/lib/ext where Hadoop librarires located.
-   The JAR laibraries will be download will be downloaded via maven. 
-   The new version of HDFS tookit doesn'nt need any Hadoop client installation.
+1. If InfoSphere Streams has access to the impl/lib/ext where Hadoop libraries located.
+   The JAR libraries will be download via maven. 
+   The new version of HDFS toolkit need not necessarily a Hadoop client installation.
 
 2. Build your application.  You can use the **sc** command or Streams Studio.  
 3. Start the InfoSphere Streams instance. 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
-
+ 
 </description>
     <version>4.0.0</version>
     <requiredProductVersion>4.1.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
 </toolkitInfoModel>
+
