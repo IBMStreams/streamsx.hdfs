@@ -15,6 +15,8 @@ Check out the binary read / write support!
 Check out the Cloud sample!
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CloudSample
 
+Kerberos configuration: 
+https://developer.ibm.com/hadoop/2016/08/18/overview-of-kerberos-in-iop-4-2/
 
 Getting started with development:
 * https://github.com/IBMStreams/streamsx.hdfs/wiki/Getting-Started-with-Developing-HDFS-Toolkit
