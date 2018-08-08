@@ -142,8 +142,7 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 
 		if (fIsDisconnected)
 			return false;
-
-		return fFileSystem.getFileStatus(new Path(filePath)).isDir();
+		return fFileSystem.getFileStatus(new Path(filePath)).isDirectory();
 	}
 	
 	@Override
