@@ -11,6 +11,11 @@
     <description>
 The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
 
+    *HDFS2FileSource*     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
+    *HDFS2FileSink*       This operator writes tuples that arrive on its input port to the output file that is named by the **file** parameter.   
+    *HDFS2DirectoryScan*  This operator repeatedly scans an HDFS directory and writes the names of new or 
+                          modified files that are found in the directory to the output port. The operator sleeps between scans.
+    
 The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
  * Apache Hadoop versions 2.7 
  * Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)
@@ -21,28 +26,55 @@ Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 You can access GPFS remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
 for example:
  
+      () as lineSink1 = HDFS2FileSink(LineIn)
       {  
-		     param
-			      hdfsUri "clsadmin": 
-			      hdfsUser: "webhdfs://your-hdfs-host-ip-address:8443";
-			      hdfsPassword: "PASSWORD";
-                  ...
+             param
+                  hdfsUri       : "clsadmin": 
+                  hdfsUser      : "webhdfs://your-hdfs-host-ip-address:8443";
+                  hdfsPassword  : "PASSWORD";
+                  file          : "LineInput.txt" ;
                   
       }
     
  Or "hdfs://your-hdfs-host-ip-address:8020" as hdfsUri
-              
+ 
+      () as lineSink1 = HDFS2FileSink(LineIn)
       {  
-		     param
-			      hdfsUri "hdfs": 
-			      hdfsUser: "hdfs://your-hdfs-host-ip-address:8020"
-                  ...
+             param
+                  hdfsUri  : "hdfs": 
+                  hdfsUser : "hdfs://your-hdfs-host-ip-address:8020"
+                  file     : "LineInput.txt" ;                  
       }
+ 
              
               
-              
+**Kerberos**             
 For Apache Hadoop 2.x, CDH, and HDP, you can optionally configure these operators to use the Kerberos protocol to authenticate users that read and write to HDFS. Kerberos authentication provides a more secure way of accessing HDFS by providing user authentication. To use Kerberos authentication, you must configure the **authPrincipal** and **authKeytab** operator parameters at compile time. The **authPrincipal** parameter specifies the Kerberos principal, which is typically the principal that is created for the Streams instance owner. The **authKeytab** parameter specifies the keytab file that is created for the principal.
+For **Kerberos** authentication it is required to create a Principal for a user and a keytab for this user.
+If you use ambari to configure your hadoop server, you can create principals and keytabs via ambari (Enable Kerberos).
+Copy the created keytab into local streams server for example in etc directory of your SPL application.
 
+Before you start your SPL application, you can check the keytab with **kinit** tool
+
+
+      kinit -k -t [KeytabPath] [Principal]
+      [KeytabPath] is the full path to the keytab file
+      For example 
+      kinit -k -t /home/streamsadmin/workspace/myproject/etc/hdfs.headless.keytab hdfs-hdp2@HDP2.COM
+
+In this case **HDP2.com** is the kerebors realm and the user is **hdfs**.
+
+Here is an SPL example to write a file into hadoop server with kerberos configuration. 
+
+        () as lineSink1 = HDFS2FileSink(LineIn)
+        {
+            param
+                authKeytab     : "etc/hdfs.headless.keytab" ;
+                authPrincipal  : "hdfs-hdp2@HDP2.COM" ;
+                configPath     : "etc" ;
+                file           : "LineInput.txt" ;
+        }
+ 
 
 + Developing and running applications that use the HDFS Toolkit
 
@@ -72,7 +104,7 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
  
 </description>
-    <version>4.1.0</version>
+    <version>4.3.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
