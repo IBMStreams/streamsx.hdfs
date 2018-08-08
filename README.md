@@ -9,7 +9,7 @@ Check out what's new with IBM Streams:
  * https://developer.ibm.com/streamsdev/2018
 
 Check out the binary read / write support!
-* https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/HDFSBinary
+* https://github.com/IBMStreams/streamsx.hdfs/tree/master/demos/HDFSBinary
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CompressedHdfsFiles
 
 Check out the Cloud sample!
