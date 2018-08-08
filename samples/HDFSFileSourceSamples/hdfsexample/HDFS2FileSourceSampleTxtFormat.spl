@@ -58,15 +58,18 @@ composite HDFS2FileSourceSampleTxtFormat {
 		stream<rstring lines> LineStream = HDFS2FileSource()
 		{
 			param
-				file : "TxtFile.txt" ;
+				file : "txtFile.txt" ;
 		}
+
 
 		//convert the LineStream into txt format and write to a file
 		stream<PersonSchema> tupleValue = Custom(LineStream)
 		{
 			logic
-				onTuple LineStream : submit((tuple<PersonSchema>) LineStream.lines,
-					tupleValue) ;
+				onTuple LineStream : {
+					printStringLn(lines);					
+					submit((tuple<PersonSchema>) LineStream.lines, tupleValue) ;
+				}
 		}
 
 		// write content of file to "TxtSink.txt" in the sample's data directory

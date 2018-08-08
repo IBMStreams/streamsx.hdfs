@@ -52,11 +52,15 @@ composite HDFS2FileSourceSampleLineFormat
 		stream<rstring lines> LineStream = HDFS2FileSource()
 		{
 			param
-				file : "LineFile.txt" ;
+				file : "LineInput.txt" ;
 		} 
 
 		() as MySink = FileSink(LineStream)
 		{
+			logic
+				onTuple LineStream : 
+					printStringLn(lines);
+					
 			param
 				file : "LineSink.txt" ;
 				flush : 1u ;
