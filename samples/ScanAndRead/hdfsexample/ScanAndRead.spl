@@ -26,6 +26,17 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  *  * <HADOOP_HOME>/bin/hadoop fs -mkdir /user/<userid>/testDirectory
  * 1. Copy a few files from local file system to the testDirectory on HDFS:
  *  * <HADOOP_HOME>/bin/hadoop fs -copyFromLocal <localFile> /user/<userid>/testDirectory
+ * 
+ * For example
+ * login as root on hadoop server
+ * useradd streamsadmin
+ * su - hdfs
+ * hadoop fs -mkdir /user/streamsadmin
+ * hadoop fs -mkdir /user/streamsadmin/testDirectory
+ * hadoop fs -copyFromLocal test1.txt /user/streamsadmin/testDirectory
+ * hadoop fs -copyFromLocal test2.txt /user/streamsadmin/testDirectory
+ * hadoop fs -chown -R  streamsadmin:streamsadmin /user/streamsadmin/
+ * Now you have two files in hadoop file system in directory /user/streamsadmin/testDirectory
  *
  * To compile and run this sample in Streams Studio:
  * 1. Start IBM Streams Studio
@@ -56,8 +67,8 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 composite ScanAndRead
 {
 	param 
-		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://10.6.25.164:8020"); //format hdfs://host:port
-		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "hbase"); 
+		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://9.30.253.149:8020"); //format hdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "streamsadmin"); 
  
 	graph
  
@@ -70,6 +81,15 @@ composite ScanAndRead
 				hdfsUser	: $hdfsUser;
 		}
 
+		() as printFileName = Custom(FileNameStream1)
+		{
+			logic
+				onTuple FileNameStream1 : 
+					printStringLn(fileNames);					
+		}
+
+
+
 		// use the file name from directory scan to read the file
 		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
 		{
@@ -81,6 +101,9 @@ composite ScanAndRead
 		// write out content of file in the "FileContents.txt" file in data directory
 		() as LineSink1 = FileSink(LineStream)
 		{
+			logic
+				onTuple LineStream : 
+					printStringLn(lines);					
 			param
 				file : "FileContents.txt" ;
 				flush: 1u;

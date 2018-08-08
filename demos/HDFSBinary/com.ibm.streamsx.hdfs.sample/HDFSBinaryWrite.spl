@@ -28,6 +28,12 @@ composite HDFSBinaryWrite
 		}
 		
 		() as localCSVSink = FileSink(Tuples) {
+	          logic
+	                onTuple Tuples :
+	                {
+	                    printStringLn(message + " " + (rstring)aFloat + " "  + (rstring)anInt ) ;
+	                }
+
 			param file: "write_local.csv";
 		}
 

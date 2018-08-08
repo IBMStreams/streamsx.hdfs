@@ -10,7 +10,7 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  * First run HDFSBinaryWrite, which will create the write-remote.bin file.
  * Then run this application.
  */
-composite CheckHDFSRead
+composite HDFSBinaryRead
 {
 	graph
 
@@ -40,6 +40,11 @@ composite CheckHDFSRead
 		// The read as converted back to text format.
 		() as localTupleWrite = FileSink(Tuples)
 		{
+	          logic
+	                onTuple Tuples :
+	                {
+	                    printStringLn(message + " " + (rstring)aFloat + " "  + (rstring)anInt ) ;
+	                }
 			param
 				file : "read_local.txt" ;
 		}
