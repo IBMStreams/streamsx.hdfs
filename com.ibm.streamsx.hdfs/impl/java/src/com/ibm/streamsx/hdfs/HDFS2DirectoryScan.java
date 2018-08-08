@@ -73,7 +73,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 	private ConsistentRegionContext crContext;
 
-	private long fLastTimestamp;
+//	private long fLastTimestamp;
 	private String fInitialDir;
 
 	// timestamp and filename of last submitted file

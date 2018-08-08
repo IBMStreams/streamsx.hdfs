@@ -30,7 +30,7 @@ composite Main
 {
 	param
 		expression<rstring> $baseDir : getSubmissionTimeValue("hadoopDir", "") ;
-		expression<uint32> $numTuples : 10000000u ;
+		expression<uint32> $numTuples : 100u ;
 		expression<int32> $numParallelCopies :(int32) getSubmissionTimeValue("width",
 			"3") ;
 	graph
@@ -46,6 +46,18 @@ composite Main
 				SourceStream : data = "This is line number " +(rstring)(numTuples ++) +
 					" of " +(rstring) $numTuples ;
 		}
+
+		() as localSink = FileSink(SourceStream) {
+	          logic
+	                onTuple SourceStream :
+	                {
+	                    printStringLn(data);
+	                }
+
+			param file: "write_local.txt";
+		}
+
+
 
 		// Note the use of getChannel() in the filename.
 		@parallel(width = $numParallelCopies)

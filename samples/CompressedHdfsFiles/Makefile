@@ -3,13 +3,19 @@
 # others. All Rights Reserved. 
 #####################################################################     
                             
-.PHONY: all clean
+PHONY: all 
 
-SPLC_FLAGS = -a -t ../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs  --data-directory data 
+TOOLKIT_NAME=com.ibm.streamsx.hdfs
+STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
+			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
+
+SPLC_FLAGS = -a --data-directory data
+
+SPL_CMD_ARGS ?= -t $(STREAMS_HDFS_TOOLKIT)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
-
-SPL_CMD_ARGS ?=
 SPL_COMP1NAME=Read
 SPL_COMP2NAME=Write
 SPL_MAIN_COMPOSITE1 = com.ibm.streamsx.hdfs.sample::$(SPL_COMP1NAME)

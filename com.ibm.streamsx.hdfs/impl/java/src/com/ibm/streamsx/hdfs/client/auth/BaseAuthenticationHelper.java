@@ -14,8 +14,8 @@ import java.io.FileNotFoundException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FsStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import com.ibm.streams.operator.logging.LoggerNames;
@@ -116,8 +116,16 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 		// check if root path /user exist
 		try {
-			fs.exists(new Path( hdfsUri + "/user" ) );
-			throw new FileNotFoundException("Path not found.");
+			if (!fs.exists(new Path( hdfsUri + "/user" ))) {
+				throw new FileNotFoundException("Path not found.");
+			}
+			else{
+				FsStatus fsStatus = fs.getStatus();
+				LOGGER.log(TraceLevel.INFO, "Number of remaining bytes on the file system: " + fsStatus.getRemaining());
+				System.out.println("Filysytem URL " + fs.getUri());
+			}
+				
+			
 		} catch (FileNotFoundException e) {
 			LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
 		}

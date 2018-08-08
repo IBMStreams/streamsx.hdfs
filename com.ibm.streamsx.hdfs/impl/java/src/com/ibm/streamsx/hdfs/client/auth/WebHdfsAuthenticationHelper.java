@@ -10,7 +10,6 @@ import java.net.URI;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -19,9 +18,7 @@ import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public class WebHdfsAuthenticationHelper extends BaseAuthenticationHelper {
 
-	private static Logger logger = Logger
-			.getLogger("WebHdfsAuthenticationHelper.class");
-
+	
 	public WebHdfsAuthenticationHelper() {
 		super();
 	}

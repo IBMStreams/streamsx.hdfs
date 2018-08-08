@@ -16,22 +16,26 @@ use com.ibm.streamsx.hdfs::* ;
 composite Write
 {
 	param
-	expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri");
+	expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://9.30.253.149:8020");
 
 	graph
-		stream<rstring message, int32 tupleNumber, float64 afloat> DataStream =
+		stream<rstring message, int32 anInt, float64 aFloat> DataStream =
 			Beacon()
 		{
 			param
-				iterations : 10000000 ;
+				iterations : 1000;
+// for test a big file		iterations : 1000000;
 			output
 				DataStream : message = "This is tuple number " +(rstring) IterationCount(),
-					tupleNumber =(int32) IterationCount(), afloat = sqrt((float64)
+					anInt =(int32) IterationCount(), aFloat = sqrt((float64)
 					IterationCount()) ;
 		}
 
 		() as refSink = FileSink(DataStream)
 		{
+			logic
+				onTuple DataStream : 
+					printStringLn(message + " " + (rstring) anInt + " " + (rstring) aFloat);					
 			param
 				file : "reference.csv" ;
 		}

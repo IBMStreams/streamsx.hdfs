@@ -21,7 +21,22 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
  * 1. Copy a few files from local file system to the testDirectory on HDFS:
  *  * <HADOOP_HOME>/bin/hadoop fs -copyFromLocal <localFile> /user/<userid>/testDirectory
  * 1. Create a second directory named "newDirectory" in HDFS and also copy a few files into that directory.  
- * 
+ * * For example
+ * login as root on hadoop server
+ * useradd streamsadmin
+ * su - hdfs
+ * hadoop fs -mkdir /user/streamsadmin
+ * hadoop fs -mkdir /user/streamsadmin/testDirectory
+ * hadoop fs -mkdir /user/streamsadmin/newDirectory
+ * hadoop fs -copyFromLocal test1.txt /user/streamsadmin/testDirectory
+ * hadoop fs -copyFromLocal test2.txt /user/streamsadmin/testDirectory
+ * hadoop fs -copyFromLocal test3.txt /user/streamsadmin/newDirectory
+ * hadoop fs -copyFromLocal test4.txt /user/streamsadmin/newDirectory
+ * hadoop fs -copyFromLocal test5.txt /user/streamsadmin/newDirectory
+ * hadoop fs -chown -R  streamsadmin:streamsadmin /user/streamsadmin/
+ * Now you have two files in hadoop file system in directory /user/streamsadmin/testDirectory
+ * and 3 files in /user/streamsadmin/newDirectory
+ *
  * To compile and run this sample in Streams Studio:
  * 1. Start Streams Studio
  * 1. In Streams Explorer view, add the "com.ibm.streams.bigdata" toolkit as one of the toolkit locations
@@ -52,8 +67,8 @@ use com.ibm.streamsx.hdfs::HDFS2FileSource ;
 composite ScanAndReadWithInputPort
 {
 	param
-		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://10.6.25.164:8020"); //format hdfs://host:port
-		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "hbase"); 
+		expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://9.30.253.149:8020"); //format hdfs://host:port
+		expression<rstring> $hdfsUser : getSubmissionTimeValue("hdfsUser", "streamsadmin"); 
 
 	graph
 
@@ -89,7 +104,16 @@ composite ScanAndReadWithInputPort
 				directory	: "testDirectory" ;
 				hdfsUri		: $hdfsUri;
 				hdfsUser	: $hdfsUser;
-	}
+		}
+
+
+		() as printFileName = Custom(FileNameStream1)
+		{
+			logic
+				onTuple FileNameStream1 : 
+					printStringLn(fileNames);					
+		}
+
 		
 		// read file discovered by directory scan
 		stream<rstring lines> LineStream = HDFS2FileSource(FileNameStream1)
@@ -102,6 +126,9 @@ composite ScanAndReadWithInputPort
 		// write content of files to "FileContentsInputPort.txt" in sample's data directory
 		() as LineSink1 = FileSink(LineStream)
 		{
+			logic
+				onTuple LineStream : 
+					printStringLn(lines);					
 			param
 				file : "FileContentsInputPort.txt" ;
 		}
