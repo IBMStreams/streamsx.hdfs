@@ -5,23 +5,12 @@
 package com.ibm.streamsx.hdfs.client.auth;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FsStatus;
 import org.apache.hadoop.fs.LocalFileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 
 import com.ibm.streams.operator.logging.TraceLevel;
-import com.ibm.streamsx.hdfs.HDFSOperatorUtils;
 import com.ibm.streamsx.hdfs.IHdfsConstants;
-import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;

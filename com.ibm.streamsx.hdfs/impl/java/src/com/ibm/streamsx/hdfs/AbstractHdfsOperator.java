@@ -26,9 +26,9 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AbstractHdfsOperator";
 	public static final String EMPTY_STR = "";
 
-	private static final String SCHEME_HDFS = "hdfs";
-	private static final String SCHEME_GPFS = "gpfs";
-	private static final String SCHEME_WEBHDFS = "webhdfs";
+//	private static final String SCHEME_HDFS = "hdfs";
+//	private static final String SCHEME_GPFS = "gpfs";
+//	private static final String SCHEME_WEBHDFS = "webhdfs";
 	public static final String RECONNPOLICY_NORETRY = "NoRetry";
 	public static final String RECONNPOLICY_BOUNDEDRETRY = "BoundedRetry";
 	public static final String RECONNPOLICY_INFINITERETRY = "InfiniteRetry";
@@ -87,11 +87,10 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 
 	/** 
-         * createConnection creates a connection to thr hadoop file system.
+         * createConnection creates a connection to the hadoop file system.
          *
         */
 	private synchronized void createConnection() throws Exception {
-		boolean connected = false;
 		// Delay in miliseconds as specified in fReconnectionInterval parameter
 		final long delay = TimeUnit.MILLISECONDS.convert((long) fReconnectionInterval, TimeUnit.SECONDS);
 		System.out.println("createConnection  ReconnectionPolicy " +  fReconnectionPolicy 
@@ -113,13 +112,10 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 				fHdfsClient = createHdfsClient();
 				fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
-
-				connected = true;
 				break;
 			} catch (Exception e) 
 			{
 				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", e.toString()));
-				connected = false;
 				Thread.sleep(delay);
 			}
 		}
@@ -151,16 +147,21 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 			libList.add(default_dir);
 
 			if (HADOOP_HOME != null) {
-				libList.add(HADOOP_HOME + "/../hadoop-conf");
-				libList.add(HADOOP_HOME + "/etc/hadoop");
-				libList.add(HADOOP_HOME + "/conf");
-				libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
-				libList.add(HADOOP_HOME + "/share/hadoop/common/*");
-				libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+				// if no config path and no HdfsUri is defined it checks the HADOOP_HOME/config
+				// directory for default core-site.xml file
+				if((getConfigPath() == null) && (getHdfsUri() == null))
+				{
+					libList.add(HADOOP_HOME + "/conf");
+					libList.add(HADOOP_HOME + "/../hadoop-conf");
+					libList.add(HADOOP_HOME + "/etc/hadoop");
+					libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
+					libList.add(HADOOP_HOME + "/share/hadoop/common/*");
+					libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
+					libList.add(HADOOP_HOME + "/*");
+					libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+				}
 				libList.add(HADOOP_HOME + "/lib/*");
 				libList.add(HADOOP_HOME + "/client/*");
-				libList.add(HADOOP_HOME + "/*");
-				libList.add(HADOOP_HOME + "/../hadoop-hdfs");
 
 			}
 		} 
@@ -171,7 +172,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 		try {
 			context.addClassLibraries(libList.toArray(new String[0]));
-
+	
 		} catch (MalformedURLException e) {
 			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR",  e);
 		}
