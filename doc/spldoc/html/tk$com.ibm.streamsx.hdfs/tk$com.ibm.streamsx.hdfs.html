@@ -32,7 +32,13 @@
 <p class="p">The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
 </p>
 
-<p class="p"><strong class="ph b">HDFS2FileSource</strong>     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.   <strong class="ph b">HDFS2FileSink</strong>       This operator writes tuples that arrive on its input port to the output file that is named by the <strong class="ph b">file</strong> parameter.    <strong class="ph b">HDFS2DirectoryScan</strong>  This operator repeatedly scans an HDFS directory and writes the names of new or modified files that are found in the directory to the output port. The operator sleeps between scans.
+<p class="p"><strong class="ph b">HDFS2FileSource</strong>     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
+</p>
+
+<p class="p"><strong class="ph b">HDFS2FileSink</strong>       This operator writes tuples that arrive on its input port to the output file that is named by the <strong class="ph b">file</strong> parameter.   
+</p>
+
+<p class="p"><strong class="ph b">HDFS2DirectoryScan</strong>  This operator repeatedly scans an HDFS directory and writes the names of new or modified files that are found in the directory to the output port. The operator sleeps between scans.
 </p>
 
 <div class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
@@ -117,10 +123,10 @@
 </p>
 
 <div class="p">
-<pre class="pre codeblock">
-  https://developer.ibm.com/hadoop/2016/08/18/overview-of-kerberos-in-iop-4-2/
-</pre>
+<ul class="ul">
+<li class="li"> https://developer.ibm.com/hadoop/2016/08/18/overview-of-kerberos-in-iop-4-2</li>
 
+</ul>
 
 </div>
 
