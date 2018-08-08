@@ -2,22 +2,33 @@
 # Copyright (C)2014, 2018 International Business Machines Corporation and 
 # others. All Rights Reserved. 
 #####################################################################
+##################################################################### 
+# Copyright (C)2014, 2018 International Business Machines Corporation and 
+# others. All Rights Reserved. 
+#####################################################################     
+                            
+PHONY: all 
 
-SPLC_FLAGS = -a -z -t ../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs
+TOOLKIT_NAME=com.ibm.streamsx.hdfs
+STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
+			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
+
+SPLC_FLAGS = -a --data-directory data
+
+SPL_CMD_ARGS ?= -t $(STREAMS_HDFS_TOOLKIT)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
-
-SPL_CMD_ARGS ?=
 SPL_MAIN_COMPOSITE = parallelwrite::Main
 BUILD_OUTPUT_DIR = output
-SOURCES = parallelwrite/Main.spl
-
-all: output/Main/parallelwrite.Main.adl
 
 
-output/Main/parallelwrite.Main.adl: $(SOURCES)
-	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR)/Main $(SPL_CMD_ARGS)
+all: data
+	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR) $(SPL_CMD_ARGS)
 
+data:
+	mkdir data
 clean: 
-	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE)
-	-rm -rf toolkit.xml
+	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR)
+

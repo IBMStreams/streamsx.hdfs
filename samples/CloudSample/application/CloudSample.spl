@@ -27,16 +27,16 @@
  * @param hdfsPassword Password to connect to HDFS.
  * @param directory directory to read and write files.
  */
-
+namespace application ;
 use com.ibm.streamsx.hdfs::* ;
 
 composite CloudSample
 {
     param
-        expression<rstring> $hdfsUri      : getSubmissionTimeValue("hdfsUri", "webhdfs://169.73.137.126:8443") ;
+        expression<rstring> $hdfsUri      : getSubmissionTimeValue("hdfsUri", "webhdfs://chs-bwd-506-mn001.bi.services.eu-gb.bluemix.net:8443") ;
         expression<rstring> $hdfsUser     : getSubmissionTimeValue("hdfsUser", "clsadmin") ;
         expression<rstring> $hdfsPassword : getSubmissionTimeValue("hdfsPassword", "IAE-Password") ;
-        expression<rstring> $directory : getSubmissionTimeValue("directory", "testDirectory") ;
+        expression<rstring> $directory    : getSubmissionTimeValue("directory", "testDirectory") ;
 
     graph
 
