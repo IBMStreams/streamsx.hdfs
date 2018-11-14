@@ -16,5 +16,8 @@ sidebar:
 
 [SPLDoc for the com.ibm.streamsx.hdfs toolkit](https://ibmstreams.github.io/streamsx.hdfs/doc/spldoc/html/index.html)
 
+## kerberos authentication
+[How to use kerberos authentication](https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-use-kerberos-authentication-in-streamsx.hdfs-toolkit)
+
 
 
