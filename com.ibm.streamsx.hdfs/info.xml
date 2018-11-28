@@ -123,9 +123,16 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 2. Build your application.  You can use the **sc** command or Streams Studio.  
 3. Start the InfoSphere Streams instance. 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
+
+++ What is new in version 4.3.0
+
+* The operator HDFS2FileSink provides a new parameter 'tempFile'.
+  
+The 'tempFile' parameter specifies the name of the file that the operator writes to. When the file is closed the file is renamed to the final filename defined by the **file** parameter.
+
  
 </description>
-    <version>4.2.0</version>
+    <version>4.3.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
