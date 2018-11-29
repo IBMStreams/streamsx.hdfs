@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
+* Copyright (C) 2017, International Business Machines Corporation
 * All Rights Reserved
 *******************************************************************************/
 
@@ -35,6 +35,5 @@ public interface IHdfsConstants {
 	public static final String KNOX_USER = "knox.user";
 	public static final String KEYSTORE = "keystore_path";
 	public static final String KEYSTORE_PASSWORD = "keystore_password";
-	
 	
 }

@@ -31,11 +31,13 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 	@Override
 	public void connect(String fileSystemUri, String hdfsUser, String configPath)
 			throws Exception {
+		System.out.println("AbstractHdfsClient connect  " + fileSystemUri + " " + hdfsUser + " " + configPath + " " + getConnectionProperties());
 		fAuthHelper = AuthenticationHelperFactory.createAuthenticationHelper(fileSystemUri, hdfsUser, configPath);
 		fFileSystem = fAuthHelper.connect(fileSystemUri, hdfsUser, getConnectionProperties());
-		
+		// check if the filesystem is available
+		fFileSystem.getStatus();
 	}
-	
+		
 	@Override
 	public InputStream getInputStream(String filePath) throws IOException {
 		if (fIsDisconnected) {
@@ -110,12 +112,37 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 	}
 
 	@Override
-	public boolean isDirectory(String filePath) throws IOException {
+	public boolean rename(String src, String dst) throws IOException {
 
 		if (fIsDisconnected)
 			return false;
 
-		return fFileSystem.getFileStatus(new Path(filePath)).isDir();
+		Path srcPath = new Path(src);
+		Path dstPath = new Path(dst);
+		Path parentPath = dstPath.getParent();
+		if (parentPath != null) {
+			if ( ! fFileSystem.mkdirs(parentPath)) {
+				return false;
+			}
+		}
+		return fFileSystem.rename(srcPath, dstPath);
+	}
+
+	@Override
+	public boolean delete(String filePath, boolean recursive) throws IOException {
+		if (fIsDisconnected)
+			return false;
+		
+		Path f = new Path(filePath);
+		return fFileSystem.delete(f, recursive);
+	}
+
+	@Override
+	public boolean isDirectory(String filePath) throws IOException {
+
+		if (fIsDisconnected)
+			return false;
+		return fFileSystem.getFileStatus(new Path(filePath)).isDirectory();
 	}
 	
 	@Override

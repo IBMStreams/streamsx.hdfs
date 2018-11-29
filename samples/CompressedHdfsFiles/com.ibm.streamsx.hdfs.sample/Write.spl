@@ -1,0 +1,63 @@
+namespace com.ibm.streamsx.hdfs.sample;
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
+use com.ibm.streamsx.hdfs::* ;
+
+/**
+ * Write compressed data into HDFS using Compress and Format operators.
+ * 
+ * This example shows how to write a compressed file into HDFS.  
+ * * We generate synthetic data Beacon operator,
+ * * Use the Format operator to put the tuples in csv format
+ * * Compress the data with the Compress operator
+ * * Write the compressed data to HDFS with HDFS2FileSink.
+ * 
+ * To run, you need to supply an hdfsUri
+ */
+composite Write
+{
+	param
+	expression<rstring> $hdfsUri : getSubmissionTimeValue("hdfsUri", "hdfs://9.30.253.149:8020");
+
+	graph
+		stream<rstring message, int32 anInt, float64 aFloat> DataStream =
+			Beacon()
+		{
+			param
+				iterations : 1000;
+// for test a big file		iterations : 1000000;
+			output
+				DataStream : message = "This is tuple number " +(rstring) IterationCount(),
+					anInt =(int32) IterationCount(), aFloat = sqrt((float64)
+					IterationCount()) ;
+		}
+
+		() as refSink = FileSink(DataStream)
+		{
+			logic
+				onTuple DataStream : 
+					printStringLn(message + " " + (rstring) anInt + " " + (rstring) aFloat);					
+			param
+				file : "reference.csv" ;
+		}
+
+		stream<blob ablob> BlobStream = Format(DataStream)
+		{
+			param
+				format : csv ;
+			output
+				BlobStream : ablob = Output() ;
+		}
+
+		stream<blob ablob> CompressedStream = Compress(BlobStream)
+		{
+			param
+				compression : gzip ;
+		}
+
+		() as hdfsSink = HDFS2FileSink(CompressedStream)
+		{
+			param
+				file : "testCompress.gz" ;
+				hdfsUri : $hdfsUri;
+		}
+}

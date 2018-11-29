@@ -1,0 +1,59 @@
+namespace com.ibm.streamsx.hdfs.sample;
+
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
+
+/**
+ * Demonstrate how to use HDFS2FileSink to write a binary file.
+ * 
+ * This composite generates tuples, and then writes them out in three ways:
+ * * to the local file system in csv format
+ * * to the local file system in a spl's binary format
+ * * to the remote file system in spl's binary format
+ * 
+ * After running the composite, the file write_local.bin (in the data directory) and
+ * write_remote.bin (on HDFS) are identical.
+ * 
+ */
+composite HDFSBinaryWrite
+{
+	graph
+		stream<rstring message, float32 aFloat, int32 anInt> Tuples = Beacon()
+		{
+			param
+				iterations : 1000 ;
+			output
+				Tuples : message = "This is tuple number " +(rstring) IterationCount(),
+					aFloat = sqrt((float32) IterationCount()), anInt =(int32) IterationCount()
+					*(int32) IterationCount() ;
+		}
+		
+		() as localCSVSink = FileSink(Tuples) {
+	          logic
+	                onTuple Tuples :
+	                {
+	                    printStringLn(message + " " + (rstring)aFloat + " "  + (rstring)anInt ) ;
+	                }
+
+			param file: "write_local.csv";
+		}
+
+		stream<blob myData> BinaryTuples = Format(Tuples)
+		{
+			param format: bin;
+			output
+				BinaryTuples : myData = Output() ;
+		}
+
+		() as localFileSink = FileSink(BinaryTuples)
+		{
+			param
+				file : "write_local.bin" ;
+		}
+
+		() as remoteSink = HDFS2FileSink(BinaryTuples)
+		{
+			param
+				file : "write_remote.bin" ;
+		}
+
+}

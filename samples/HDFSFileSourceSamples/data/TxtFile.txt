@@ -1,0 +1,16 @@
+{id=1,fname="Tasos",lname="Kementsietsidis",age=35,gender="M",score=78.3,total=349.3}
+{id=2,fname="Lipyeow",lname="Lim",age=31,gender="M",score=23.2,total=235.3}
+{id=3,fname="Min",lname="Wang",age=29,gender="F",score=29.3,total=923.3}
+{id=4,fname="Mike",lname="Ward",age=31,gender="M",score=33.3,total=912.3}
+{id=5,fname="Daby",lname="Sow",age=30,gender="M",score=98.3,total=476.3}
+{id=6,fname="Marion",lname="Blount",age=22,gender="M",score=75.3,total=834.3}
+{id=7,fname="Kyriakos",lname="Karenos",age=20,gender="M",score=12.3,total=923.3}
+{id=8,fname="Petros",lname="Zerfos",age=20,gender="M",score=93.2,total=473.3}
+{id=9,fname="Aktina",lname="Stathaki",age=40,gender="F",score=57.3,total=523.3}
+{id=10,fname="Fanis",lname="Tsandilas",age=22,gender="M",score=11.2,total=924.3}
+{id=11,fname="Anastasia",lname="Bezerianos",age=55,gender="F",score=63.2,total=247.3}
+{id=12,fname="Giorgos",lname="Katsirelos",age=34,gender="M",score=41.3,total=347.3}
+{id=13,fname="Yannis",lname="Velegrakis",age=30,gender="M",score=12.3,total=743.3}
+{id=14,fname="Cristiana",lname="Chitic",age=30,gender="F",score=93.2,total=663.3}
+{id=15,fname="Georgia",lname="Papakleov",age=28,gender="F",score=12.1,total=549.3}
+{id=16,fname="Kyriaki",lname="Levanti",age=26,gender="F",score=73.8,total=349.3}

@@ -1,0 +1,120 @@
+
+/*******************************************************************************
+* Copyright (C) 2014, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/   
+namespace hdfsexample ;
+
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
+
+/**
+ * Returns a filename for a particular iteration.
+ * 
+ * This function is provided to demonstrate one way of using the dynamic filename
+ * feature.  In a more realistic usecase, you'd probably call such a file on a full
+ * tuple, and use fields of the tuple to generate a file name.  remember, though, that
+ * this is called for every tuple, so you want to avoid heavy-weight operations.
+ */
+rstring getFileName(uint64 n)
+{
+	uint64 fileNum = n /(uint64) 30u ;
+	if(fileNum ==(uint64) 0)
+	{
+		return "firstFile" ;
+	}
+
+	else if(fileNum ==(uint64) 1)
+	{
+		return "secondFile" ;
+	}
+
+	else if(fileNum ==(uint64) 2)
+	{
+		return "thirdFile" ;
+	}
+
+	else if(fileNum ==(uint64) 3)
+	{
+		return "fourthFile" ;
+	}
+
+	else
+	{
+	// Watership down joke 
+		return "HrairFile" ;
+	}
+
+}
+
+/**
+ * Demonstrates the use of the dynamicFilename parameter.
+ * 
+ * In this composite, the Beacon operator produces tuples with two attributes. 
+ * The first is the data to be written, and the second is the name to use to write
+ * it.  
+ * When this second attribute changes (and only then), the current file is closed,
+ * and the file name is re-evaluated.  
+ * 
+ * In this example, the Beacon produces 100 tuples.  We call the function getFileName
+ * to get the prefix to use for the file, and then also append a filenum and the time.
+ * For example, for the first thirty tuples, the filename expression is 
+ * firstFile%FILENUM_%TIME.txt
+ * 
+ * Notice that while the time is different for each of those thirty tuples, the string
+ * substituations only happen on the *first* tuple, and all subsequent tuples with the same
+ * string go into the same file.  
+ * 
+ * The result of the running writes four files.  My four files are below
+ * (when you run, your times will be different):
+ * <code>
+ * "firstFile0_20140611_140008.txt",710
+ * "secondFile1_20140611_140038.txt",720
+ * "thirdFile2_20140611_140108.txt",720
+ * "fourthFile3_20140611_140138.txt",240
+ * </code>
+ */
+composite DynamicFilename
+{
+	graph
+		stream<rstring toWrite, rstring filename> sinkStream = Beacon()
+		{
+			param
+				iterations : 100 ;
+				period : 1.0 ;
+			output
+				sinkStream : toWrite = "This is tuple number " +(rstring) IterationCount(),
+					filename = getFileName(IterationCount()) + "%FILENUM_%TIME.txt" ;
+		}
+
+		stream<rstring filename, uint64 size> namesWritten = HDFS2FileSink(sinkStream)
+		{
+			param
+				fileAttributeName : "filename" ;
+		}
+
+		() as filesWritten = FileSink(namesWritten)
+		{
+			param
+				file : "names.csv" ;
+		}
+
+		// Now, let's have the filename be the first attribute and the data be the second.
+		stream<rstring filename, rstring toWrite> reversed = Functor(sinkStream)
+		{
+			output
+				reversed : filename = "rev_" + filename ;
+		}
+
+		stream<rstring filename, uint64 size> namesWritten2 = HDFS2FileSink(reversed)
+		{
+			param
+				fileAttributeName : "filename" ;
+		}
+
+		() as filesWritten2 = FileSink(namesWritten2)
+		{
+			param
+				file : "names2.csv" ;
+		}
+
+}
