@@ -73,7 +73,7 @@ gg=="
     ><g visibility="hidden" style="stroke:none;font-style:italic;font-size:12px;font-family:&apos;Helvetica&apos;,&apos;SansSerif&apos;;"
     ><rect x="47.65" y="15.0" width="384.65997" style="fill:rgb(230,230,255);stroke:rgb(0,0,80);" rx="2.0" ry="2.0" height="92.0"
       /><text x="48.65" y="28.0"
-      >Optional: file, timeFormat, hdfsUri, bytesPerFile, </text
+      >Optional: file, tempFile, timeFormat, hdfsUri, bytesPerFile, </text
       ><text x="48.65" y="43.0"
       >tuplesPerFile, closeOnPunct, fileAttributeName, </text
       ><text x="48.65" y="58.0"
