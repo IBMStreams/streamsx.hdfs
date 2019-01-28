@@ -1,0 +1,44 @@
+Overview
+========
+
+Provides functions to access files on HDFS. For example, connect to IBM Analytics Engine on IBM Cloud.
+This package exposes the `com.ibm.streamsx.hdfs` toolkit as Python methods.
+
+* `IBM Streaming Analytics <https://www.ibm.com/cloud/streaming-analytics>`_
+* `IBM Analytics Engine <https://www.ibm.com/cloud/analytics-engine>`_
+
+
+Sample
+======
+
+A simple hello world example of a Streams application writing string messages to
+a file to HDFS. Scan for created file on HDFS and read the content::
+
+    from streamsx.topology.topology import *
+    from streamsx.topology.schema import CommonSchema, StreamSchema
+    from streamsx.topology.context import submit
+    import streamsx.hdfs as hdfs
+
+    topo = Topology('HDFSHelloWorld')
+
+    to_hdfs = topo.source(['Hello', 'World!'])
+    to_hdfs = to_hdfs.as_string()
+   
+    # Write a stream to HDFS
+    hdfs.write(to_hdfs, '/sample/hw.txt')
+
+    scanned = hdfs.scan(topo, directory='/sample')
+    
+    # read text file line by line
+    r = hdfs.read(scanned)
+    
+    # print each line (tuple)
+    r.print()
+
+    submit('STREAMING_ANALYTICS_SERVICE', topo)
+
+
+Documentation
+=============
+
+* `streamsx.hdfs package documentation <http://streamsxhdfs.readthedocs.io/en/pypackage/>`_
