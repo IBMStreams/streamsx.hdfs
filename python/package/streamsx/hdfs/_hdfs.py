@@ -11,11 +11,19 @@ from streamsx.topology.schema import CommonSchema, StreamSchema
 from streamsx.spl.types import rstring
 from urllib.parse import urlparse
 
+
+FileInfoSchema = StreamSchema('tuple<rstring fileName, uint64 fileSize>')
+"""Structured schema of the file write response tuple. This schema is the output schema of the write method.
+
+``'tuple<rstring fileName, uint64 fileSize>'``
+"""
+
 def _read_ae_service_credentials(credentials):
     hdfs_uri = ""
     user = ""
     password = ""
     if isinstance(credentials, dict):
+        # check for Analytics Engine service credentials
         if 'cluster' in credentials:
             user = credentials.get('cluster').get('user')
             password = credentials.get('cluster').get('password')
@@ -29,25 +37,37 @@ def _read_ae_service_credentials(credentials):
     hdfs_uri = 'webhdfs://'+uri_parsed.netloc
     return hdfs_uri, user, password
    
+def _check_time_param(time_value, parameter_name):
+    if isinstance(time_value, datetime.timedelta):
+        result = time_value.total_seconds()
+    elif isinstance(time_value, int) or isinstance(time_value, float):
+        result = time_value
+    else:
+        raise TypeError(time_value)
+    if result <= 1:
+        raise ValueError("Invalid "+parameter_name+" value. Value must be at least one second.")
+    return result
 
-def scan(topology, credentials, directory, init_delay=None, schema=CommonSchema.String, name=None):
-    """Runs a SQL statement using DB2 client driver and JDBC database interface.
 
-    The statement is called once for each input tuple received. Result sets that are produced by the statement are emitted as output stream tuples.
+def scan(topology, credentials, directory, pattern=None, init_delay=None, schema=CommonSchema.String, name=None):
+    """Scans a Hadoop Distributed File System directory for new or modified files.
+
+    Repeatedly scans a HDFS directory and writes the names of new or modified files that are found in the directory to the output stream.
 
     Args:
         topology(Topology): Topology to contain the returned stream.
-        credentials(dict): The credentials of the IBM cloud Analytics Engine service in JSON.     
-        directory(str): The directory to be scanned.
-        init_delay(int): The time to wait in seconds before the operator scans the directory for the first time. If not set, then the default value is 0.
+        credentials(dict|file): The credentials of the IBM cloud Analytics Engine service in *JSON* or the path to the *configuration file* (``hdfs-site.xml`` or ``core-site.xml``). If the *configuration file* is specified, then this file will be copied to the 'etc' directory of the application bundle.     
+        directory(str): The directory to be scanned. Relative path is relative to the '/user/userid/' directory. 
+        pattern(str): Limits the file names that are listed to the names that match the specified regular expression.
+        init_delay(int|float|datetime.timedelta): The time to wait in seconds before the operator scans the directory for the first time. If not set, then the default value is 0.
         schema(Schema): Optional output stream schema. Default is ``CommonSchema.String``.      
         name(str): Source name in the Streams context, defaults to a generated name.
 
     Returns:
-        Output Stream.
+        Output Stream containing file names. Default output schema is ``CommonSchema.String``.
     """
 
-    _op = _HDFS2DirectoryScan(topology, directory=directory, initDelay=init_delay, schema=schema, name=name)
+    _op = _HDFS2DirectoryScan(topology, directory=directory, pattern=pattern, schema=schema, name=name)
     if isinstance(credentials, dict):
         hdfs_uri, user, password = _read_ae_service_credentials(credentials)
         _op.params['hdfsUri'] = hdfs_uri
@@ -57,15 +77,85 @@ def scan(topology, credentials, directory, init_delay=None, schema=CommonSchema.
         # expect core-site.xml file in credentials param 
         topology.add_file_dependency(credentials, 'etc')
         _op.params['configPath'] = 'etc'
-
+    if init_delay is not None:
+        _op.params['initDelay'] = streamsx.spl.types.float64(_check_time_param(init_delay, 'init_delay'))
 
     return _op.outputs[0]
 
-def read(stream, credentials, schema=None, name=None):
-    return
 
-def write(stream, credentials, schema=None, name=None):
-    return
+def read(stream, credentials, schema=CommonSchema.String, name=None):
+    """Reads files from a Hadoop Distributed File System.
+
+    Args:
+        stream(Stream): Stream of tuples containing file names to be read. Supports ``CommonSchema.String`` as input.
+        credentials(dict|file): The credentials of the IBM cloud Analytics Engine service in *JSON* or the path to the *configuration file* (``hdfs-site.xml`` or ``core-site.xml``). If the *configuration file* is specified, then this file will be copied to the 'etc' directory of the application bundle.     
+
+        name(str): Name of the operator in the Streams context, defaults to a generated name.
+
+    Returns:
+        Output Stream for file content. Default output schema is ``CommonSchema.String`` (line per file).
+    """
+
+    _op = _HDFS2FileSource(stream, schema=schema, name=name)
+    if isinstance(credentials, dict):
+        hdfs_uri, user, password = _read_ae_service_credentials(credentials)
+        _op.params['hdfsUri'] = hdfs_uri
+        _op.params['hdfsUser'] = user
+        _op.params['hdfsPassword'] = password
+    else:
+        # expect core-site.xml file in credentials param 
+        stream.topology.add_file_dependency(credentials, 'etc')
+        _op.params['configPath'] = 'etc'
+
+    return _op.outputs[0]
+
+
+def write(stream, credentials, file, time_per_file=None, tuples_per_file=None, bytes_per_file=None, name=None):
+    """Writes files to a Hadoop Distributed File System.
+
+    When writing to a file, that exists already on HDFS with the same name, then this file is overwritten.
+
+    Example with input stream of type ``CommonSchema.String``::
+
+        import streamsx.hdfs as hdfs
+        
+        s = topo.source(['Hello World!']).as_string()
+        result = hdfs.write(s, credentials=credentials, file='sample%FILENUM.txt')
+        result.print()
+
+    Args:
+        stream(Stream): Stream of tuples containing the data to be written to files. Supports ``CommonSchema.String`` as input.
+        credentials(dict|file): The credentials of the IBM cloud Analytics Engine service in *JSON* or the path to the *configuration file* (``hdfs-site.xml`` or ``core-site.xml``). If the *configuration file* is specified, then this file will be copied to the 'etc' directory of the application bundle.     
+        file(str): Specifies the name of the file. The file parameter can optionally contain the following variables, which are evaluated at runtime to generate the file name:
+         
+          * %FILENUM The file number, which starts at 0 and counts up as a new file is created for writing.
+         
+          * %TIME The time when the file is created. The time format is yyyyMMdd_HHmmss.
+          
+          Important: If the %FILENUM or %TIME specification is not included, the file is overwritten every time a new file is created. 
+        name(str): Sink name in the Streams context, defaults to a generated name.
+
+    Returns:
+        Output Stream with schema :py:const:`~streamsx.hdfs.FileInfoSchema`.
+    """
+
+    _op = _HDFS2FileSink(stream, file=file, tuplesPerFile=tuples_per_file, bytesPerFile=bytes_per_file, schema=FileInfoSchema, name=name)
+    if isinstance(credentials, dict):
+        hdfs_uri, user, password = _read_ae_service_credentials(credentials)
+        _op.params['hdfsUri'] = hdfs_uri
+        _op.params['hdfsUser'] = user
+        _op.params['hdfsPassword'] = password
+    else:
+        # expect core-site.xml file in credentials param 
+        stream.topology.add_file_dependency(credentials, 'etc')
+        _op.params['configPath'] = 'etc'
+
+    if time_per_file is None and tuples_per_file is None and bytes_per_file is None:
+        _op.params['closeOnPunct'] = _op.expression('true')
+    if time_per_file is not None:
+        _op.params['timePerFile'] = streamsx.spl.types.float64(_check_time_param(time_per_file, 'time_per_file'))
+
+    return _op.outputs[0]
 
 
 class _HDFS2DirectoryScan(streamsx.spl.op.Source):

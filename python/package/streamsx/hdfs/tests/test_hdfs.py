@@ -97,11 +97,18 @@ class TestDistributed(unittest.TestCase):
         if self.hdfs_toolkit_location is not None:
             tk.add_toolkit(topo, self.hdfs_toolkit_location)
 
-        scanned_files = hdfs.scan(topo, credentials=hdfs_cfg_file, directory='testDirectory')
+        s = topo.source(['Hello World!']).as_string()
+        result = hdfs.write(s, credentials=hdfs_cfg_file, file='pytest/sample%FILENUM.txt')
+        result.print()
+
+        scanned_files = hdfs.scan(topo, credentials=hdfs_cfg_file, directory='pytest', init_delay=10)
         scanned_files.print()
 
+        lines = hdfs.read(scanned_files, credentials=hdfs_cfg_file)
+        lines.print()
+
         tester = Tester(topo)
-        tester.tuple_count(scanned_files, 1, exact=False)
+        tester.tuple_count(lines, 1, exact=True)
         #tester.run_for(60)
 
         cfg = {}
@@ -124,11 +131,18 @@ class TestDistributed(unittest.TestCase):
         if self.hdfs_toolkit_location is not None:
             tk.add_toolkit(topo, self.hdfs_toolkit_location)
 
-        scanned_files = hdfs.scan(topo, credentials=credentials, directory='testDirectory')
+        s = topo.source(['Hello World!']).as_string()
+        result = hdfs.write(s, credentials=credentials, file='pytest/sample%FILENUM.txt')
+        result.print()
+
+        scanned_files = hdfs.scan(topo, credentials=credentials, directory='pytest', init_delay=10)
         scanned_files.print()
 
+        lines = hdfs.read(scanned_files, credentials=credentials)
+        lines.print()
+
         tester = Tester(topo)
-        tester.tuple_count(scanned_files, 1, exact=False)
+        tester.tuple_count(lines, 1, exact=True)
         #tester.run_for(60)
 
         cfg = {}
