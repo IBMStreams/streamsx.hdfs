@@ -31,6 +31,8 @@ The mandatory JSON elements are "user", "password" and "webhdfs"::
         },
     }
 
+If you are using HDFS server(s) different to the "Analytics Engine" service, 
+then you can provide the  *configuration file* (``hdfs-site.xml`` or ``core-site.xml``) to configure the connection.
 
 Sample
 ++++++
@@ -43,18 +45,20 @@ a file to HDFS. Scan for created file on HDFS and read the content::
     from streamsx.topology.context import submit
     import streamsx.hdfs as hdfs
 
+    credentials = json.load(credentials_analytics_engine_service)
+
     topo = Topology('HDFSHelloWorld')
 
     to_hdfs = topo.source(['Hello', 'World!'])
     to_hdfs = to_hdfs.as_string()
    
     # Write a stream to HDFS
-    hdfs.write(to_hdfs, '/sample/hw.txt')
+    hdfs.write(to_hdfs, credentials=credentials, file='/sample/hw.txt')
 
-    scanned = hdfs.scan(topo, directory='/sample')
+    scanned = hdfs.scan(topo, credentials=credentials, directory='/sample', init_delay=10)
     
     # read text file line by line
-    r = hdfs.read(scanned)
+    r = hdfs.read(scanned, credentials=credentials)
     
     # print each line (tuple)
     r.print()
