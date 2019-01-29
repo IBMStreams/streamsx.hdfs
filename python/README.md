@@ -6,7 +6,7 @@ Package is organized using standard packaging to upload to PyPi.
 
 The package is uploaded to PyPi in the standard way:
 ```
-cd python/package
+cd package
 python setup.py sdist bdist_wheel upload -r pypi
 ```
 Note: This is done using the `ibmstreams` account at pypi.org and requires `.pypirc` file containing the credentials in your home directory.
@@ -15,12 +15,12 @@ Package details: https://pypi.python.org/pypi/streamsx.hdfs
 
 Documentation is using Sphinx and can be built locally using:
 ```
-cd python/package/docs
+cd package/docs
 make html
 ```
 and viewed using
 ```
-firefox python/package/docs/build/html/index.html
+firefox package/docs/build/html/index.html
 ```
 
 The documentation is also setup at `readthedocs.io`.
@@ -36,9 +36,37 @@ Analytics Engine service credentials are located in a file referenced by environ
 
 Alternative the "core-site.xml" file can be specified for testing with the environment variable `HDFS_SITE_XML`.
 
-```
-cd python/package
-python3 -u -m unittest streamsx.hdfs.tests.test_hdfs.TestDistributed
 
-python3 -u -m unittest streamsx.hdfs.tests.test_hdfs.TestCloud
+### Test parameters only
+
+This test does not require any Streams instance.
+
 ```
+cd package
+python3 -u -m unittest streamsx.hdfs.tests.test_hdfs.TestParams
+
+```
+
+### Test with local Streams instance
+
+This test requires STREAMS_INSTALL set and a running Streams instance.
+
+Required envionment variable for the hfds toolkit location: `STREAMS_HDFS_TOOLKIT`
+
+```
+cd package
+python3 -u -m unittest streamsx.hdfs.tests.test_hdfs.TestDistributed
+```
+
+### Test with Streaming Analytics Service
+
+This requires Streaming Analytics service and IBM Analytics Engine service in IBM cloud.
+
+Required envionment variable for the hfds toolkit location: `STREAMS_HDFS_TOOLKIT`
+
+```
+cd package
+python3 -u -m unittest streamsx.hdfs.tests.test_hdfs.TestCloud.test_close_on_tuples unittest streamsx.hdfs.tests.test_hdfs.TestCloud.test_hdfs_uri
+```
+
+
