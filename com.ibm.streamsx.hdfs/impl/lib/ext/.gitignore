@@ -21,3 +21,7 @@
 /slf4j-api-1.7.10.jar
 /slf4j-log4j12-1.7.10.jar
 /protobuf-java-2.5.0.jar
+/commons-codec-1.9.jar
+/hadoop-annotations-2.9.2.jar
+/hadoop-auth-2.9.2.jar
+/hadoop-common-2.9.2.jar

@@ -2,21 +2,21 @@ streamsx.hdfs
 =============
 This toolkit provides operators and functions for interacting with Hadoop File System.
 
-HDFS Toolkit v4.0 is officially released to support IBM Streams on IBM Cloud:
+HDFS Toolkit v4.4.0 is officially released to support IBM Streams on IBM Cloud:
 * https://github.com/IBMStreams/streamsx.hdfs/releases
 
 Check out what's new with IBM Streams:
- * https://developer.ibm.com/streamsdev/2018
+ * https://developer.ibm.com/streamsdev/2019
 
 Check out the binary read / write support!
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/demos/HDFSBinary
 * https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CompressedHdfsFiles
 
 Check out the Cloud sample!
-* https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/CloudSample
+* https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-connect-to-IAE-via-HDFS-Toolkit
 
 Kerberos configuration: 
-* https://developer.ibm.com/hadoop/2016/08/18/overview-of-kerberos-in-iop-4-2/
+* https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-use-kerberos-authentication-in-streamsx.hdfs-toolkit
 
 Getting started with development:
 * https://github.com/IBMStreams/streamsx.hdfs/wiki/Getting-Started-with-Developing-HDFS-Toolkit
@@ -27,12 +27,12 @@ Main Site:
 
 To learn more about Streams:
 * [IBM Streams on Github](http://ibmstreams.github.io)
-* [Introduction to Streams Quick Start Edition](http://ibmstreams.github.io/streamsx.documentation/docs/4.2/qse-intro/)
-* [Streams Getting Started Guide](http://ibmstreams.github.io/streamsx.documentation/docs/4.2/qse-getting-started/)
+* [Introduction to Streams Quick Start Edition](http://ibmstreams.github.io/streamsx.documentation/docs/4.3/qse-intro/)
+* [Streams Getting Started Guide](http://ibmstreams.github.io/streamsx.documentation/docs/4.3/qse-getting-started/)
 * [StreamsDev](https://developer.ibm.com/streamsdev/)
 
 To learn more about Apache HDFS and Hadoop WebHDFS REST API:
-* [Apache HDFS User Guide](https://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html)
-* [Hadoop WebHDFS REST API](https://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)
+* [Apache HDFS User Guide](https://hadoop.apache.org/docs/r2.8.5/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html)
+* [Hadoop WebHDFS REST API](https://hadoop.apache.org/docs/r2.8.5/hadoop-project-dist/hadoop-hdfs/WebHDFS.html)
 
 

@@ -130,9 +130,12 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
   
 The 'tempFile' parameter specifies the name of the file that the operator writes to. When the file is closed the file is renamed to the final filename defined by the **file** parameter.
 
+++ What is new in version 4.4.0
+
+* The pom.xml file has been upgraded to use hadoop version 2.8.5 libraries. 
  
 </description>
-    <version>4.3.0</version>
+    <version>4.4.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
