@@ -2,7 +2,7 @@
 
 This SPL sample demonstrates how to connect to the HDFS via kerberos authentication.
 
-At fierst read this guide in WiKi to setup kerberos in your HDP server:
+At first read this guide in WiKi to setup kerberos in your HDP server:
 
 ### How to use kerberos authentication in streamsx.hdfs toolkit
  
@@ -37,27 +37,28 @@ Please perform exactly the following steps.
          which java
 
 
-       The out put is like this line.
+       The output is like this line.
 
          /apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
 
 
-   - 3- Copy core-site.xml file from Hadoop server on your Streams server in teh "etc" directory of your SPL application.
+   - 3- Copy core-site.xml file from Hadoop server on your Streams server in the "etc" directory of your SPL application.
      For example 
      
          scp root@<your-hdp-server>:/etc/hadoop/conf/core-site.xml etc
 
-   - 4- Copy the keytab file from Hadoop server on your Streams server in teh "etc" directory of your SPL application.
+   - 4- Copy the keytab file from Hadoop server on your Streams server in the "etc" directory of your SPL application.
 
          scp root@<your-hdp-server>:/etc/security/ketabs/hdfs.headless.keytab etc
 
-   - 5- Copy the kerberos configuration file krb5.conf file from Hadoop server on your Streams server in teh "etc" directory of your SPL application.
+   - 5- Copy the kerberos configuration file krb5.conf file from Hadoop server on your Streams server in the "etc" directory of your SPL application.
 
          scp root@<your-hdp-server>:/etc/krb5.conf etc
 
 
    - 6- Test the keytab
-    For example:
+   
+     For example:
 
            kinit -k -t hdfs.headless.keytab <your-hdfs-principal>
     
@@ -65,7 +66,7 @@ Please perform exactly the following steps.
 
           /tmp/crb5_xxxx
           
-  xxxx is your user id for example 1005  
+   xxxx is your user id for example 1005  
 
 
    - 7- If you have any problem to access to the realm, copy the crb5.conf file from your HDFS server into a directory and add the following **vmArg** parameter to all your HDFS2 operators in your SPL files:
@@ -101,7 +102,8 @@ In this case the path of krb5.conf file is an absolute path
   
         streamtool submitjob ./output/application.HdfsKerberos.sab
         
-  Or you can submit a streams job with Submission Time parameters:
+  Or you can submit a streams job with **Submission Time** parameters:
+  
   For example:
 
        submitjob ./output/application.HdfsKerberos.sab -P configPath="etc" -P authKeytab="etc/hdfs.headless.keytab"
