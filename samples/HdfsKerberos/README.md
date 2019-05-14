@@ -1,8 +1,8 @@
 ## HsdfKerberso SPL sample 
 
-The  SPL application demonstrates how to connect to an HDFS via kerberos authentication.
+This SPL sample demonstrates how to connect to the HDFS via kerberos authentication.
 
-Read this guide in WiKi:
+At fierst read this guide in WiKi to setup kerberos in your HDP server:
 
 ### How to use kerberos authentication in streamsx.hdfs toolkit
  
