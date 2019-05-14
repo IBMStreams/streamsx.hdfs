@@ -32,7 +32,7 @@ Please perform exactly the following steps.
 
           source ~/.bashrc
 
-   Now check the java location.
+      Now check the java location.
 
         which java
 
@@ -55,7 +55,7 @@ The out put is like this line.
          scp root@<your-hdp-server>:/etc/krb5.conf etc
 
 
-- 6- Test the keytab
+   - 6- Test the keytab
     For example:
 
            kinit -k -t hdfs.headless.keytab <your-hdfs-principal>
@@ -67,7 +67,7 @@ The out put is like this line.
   xxxx is your user id for example 1005  
 
 
-   - 6- If you have any problem to access to the realm, copy the crb5.conf file from your HDFS server into a directory and add the following **vmArg** parameter to all your HDFS2 operators in your SPL files:
+   - 7- If you have any problem to access to the realm, copy the crb5.conf file from your HDFS server into a directory and add the following **vmArg** parameter to all your HDFS2 operators in your SPL files:
 In this case the path of krb5.conf file is an absolute path 
    For example: 
 
@@ -75,9 +75,9 @@ In this case the path of krb5.conf file is an absolute path
 
    **vmArgs** is a set of arguments to be passed to the Java VM within which this operator will be run.
 
-   - 7- replace the default vaule of $authKeytab and $authPrincipal in application/HdfsKerberps.spl file.
+   - 8-  replace the default vaule of $authKeytab and $authPrincipal in application/HdfsKerberps.spl file.
 
-   - 8- Make and start the application
+   - 9- Make and start the application
 
          make
 
