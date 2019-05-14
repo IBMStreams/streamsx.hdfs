@@ -1,0 +1,88 @@
+/*
+Please perform exactly the following steps.
+
+1- Add the host name and the IP Address of your HDP server in your /etc/hosts file.
+login as root in your streams server and.
+vi /etc/hosts
+xxx.xxx.xxx.xxx <your-hdp-server>
+
+2- login as streams user and add the following lines at the end of your .bashrc file.
+vi ~/.bashrc
+export JAVA_HOME=$STREAMS_INSTALL/java
+export PATH=$JAVA_HOME/bin:$PATH
+
+save the file and source it.
+
+source ~/.bashrc
+
+Now check the java location
+
+3- Copy the hadoop configuration file from your hadoop server into etc directory of your project.
+4- Copy teh keytab file from your hadoop server into etc directory of your project.
+
+for example scp root@<your-hdp-server>:/etc/security/ketabs/hdfs.headless.keytab etc
+
+
+which java
+The out put is like this line.
+/apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
+
+5- replace the default vaule of $authKeytab and $authPrincipal
+
+6- 
+make
+
+and start the appliaction in standalon mode
+
+output/bin/standalone
+ 
+*/
+
+namespace application ;
+
+use com.ibm.streamsx.hdfs::HDFS2FileSink ;
+use com.ibm.streamsx.hdfs::HDFS2FileSource ;
+
+composite HdfsKerberos
+{
+    param
+	expression<rstring> $authKeytab : getSubmissionTimeValue("authKeytab", "etc/hdfs.headless.keytab") ;
+	expression<rstring> $authPrincipal : getSubmissionTimeValue("authPrincipal", "hdfs-hdp2@HDP2.COM") ;
+	expression<rstring> $configPath : getSubmissionTimeValue("configPath", "etc") ;
+
+    graph
+            stream<rstring lines> LineIn = FileSource()
+            {
+                    param
+                            file : "LineInput.txt" ;
+            }
+
+            () as lineSink1 = HDFS2FileSink(LineIn)
+            {
+                    param
+                            authKeytab       : $authKeytab ;
+                            authPrincipal    : $authPrincipal ;
+                            configPath       : $configPath ;
+                            file             : "HDFS-LineInput.txt" ;
+            }
+
+            stream<rstring lines> LineStream = HDFS2FileSource()
+            {
+                    param
+                            authKeytab       : $authKeytab;
+                            authPrincipal    : $authPrincipal ;
+                            configPath       : $configPath ;
+                            file             : "HDFS-LineInput.txt" ;
+                            initDelay        : 10.0l ;
+            }
+
+            () as MySink = FileSink(LineStream)
+            {
+			logic
+ 				onTuple LineStream : printStringLn(lines);			                    
+			param
+                            file             : "result.txt" ;
+                            flush            : 1u ;
+   
+            }
+}

@@ -1,0 +1,202 @@
+  <configuration>
+    
+    <property>
+      <name>fs.azure.user.agent.prefix</name>
+      <value>User-Agent: APN/1.0 Hortonworks/1.0 HDP/2.6.5.0-292</value>
+    </property>
+    
+    <property>
+      <name>fs.defaultFS</name>
+      <value>hdfs://hdp21.fyre.ibm.com:8020</value>
+      <final>true</final>
+    </property>
+    
+    <property>
+      <name>fs.s3a.fast.upload</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>fs.s3a.fast.upload.buffer</name>
+      <value>disk</value>
+    </property>
+    
+    <property>
+      <name>fs.s3a.multipart.size</name>
+      <value>67108864</value>
+    </property>
+    
+    <property>
+      <name>fs.s3a.user.agent.prefix</name>
+      <value>User-Agent: APN/1.0 Hortonworks/1.0 HDP/2.6.5.0-292</value>
+    </property>
+    
+    <property>
+      <name>fs.trash.interval</name>
+      <value>360</value>
+    </property>
+    
+    <property>
+      <name>ha.failover-controller.active-standby-elector.zk.op.retries</name>
+      <value>120</value>
+    </property>
+    
+    <property>
+      <name>ha.zookeeper.acl</name>
+      <value>sasl:nn:rwcda</value>
+    </property>
+    
+    <property>
+      <name>hadoop.custom-extensions.root</name>
+      <value>/hdp/ext/2.6/hadoop</value>
+    </property>
+    
+    <property>
+      <name>hadoop.http.authentication.simple.anonymous.allowed</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.ambari-server-hdp2.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.ambari-server-hdp2.hosts</name>
+      <value>hdp21.fyre.ibm.com</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.beacon.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.beacon.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.beacon.users</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hdfs.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hdfs.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.HTTP.groups</name>
+      <value>users</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.HTTP.hosts</name>
+      <value>hdp21.fyre.ibm.com</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.knox.groups</name>
+      <value>users</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.knox.hosts</name>
+      <value>hdp21.fyre.ibm.com</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.yarn.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.yarn.hosts</name>
+      <value>hdp21.fyre.ibm.com</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.auth_to_local</name>
+      <value>RULE:[1:$1@$0](ambari-qa-hdp2@HDP2.COM)s/.*/ambari-qa/
+RULE:[1:$1@$0](hbase-hdp2@HDP2.COM)s/.*/hbase/
+RULE:[1:$1@$0](hdfs-hdp2@HDP2.COM)s/.*/hdfs/
+RULE:[1:$1@$0](.*@HDP2.COM)s/@.*//
+RULE:[2:$1@$0](activity_analyzer@HDP2.COM)s/.*/activity_analyzer/
+RULE:[2:$1@$0](activity_explorer@HDP2.COM)s/.*/activity_explorer/
+RULE:[2:$1@$0](amshbase@HDP2.COM)s/.*/ams/
+RULE:[2:$1@$0](amszk@HDP2.COM)s/.*/ams/
+RULE:[2:$1@$0](beacon@HDP2.COM)s/.*/beacon/
+RULE:[2:$1@$0](dn@HDP2.COM)s/.*/hdfs/
+RULE:[2:$1@$0](hbase@HDP2.COM)s/.*/hbase/
+RULE:[2:$1@$0](jhs@HDP2.COM)s/.*/mapred/
+RULE:[2:$1@$0](knox@HDP2.COM)s/.*/knox/
+RULE:[2:$1@$0](nfs@HDP2.COM)s/.*/hdfs/
+RULE:[2:$1@$0](nm@HDP2.COM)s/.*/yarn/
+RULE:[2:$1@$0](nn@HDP2.COM)s/.*/hdfs/
+RULE:[2:$1@$0](rm@HDP2.COM)s/.*/yarn/
+RULE:[2:$1@$0](yarn@HDP2.COM)s/.*/yarn/
+DEFAULT</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.authentication</name>
+      <value>kerberos</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.authorization</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>io.compression.codecs</name>
+      <value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.SnappyCodec</value>
+    </property>
+    
+    <property>
+      <name>io.file.buffer.size</name>
+      <value>131072</value>
+    </property>
+    
+    <property>
+      <name>io.serializations</name>
+      <value>org.apache.hadoop.io.serializer.WritableSerialization</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.connect.max.retries</name>
+      <value>50</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.connection.maxidletime</name>
+      <value>30000</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.idlethreshold</name>
+      <value>8000</value>
+    </property>
+    
+    <property>
+      <name>ipc.server.tcpnodelay</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>mapreduce.jobtracker.webinterface.trusted</name>
+      <value>false</value>
+    </property>
+    
+    <property>
+      <name>net.topology.script.file.name</name>
+      <value>/etc/hadoop/conf/topology_script.py</value>
+    </property>
+    
+  </configuration>
