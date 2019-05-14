@@ -8,6 +8,16 @@ At first read this guide in WiKi to setup kerberos in your HDP server:
  
 https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-use-kerberos-authentication-in-streamsx.hdfs-toolkit/
 
+And check the version of your streamsx.hdfs toolkit
+
+    cat $STREAMS_INSTALL/toolkits/com.ibm.streamsx.hdfs/info.xml  | grep "<version>"
+    <version>4.4.1</version>
+
+If your toolkit is older as 4.4.1 version please upgrade it with a new one.
+
+ https://github.com/IBMStreams/streamsx.hdfs/releases
+
+
 Please perform exactly the following steps.
 
    
