@@ -34,11 +34,12 @@ Please perform exactly the following steps.
 
       Now check the java location.
 
-        which java
+         which java
 
 
-The out put is like this line.
-/apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
+       The out put is like this line.
+
+         /apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
 
 
    - 3- Copy core-site.xml file from Hadoop server on your Streams server in teh "etc" directory of your SPL application.
@@ -76,14 +77,34 @@ In this case the path of krb5.conf file is an absolute path
    **vmArgs** is a set of arguments to be passed to the Java VM within which this operator will be run.
 
    - 8-  replace the default vaule of $authKeytab and $authPrincipal in application/HdfsKerberps.spl file.
+   
+   - 9-  Make sure that the streams user have read/weite access to the HDFS file system. /user/<your-username>
+ 
+     For eaxmple:
+     
+     login as root in your HDFS server.
+    
+     
+         su - hdfs
+         kinit -k -t /etc/security/ketabs/hdfs.headless.keytab <your-hdfs-principal>
+         hadoop fs -ls /user/streamsadmin  
 
-   - 9- Make and start the application
+   - 10- Make the application and start it.
 
          make
 
-   and start the appliaction in standalon mode
+     And start the appliaction in standalon mode
 
-        output/bin/standalone
+         output/bin/standalone
+
+  It is also possible to start it in distributed mode.
+  
+        streamtool submitjob ./output/application.HdfsKerberos.sab
+        
+  Or you can submit a streams job with Submission Time parameters:
+  For example:
+
+       submitjob ./output/application.HdfsKerberos.sab -P configPath="etc" -P authKeytab="etc/hdfs.headless.keytab"
 
 
 It reads the lines from the file data/LineInput.txt via **FileSource** operator.
