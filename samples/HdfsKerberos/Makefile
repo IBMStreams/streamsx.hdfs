@@ -17,7 +17,7 @@ SPL_MAIN_COMPOSITE1 = application::$(SPL_COMP1NAME)
 BUILD_OUTPUT_DIR = output
 
 all: data clean
-#	rm -rf output; cd ../streamsx.hdfs; ant clean; ant
+	cp etc/krb5.conf /tmp
 	$(SPLC) $(SPLC_FLAGS) -M  $(SPL_MAIN_COMPOSITE1) --output-dir ./$(BUILD_OUTPUT_DIR)  $(SPL_CMD_ARGS)
 
 data:

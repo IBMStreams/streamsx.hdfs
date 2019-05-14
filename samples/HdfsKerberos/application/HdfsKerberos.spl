@@ -16,6 +16,10 @@ save the file and source it.
 source ~/.bashrc
 
 Now check the java location
+which java
+The out put is like this line.
+/apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
+
 
 3- Copy the hadoop configuration file from your hadoop server into etc directory of your project.
 4- Copy teh keytab file from your hadoop server into etc directory of your project.
@@ -23,9 +27,6 @@ Now check the java location
 for example scp root@<your-hdp-server>:/etc/security/ketabs/hdfs.headless.keytab etc
 
 
-which java
-The out put is like this line.
-/apps/software/InfoSphere_Streams/4.3.0.0/java/bin/java
 
 5- replace the default vaule of $authKeytab and $authPrincipal
 
@@ -64,6 +65,8 @@ composite HdfsKerberos
                             authPrincipal    : $authPrincipal ;
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
+         		    vmArg : "-Djava.security.krb5.conf=/tmp/krb5.conf";
+
             }
 
             stream<rstring lines> LineStream = HDFS2FileSource()
@@ -74,6 +77,7 @@ composite HdfsKerberos
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
                             initDelay        : 10.0l ;
+         		    vmArg : "-Djava.security.krb5.conf=/tmp/krb5.conf";
             }
 
             () as MySink = FileSink(LineStream)
