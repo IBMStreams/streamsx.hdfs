@@ -3,13 +3,15 @@ Please perform exactly the following steps.
 
 1- Add the host name and the IP Address of your HDP server in your /etc/hosts file.
 login as root in your streams server and.
-vi /etc/hosts
-xxx.xxx.xxx.xxx <your-hdp-server>
+
+     vi /etc/hosts
+     xxx.xxx.xxx.xxx <your-hdp-server>
 
 2- login as streams user and add the following lines at the end of your .bashrc file.
-vi ~/.bashrc
-export JAVA_HOME=$STREAMS_INSTALL/java
-export PATH=$JAVA_HOME/bin:$PATH
+
+      vi ~/.bashrc
+      export JAVA_HOME=$STREAMS_INSTALL/java
+      export PATH=$JAVA_HOME/bin:$PATH
 
 save the file and source it.
 
@@ -65,7 +67,7 @@ composite HdfsKerberos
                             authPrincipal    : $authPrincipal ;
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
-         		    vmArg : "-Djava.security.krb5.conf=/tmp/krb5.conf";
+         		    vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
 
             }
 
@@ -77,13 +79,13 @@ composite HdfsKerberos
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
                             initDelay        : 10.0l ;
-         		    vmArg : "-Djava.security.krb5.conf=/tmp/krb5.conf";
+         		    vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
             }
 
             () as MySink = FileSink(LineStream)
             {
 			logic
- 				onTuple LineStream : printStringLn(lines);			                    
+ 			    onTuple LineStream : printStringLn(lines);			                    
 			param
                             file             : "result.txt" ;
                             flush            : 1u ;
