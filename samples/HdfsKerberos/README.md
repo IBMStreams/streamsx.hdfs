@@ -17,10 +17,13 @@ Please perform exactly the following steps.
 
          vi /etc/hosts
          xxx.xxx.xxx.xxx <your-hdp-server>
+     
+     Save the file and check it with ping
+     
+          ping <your-hdp-server>
 
    - 2- login as streams user and add the following lines at the end of your .bashrc file.
    
- 
          vi ~/.bashrc
          export JAVA_HOME=$STREAMS_INSTALL/java
          export PATH=$JAVA_HOME/bin:$PATH
