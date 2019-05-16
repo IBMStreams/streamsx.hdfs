@@ -45,18 +45,17 @@ import com.ibm.streamsx.hdfs.client.IHdfsClient;
 public class HDFS2FileSource extends AbstractHdfsOperator implements
 		StateHandler {
 
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource";
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.HDFSFileSource"; 
 	private static final int BUFFER_SIZE = 1024*1024*8;
 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY
-			+ "." + CLASS_NAME, "com.ibm.streamsx.hdfs.BigDataMessages");
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
 
 	private static Logger TRACE = Logger.getLogger(HDFS2FileSource.class
 			.getName());
 
 	// TODO check that name matches filesource change required
-	private static final String FILES_OPENED_METRIC = "nFilesOpened";
-	private static final String BLOCKSIZE_PARAM = "blockSize";
+	private static final String FILES_OPENED_METRIC = "nFilesOpened"; 
+	private static final String BLOCKSIZE_PARAM = "blockSize"; 
 	private Metric nFilesOpened;
 
 	private String fFileName;
@@ -66,7 +65,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	boolean fBinaryFile = false;
 	private int fBlockSize = 1024 * 4;
 
-	private String fEncoding = "UTF-8";
+	private String fEncoding = "UTF-8"; 
 
 	private ConsistentRegionContext fCrContext;
 
@@ -84,33 +83,33 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		if (fFileName != null) {
 			try {
 				URI uri = new URI(fFileName);
-				LOGGER.log(TraceLevel.DEBUG, "uri: " + uri.toString());
+				LOGGER.log(TraceLevel.DEBUG, "uri: " + uri.toString()); 
 
 				String scheme = uri.getScheme();
 				if (scheme != null) {
 					String fs;
 					if (uri.getAuthority() != null)
-						fs = scheme + "://" + uri.getAuthority();
+						fs = scheme + "://" + uri.getAuthority(); 
 					else
-						fs = scheme + ":///";
+						fs = scheme + ":///"; 
 
 					if (getHdfsUri() == null)
 						setHdfsUri(fs);
 
-					LOGGER.log(TraceLevel.DEBUG, "fileSystemUri: "
+					LOGGER.log(TraceLevel.DEBUG, "fileSystemUri: " 
 							+ getHdfsUri());
 
 					// Use original parameter value
 					String path = fFileName.substring(fs.length());
 
-					if (!path.startsWith("/"))
-						path = "/" + path;
+					if (!path.startsWith("/")) 
+						path = "/" + path; 
 
 					setFile(path);
 				}
 			} catch (URISyntaxException e) {
 				LOGGER.log(TraceLevel.DEBUG,
-						"Unable to construct URI: " + e.getMessage());
+						Messages.getString("HDFS_SOURCE_INVALID_URL", e.getMessage())); 
 
 				throw e;
 			}
@@ -120,14 +119,14 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		
 		// register for data governance
 		TRACE.log(TraceLevel.INFO,
-				"HDFS2FileSource - Data Governance - file: " + fFileName + " and HdfsUri: " + getHdfsUri());
+				"HDFS2FileSource - Data Governance - file: " + fFileName + " and HdfsUri: " + getHdfsUri());  
 		if (fFileName != null && getHdfsUri() != null) {
 			registerForDataGovernance(getHdfsUri(), fFileName);
 		}
 
 		// Associate the aspect Log with messages from the SPL log
 		// logger.
-		setLoggerAspects(LOGGER.getName(), "HDFSFileSource");
+		setLoggerAspects(LOGGER.getName(), "HDFSFileSource"); 
 
 		initMetrics(context);
 
@@ -141,37 +140,37 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		// If we ever switch to the generated xml files, we'll be able to delete
 		// this.
 		if (context.getParameterNames().contains(BLOCKSIZE_PARAM)) {
-			TRACE.fine("Blocksize parameter is supplied, setting blocksize based on that.");
+			TRACE.fine("Blocksize parameter is supplied, setting blocksize based on that."); 
 			fBlockSize = Integer.parseInt(context.getParameterValues(
 					BLOCKSIZE_PARAM).get(0));
 		} else {
-			TRACE.fine("Blocksize parameter not supplied, using default "
+			TRACE.fine("Blocksize parameter not supplied, using default " 
 					+ fBlockSize);
 		}
 		if (MetaType.BLOB == outType) {
 			fBinaryFile = true;
-			TRACE.info("File will be read as a binary blobs of size "
+			TRACE.info("File will be read as a binary blobs of size " 
 					+ fBlockSize);
 		} else {
-			TRACE.info("Files will be read as text files, with one tuple per line.");
+			TRACE.info("Files will be read as text files, with one tuple per line."); 
 		}
 
 		fCrContext = context.getOptionalContext(ConsistentRegionContext.class);
 	}
 
 	private void registerForDataGovernance(String serverURL, String file) {
-		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Registering for data governance with server URL: " + serverURL + " and file: " + file);						
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Registering for data governance with server URL: " + serverURL + " and file: " + file);						  
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(IGovernanceConstants.TAG_REGISTER_TYPE, IGovernanceConstants.TAG_REGISTER_TYPE_INPUT);
-		properties.put(IGovernanceConstants.PROPERTY_INPUT_OPERATOR_TYPE, "HDFS2FileSource");
+		properties.put(IGovernanceConstants.PROPERTY_INPUT_OPERATOR_TYPE, "HDFS2FileSource"); 
 		properties.put(IGovernanceConstants.PROPERTY_SRC_NAME, file);
 		properties.put(IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_FILE_TYPE);
-		properties.put(IGovernanceConstants.PROPERTY_SRC_PARENT_PREFIX, "p1");
-		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_NAME, serverURL);
-		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE);
-		properties.put("p1" + IGovernanceConstants.PROPERTY_PARENT_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE_SHORT);
-		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Data governance: " + properties.toString());
+		properties.put(IGovernanceConstants.PROPERTY_SRC_PARENT_PREFIX, "p1"); 
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_NAME, serverURL); 
+		properties.put("p1" + IGovernanceConstants.PROPERTY_SRC_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE); 
+		properties.put("p1" + IGovernanceConstants.PROPERTY_PARENT_TYPE, IGovernanceConstants.ASSET_HDFS_SERVER_TYPE_SHORT); 
+		TRACE.log(TraceLevel.INFO, "HDFS2FileSource - Data governance: " + properties.toString()); 
 		
 		setTagData(IGovernanceConstants.TAG_OPERATOR_IGC, properties);				
 	}
@@ -188,9 +187,9 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		 */
 		if (streamingInputs.size() == 0
 				&& !checker.getOperatorContext().getParameterNames()
-						.contains("file")) {
+						.contains("file")) { 
 			checker.setInvalidContext(
-					"HDFSFileSource requires either file parameter to be specified or the number of input ports to be one.",
+					Messages.getString("HDFS_SOURCE_INVALID_PARAM"), 
 					null);
 		}
 
@@ -200,9 +199,9 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		 */
 		if (streamingInputs.size() == 1
 				&& checker.getOperatorContext().getParameterNames()
-						.contains("file")) {
+						.contains("file")) { 
 			checker.setInvalidContext(
-					"HDFSFileSource requires either file parameter to be specified or the number of input ports to be one. Both cannot be specified together.",
+					Messages.getString("HDFS_SOURCE_ONLY_ONE_PARAM"), 
 					null);
 		}
 	}
@@ -215,7 +214,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		{
 			if (crContext.isStartOfRegion() && opContext.getNumberOfStreamingInputs()>0)
 			{
-				checker.setInvalidContext("The following operator cannot be the start of a consistent region when an input port is present: HDFS2FileSource.", null);
+				checker.setInvalidContext(Messages.getString("HDFS_NOT_CONSISTENT_REGION", "HDFS2FileSource"), null); 
 			}
 		}
 	}
@@ -228,11 +227,11 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		/*
 		 * Check if initDelay is negative
 		 */
-		if (context.getParameterNames().contains("initDelay")) {
-			if (Integer.valueOf(context.getParameterValues("initDelay").get(0)) < 0) {
+		if (context.getParameterNames().contains("initDelay")) { 
+			if (Integer.valueOf(context.getParameterValues("initDelay").get(0)) < 0) { 
 				checker.setInvalidContext(
-						"initDelay value {0} should be zero or greater than zero  ",
-						new String[] { context.getParameterValues("initDelay")
+						Messages.getString("HDFS_SOURCE_INVALID_INIT_DELAY_PARAM"), 
+						new String[] { context.getParameterValues("initDelay") 
 								.get(0).trim() });
 			}
 		}
@@ -247,7 +246,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		// check that number of attributes is 1
 		if (outputSchema.getAttributeCount() != 1) {
 			checker.setInvalidContext(
-					"Output port can have only one attribute. The type of this attribute has to be rstring, ustring, or blob",
+					Messages.getString("HDFS_SOURCE_INVALID_OUTPUT"), 
 					null);
 		}
 
@@ -255,18 +254,15 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				&& outputSchema.getAttribute(0).getType().getMetaType() != MetaType.USTRING
 				&& outputSchema.getAttribute(0).getType().getMetaType() != MetaType.BLOB) {
 			checker.setInvalidContext(
-					"Expected attribute of type rstring, ustring or blob found attribute of type "
-							+ outputSchema.getAttribute(0).getType()
-									.getMetaType(), null);
+					Messages.getString("HDFS_SOURCE_INVALID_ATTR_TYPE", outputSchema.getAttribute(0).getType().getMetaType()), 
+					null);
 		}
 
 		if (MetaType.BLOB != outputSchema.getAttribute(0).getType()
 				.getMetaType()
 				&& checker.getOperatorContext().getParameterNames()
 						.contains(BLOCKSIZE_PARAM)) {
-			checker.setInvalidContext(
-					BLOCKSIZE_PARAM
-							+ " may only be used when the outstream an atribute of type blob",
+			checker.setInvalidContext(Messages.getString("HDFS_SOURCE_INVALID_BLOCKSIZE_PARAM", "BLOCKSIZE_PARAM"), 
 					null);
 		}
 	}
@@ -279,7 +275,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 
 		// check that we have max of one input port
 		if (streamingInputs.size() > 1) {
-			throw new Exception("HDFSFileSource can only have one input port");
+			throw new Exception("HDFSFileSource can only have one input port"); 
 		}
 
 		// if we have an input port
@@ -291,7 +287,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			// check that number of attributes is 1
 			if (inputSchema.getAttributeCount() != 1) {
 				checker.setInvalidContext(
-						"Expect only one attribute on input port--attribute should be rstring giving a filename to open",
+						Messages.getString("HDFS_SOURCE_INVALID_FILENAME_ATTR"), 
 						null);
 			}
 
@@ -299,9 +295,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			if (MetaType.RSTRING != inputSchema.getAttribute(0).getType()
 					.getMetaType()) {
 				checker.setInvalidContext(
-						"Expected attribute of type rstring, found attribute of type "
-								+ inputSchema.getAttribute(0).getType()
-										.getMetaType(), null);
+						Messages.getString("HDFS_SOURCE_INVALID_STRING_ATTR", inputSchema.getAttribute(0).getType().getMetaType()), 
+										null);
 			}
 		}
 	}
@@ -310,9 +305,9 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	public static void checkUriMatch(OperatorContextChecker checker)
 			throws Exception {
 		List<String> hdfsUriParamValues = checker.getOperatorContext()
-				.getParameterValues("hdfsUri");
+				.getParameterValues("hdfsUri"); 
 		List<String> fileParamValues = checker.getOperatorContext()
-				.getParameterValues("file");
+				.getParameterValues("file"); 
 
 		String hdfsUriValue = null;
 		if (hdfsUriParamValues.size() == 1)
@@ -331,8 +326,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				hdfsUri = new URI(hdfsUriValue);
 			} catch (URISyntaxException e) {
 				LOGGER.log(TraceLevel.ERROR,
-						"'hdfsUri' parameter contains an invalid URI: "
-								+ hdfsUriValue);
+						Messages.getString("HDFS_SOURCE_INVALID_HDFS_URL", hdfsUriValue));
 				throw e;
 			}
 
@@ -340,8 +334,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				fileUri = new URI(fileValue);
 			} catch (URISyntaxException e) {
 				LOGGER.log(TraceLevel.ERROR,
-						"'file' parameter contains an invalid URI: "
-								+ fileValue);
+						Messages.getString("HDFS_SOURCE_INVALID_FILE_URL", fileValue));
 				throw e;
 			}
 
@@ -349,9 +342,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				// must have the same scheme
 				if (!hdfsUri.getScheme().equals(fileUri.getScheme())) {
 					checker.setInvalidContext(
-							"The 'file' scheme (" + fileUri.getScheme()
-									+ ") must match the 'hdfsUri' scheme ("
-									+ hdfsUri.getScheme() + ")", null);
+							Messages.getString("HDFS_SOURCE_INVALID_SCHEMA", fileUri.getScheme(), hdfsUri.getScheme()), 
+							null); 
 					return;
 				}
 
@@ -363,10 +355,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 								&& fileUri.getAuthority() != null && !hdfsUri
 								.getAuthority().equals(fileUri.getAuthority()))) {
 					checker.setInvalidContext(
-							"The host and port specified by the 'file' parameter ("
-									+ fileUri.getAuthority()
-									+ ") must match the host and port specified by the 'hdfsUri' parameter ("
-									+ hdfsUri.getAuthority() + ")", null);
+							Messages.getString("HDFS_SOURCE_INVALID_HOST", fileUri.getAuthority(), hdfsUri.getAuthority()), 
+									null); 
 					return;
 				}
 			}
@@ -380,7 +370,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 
 	private void processFile(String filename) throws Exception {
 		if (LOGGER.isLoggable(LogLevel.INFO)) {
-			LOGGER.log(LogLevel.INFO, "Process File: " + filename);
+			LOGGER.log(LogLevel.INFO, Messages.getString("HDFS_SOURCE_PROCESS_FILE", filename)); 
 		}
 		IHdfsClient hdfsClient = getHdfsClient();
 		
@@ -397,7 +387,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 		
 		if (fDataStream == null) {
-			LOGGER.log(LogLevel.ERROR, "Problem opening file " + filename);
+			LOGGER.log(LogLevel.ERROR, Messages.getString("HDFS_SOURCE_NOT_OPENING_FILE", filename)); 
 			return;
 		}
 		
@@ -411,7 +401,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			}
 		} catch (IOException e) {
 			LOGGER.log(LogLevel.ERROR,
-					"Exception occured during read: " + e.getMessage());
+					Messages.getString("HDFS_SOURCE_EXCEPTION_READ_FILE"), e.getMessage()); 
 		} finally {
 			closeFile();
 		}
@@ -465,7 +455,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				if (fSeekToLine >=0)
 				{
 
-					TRACE.info("Process File Seek to position: " + fSeekToLine);					
+					TRACE.info("Process File Seek to position: " + fSeekToLine);					 
 					
 					reader.close();
 					closeFile();
@@ -523,7 +513,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 				
 				if (fSeekPosition >=0)
 				{
-					TRACE.info("reset to position: " + fSeekPosition);
+					TRACE.info("reset to position: " + fSeekPosition); 
 					((FSDataInputStream)dataStream).seek(fSeekPosition);
 					fSeekPosition = -1;
 				}
@@ -553,7 +543,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, Messages.getString("HDFS_SOURCE_INIT_DELAY_INTERRUPTED")); 
 			}
 		}
 		try {
@@ -574,7 +564,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			try {
 				Thread.sleep((long) (fInitDelay * 1000));
 			} catch (InterruptedException e) {
-				LOGGER.log(LogLevel.INFO, "Init delay interrupted");
+				LOGGER.log(LogLevel.INFO, Messages.getString("HDFS_SOURCE_INIT_DELAY_INTERRUPTED")); 
 			}
 		}
 		fIsFirstTuple = false;
@@ -583,7 +573,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		// check if file name is an empty string. If so, log a warning and
 		// continue with the next tuple
 		if (filename.isEmpty()) {
-			LOGGER.log(LogLevel.WARN, "file name is an empty string. Skipping.");
+			LOGGER.log(LogLevel.WARN, Messages.getString("HDFS_SOURCE_EMPTY_FILE_NAME")); 
 		} else {
 			// IHdfsClient hdfsClient = getHdfsClient();
 			try {
@@ -624,7 +614,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	@Override
 	public void checkpoint(Checkpoint checkpoint) throws Exception {		
 		
-		TRACE.info("Checkpoint " + checkpoint.getSequenceId());
+		TRACE.info("Checkpoint " + checkpoint.getSequenceId()); 
 		
 		if (!isDynamicFile() && fDataStream instanceof FSDataInputStream)
 		{		
@@ -632,25 +622,25 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			FSDataInputStream fsDataStream = (FSDataInputStream)fDataStream;
 			long pos = fsDataStream.getPos();
 			
-			TRACE.info("checkpoint position: " + pos);
+			TRACE.info("checkpoint position: " + pos); 
 			
 			checkpoint.getOutputStream().writeLong(pos);
 			
 			// for text file
-			TRACE.info("checkpoint lineNumber: " + fLineNum);
+			TRACE.info("checkpoint lineNumber: " + fLineNum); 
 			checkpoint.getOutputStream().writeLong(fLineNum);
 		}
 	}
 
 	@Override
 	public void drain() throws Exception {
-		TRACE.info("Drain");
+		TRACE.info("Drain"); 
 	}
 
 	@Override
 	public void reset(Checkpoint checkpoint) throws Exception {
 		
-		TRACE.info("Reset " + checkpoint.getSequenceId());
+		TRACE.info("Reset " + checkpoint.getSequenceId()); 
 		
 		if (!isDynamicFile())
 		{	
@@ -660,13 +650,13 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 			// for text file
 			fSeekToLine = checkpoint.getInputStream().readLong();
 			
-			TRACE.info("reset position: " + fSeekPosition);
-			TRACE.info("reset lineNumber: " + fSeekToLine);
+			TRACE.info("reset position: " + fSeekPosition); 
+			TRACE.info("reset lineNumber: " + fSeekToLine); 
 			
 			// if thread is not running anymore, restart thread
 			if (fProcessThreadDone)
 			{
-				TRACE.info("reset process thread");
+				TRACE.info("reset process thread"); 
 				processThread = createProcessThread();
 				
 				// set to false here to avoid the delay of unsetting
@@ -679,20 +669,20 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 	@Override
 	public void resetToInitialState() throws Exception {
 		
-		TRACE.info("Resest to initial");
+		TRACE.info("Resest to initial"); 
 		if (!isDynamicFile())
 		{					
-			TRACE.info("Seek to 0");
+			TRACE.info("Seek to 0"); 
 			fSeekPosition = 0;					
 			fSeekToLine = 0;
 			
-			TRACE.info("reset position: " + fSeekPosition);
-			TRACE.info("reset lineNumber: " + fSeekToLine);
+			TRACE.info("reset position: " + fSeekPosition); 
+			TRACE.info("reset lineNumber: " + fSeekToLine); 
 			
 			// if thread is not running anymore, restart thread
 			if (fProcessThreadDone)
 			{
-				TRACE.info("reset process thread");
+				TRACE.info("reset process thread"); 
 				processThread = createProcessThread();
 				
 				// set to false here to avoid the delay of unsetting

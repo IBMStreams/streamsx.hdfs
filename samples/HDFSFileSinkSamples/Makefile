@@ -1,45 +1,36 @@
 ##################################################################### 
-# Copyright (C)2014, International Business Machines Corporation and 
+# Copyright (C)2014, 2018 International Business Machines Corporation and 
 # others. All Rights Reserved. 
 #####################################################################
 
 .PHONY: all clean
 
-STREAMS_SPLPATH ?=../../com.ibm.streamsx.hdfs:$(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs
-SPLC_FLAGS = -a -z --spl-path $(STREAMS_SPLPATH)
+TOOLKIT_NAME=com.ibm.streamsx.hdfs
+STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
+			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
+
+SPLC_FLAGS = -a --data-directory data
+
+SPL_CMD_ARGS ?= -t $(STREAMS_HDFS_TOOLKIT)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
-
-SPL_CMD_ARGS ?=
 SPL_MAIN_COMPOSITE1 = HDFS2FileSinkSampleLineFormat
 SPL_MAIN_COMPOSITE2 = HDFS2FileSinkSampleTxtFormat
 SPL_MAIN_DYNAMIC = DynamicFilename
-STANDALONE_OUTPUT_DIR = output/Standalone
-DISTRIBUTED_OUTPUT_DIR = output/Distributed
+BUILD_OUTPUT_DIR = output
 
 
-all: distributed
+all: data
+	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1) $(SPL_CMD_ARGS)
+	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2) $(SPL_CMD_ARGS)
+	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
 
-standalone:
-	$(SPLC) $(SPLC_FLAGS) -T -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1) $(SPL_CMD_ARGS) 
-	$(SPLC) $(SPLC_FLAGS) -T -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2) $(SPL_CMD_ARGS)
-	$(SPLC) $(SPLC_FLAGS) -T -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
-
-distributed:
-	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1) $(SPL_CMD_ARGS)
-	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2) $(SPL_CMD_ARGS)
-	$(SPLC) $(SPLC_FLAGS) -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
-
-clean: clean-standalone clean-distributed
-
-clean-standalone:
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
-	-rm -rf toolkit.xml
-
-clean-distributed:
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
-	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
+data:
+	mkdir data
+clean:
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
+	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
 	-rm -rf toolkit.xml

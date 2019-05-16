@@ -1,38 +1,34 @@
 ##################################################################### 
-# Copyright (C)2014, International Business Machines Corporation and 
+# Copyright (C)2014, 2018 International Business Machines Corporation and 
 # others. All Rights Reserved. 
 #####################################################################
+##################################################################### 
+# Copyright (C)2014, 2018 International Business Machines Corporation and 
+# others. All Rights Reserved. 
+#####################################################################     
+                            
+PHONY: all 
 
-STREAMS_SPLPATH ?= ..:../..
-SPLC_FLAGS = -a -z --spl-path $(STREAMS_SPLPATH)
-#-t ../com.ibm.streamsx.hdfs -t ../../com.ibm.streamsx.hdfs
+TOOLKIT_NAME=com.ibm.streamsx.hdfs
+STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
+			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
+
+SPLC_FLAGS = -a --data-directory data
+
+SPL_CMD_ARGS ?= -t $(STREAMS_HDFS_TOOLKIT)
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
-
-SPL_CMD_ARGS ?=
 SPL_MAIN_COMPOSITE = parallelwrite::Main
-STANDALONE_OUTPUT_DIR = output/Standalone
-DISTRIBUTED_OUTPUT_DIR = output/Distributed
-SOURCES = parallelwrite/Main.spl
+BUILD_OUTPUT_DIR = output
 
-all: distributed
 
-standalone: output/Standalone/Main/bin/standalone
+all: data
+	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR) $(SPL_CMD_ARGS)
 
-distributed: output/Distributed/Main/parallelwrite.Main.adl
+data:
+	mkdir data
+clean: 
+	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(BUILD_OUTPUT_DIR)
 
-output/Standalone/Main/bin/standalone: $(SOURCES)
-	$(SPLC) $(SPLC_FLAGS) -T -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/Main $(SPL_CMD_ARGS) 
-
-output/Distributed/Main/parallelwrite.Main.adl: $(SOURCES)
-	$(SPLC) $(SPLC_FLAGS) -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/Main $(SPL_CMD_ARGS)
-
-clean: clean-standalone clean-distributed
-
-clean-standalone:
-	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(STANDALONE_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE)
-	-rm -rf toolkit.xml
-
-clean-distributed:
-	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE) --output-dir ./$(DISTRIBUTED_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE)
-	-rm -rf toolkit.xml
