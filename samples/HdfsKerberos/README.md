@@ -4,7 +4,7 @@ This SPL sample demonstrates how to connect to the HDFS via kerberos authenticat
 
 At first read this guide in WiKi to setup kerberos in your HDP server:
 
-### How to use kerberos authentication in streamsx.hdfs toolkit
+### How to use kerberos authentication in streamsx.hdfs toolkit:
  
 https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-use-kerberos-authentication-in-streamsx.hdfs-toolkit/
 
@@ -72,11 +72,11 @@ Please perform exactly the following steps.
 
            kinit -k -t hdfs.headless.keytab <your-hdfs-principal>
     
-   If your configuration is correct, it creates a file in /tmp directory like this:
+     If your configuration is correct, it creates a file in /tmp directory like this:
 
           /tmp/crb5_xxxx
           
-   xxxx is your user id for example 1005  
+     xxxx is your user id for example 1005  
 
 
    - 7- If you have any problem to access to the realm, copy the crb5.conf file from your HDFS server into a directory and add the following **vmArg** parameter to all your HDFS2 operators in your SPL files:
