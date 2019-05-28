@@ -7,7 +7,7 @@
     
     <property>
       <name>fs.defaultFS</name>
-      <value>hdfs://hdp21.fyre.ibm.com:8020</value>
+      <value>hdfs://host.your-server-name:8020</value>
       <final>true</final>
     </property>
     
@@ -63,7 +63,7 @@
     
     <property>
       <name>hadoop.proxyuser.ambari-server-hdp2.hosts</name>
-      <value>hdp21.fyre.ibm.com</value>
+      <value>host.your-server-name</value>
     </property>
     
     <property>
@@ -98,7 +98,7 @@
     
     <property>
       <name>hadoop.proxyuser.HTTP.hosts</name>
-      <value>hdp21.fyre.ibm.com</value>
+      <value>host.your-server-name</value>
     </property>
     
     <property>
@@ -108,7 +108,7 @@
     
     <property>
       <name>hadoop.proxyuser.knox.hosts</name>
-      <value>hdp21.fyre.ibm.com</value>
+      <value>host.your-server-name</value>
     </property>
     
     <property>
@@ -118,7 +118,7 @@
     
     <property>
       <name>hadoop.proxyuser.yarn.hosts</name>
-      <value>hdp21.fyre.ibm.com</value>
+      <value>host.your-server-name</value>
     </property>
     
     <property>
