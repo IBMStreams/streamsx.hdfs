@@ -136,7 +136,7 @@ composite HdfsKerberos
                             authPrincipal    : $authPrincipal ;
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
-         		    vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
+         		    		vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
 
             }
 
@@ -148,7 +148,7 @@ composite HdfsKerberos
                             configPath       : $configPath ;
                             file             : "HDFS-LineInput.txt" ;
                             initDelay        : 10.0l ;
-         		    vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
+         		    		vmArg            : "-Djava.security.krb5.conf=/tmp/krb5.conf";
             }
 
             () as MySink = FileSink(LineStream)
