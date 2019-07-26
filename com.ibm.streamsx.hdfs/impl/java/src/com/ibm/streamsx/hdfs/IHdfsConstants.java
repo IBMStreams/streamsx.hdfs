@@ -14,6 +14,8 @@ public class IHdfsConstants {
 	public static final String PARAM_FILE_NAME_ATTR = "fileAttributeName";
 	public static final String PARAM_LOCAL_FILE_NAME_ATTR = "localFileAttrName";
 	public static final String PARAM_HDFS_FILE_NAME_ATTR = "hdfsFileAttrName";
+	public static final String PARAM_LOCAL_FILE_NAME = "localFile";
+	public static final String PARAM_HDFS_FILE_NAME = "hdfsFile";
 	public static final String PARAM_SLEEP_TIME = "sleepTime";
 	public static final String PARAM_INITDELAY = "initDelay";
 	public static final String PARAM_ENCODING = "encoding";
@@ -453,7 +455,7 @@ public class IHdfsConstants {
 		    
    public static final String DESC_HDFS_FIEL_COPY_OUTPUT="The `HDFS2FileCopy` operator is configurable with an optional output port.\\n" +  
    "The output port is non-mutating and its punctuation mode is `Free`.\\n" +
-   "The schema of the output port is <string result>, which delivers the result of copy actions.";
+   "The schema of the output port is <string result, uint64 elapsedTime>, which delivers the result of copy actions and the elapsed time.";
 
    public static final String DESC_HDFS_COPYY_LOCAL_FILE = "This optional parameter specifies the name of local file to be copied.\\n" +  
    "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n" +  
@@ -475,6 +477,10 @@ public class IHdfsConstants {
    "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n" +
    "This parameter is mandatory if the 'hdfsFile' is not specified. \\n"; 
 
+   public static final String DESC_HDFS_COPYY_DIRECTION = "This parameter specifies the direction of of copy. The parameter can be set with the following valuues. \\n" +
+   "* copyFromLocalFile  Copy a file from local disk to the HDFS file system.\\n" +
+   "* copyToLocalFile Copy a file from HDFS file system to the local disk.\\n";
+   
    public static final String DESC_HDFS_COPYY_DELETE_SOURCE_FILE = "This optional parameter specifies whether to delete the source file.";
    
    public static final String DESC_HDFS_COPYY_OVERWRITE_DEST_FILE = "This optional parameter specifies whether to overwrite the distination file.";
