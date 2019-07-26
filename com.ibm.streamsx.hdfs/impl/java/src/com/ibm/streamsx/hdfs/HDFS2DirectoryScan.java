@@ -33,11 +33,32 @@ import com.ibm.streams.operator.logging.LogLevel;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streams.operator.metrics.Metric;
+import com.ibm.streams.operator.model.Icons;
+import com.ibm.streams.operator.model.InputPortSet;
+import com.ibm.streams.operator.model.InputPorts;
+import com.ibm.streams.operator.model.OutputPortSet;
+import com.ibm.streams.operator.model.OutputPorts;
 import com.ibm.streams.operator.model.Parameter;
+import com.ibm.streams.operator.model.PrimitiveOperator;
 import com.ibm.streams.operator.model.SharedLoader;
+import com.ibm.streams.operator.model.InputPortSet.WindowMode;
+import com.ibm.streams.operator.model.InputPortSet.WindowPunctuationInputMode;
+import com.ibm.streams.operator.model.OutputPortSet.WindowPunctuationOutputMode;
 import com.ibm.streams.operator.state.Checkpoint;
 import com.ibm.streams.operator.state.ConsistentRegionContext;
 import com.ibm.streams.operator.state.StateHandler;
+
+
+@PrimitiveOperator(name="HDFS2DirectoryScan", namespace="com.ibm.streamsx.hdfs",
+description=IHdfsConstants.DESC_HDFS_DIR_SCAN)
+@Icons(location32 = "impl/java/icons/HDFS2FileSink_32.gif", location16 = "impl/java/icons/HDFS2FileSink_16.gif")
+
+@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_DIR_SCAN_INPUT, 
+cardinality=1, optional=true, controlPort=true,
+windowingMode=WindowMode.NonWindowed,windowPunctuationInputMode=WindowPunctuationInputMode.Oblivious)})
+
+@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_DIR_SCAN_OUTPUT, 
+cardinality=1, optional=false, windowPunctuationOutputMode=WindowPunctuationOutputMode.Free)})
 
 @SharedLoader
 public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHandler {
@@ -117,7 +138,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		}
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true  , description = IHdfsConstants.DESC_HDFS_DIR_SCAN_DIRECTORY)
 	public void setDirectory(String directory) {
 		TRACE.entering(CLASS_NAME, "setDirectory", directory); 
 		this.directory = directory;
@@ -127,7 +148,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		return directory;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true , description = IHdfsConstants.DESC_HDFS_DIR_SCAN_PATTERN)
 	public void setPattern(String pattern) {
 		this.pattern = pattern;
 	}
@@ -136,17 +157,17 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		return pattern;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_INIT_DELAY)
 	public void setInitDelay(double initDelay) {
 		this.initDelay = initDelay;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true , description = IHdfsConstants.DESC_HDFS_DIR_SCAN_SLEEP_TIME)
 	public void setSleepTime(double sleepTime) {
 		this.sleepTime = sleepTime;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true , description = IHdfsConstants.DESC_HDFS_DIR_SCAN_STRICT_MODE)
 	public void setStrictMode(boolean strictMode) {
 		this.isStrictMode = strictMode;
 	}

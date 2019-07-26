@@ -22,20 +22,21 @@ import com.ibm.streamsx.hdfs.client.auth.IAuthenticationHelper;
 abstract class AbstractHdfsClient implements IHdfsClient {
 	
 
-	protected FileSystem fFileSystem;
+	public FileSystem fFileSystem;
 	protected boolean fIsDisconnected;
 	protected IAuthenticationHelper fAuthHelper;
 	
 	private HashMap<String, String> fConnectionProperties = new HashMap<String, String>();
 
 	@Override
-	public void connect(String fileSystemUri, String hdfsUser, String configPath)
+	public FileSystem connect(String fileSystemUri, String hdfsUser, String configPath)
 			throws Exception {
 		System.out.println("AbstractHdfsClient connect  " + fileSystemUri + " " + hdfsUser + " " + configPath + " " + getConnectionProperties());
 		fAuthHelper = AuthenticationHelperFactory.createAuthenticationHelper(fileSystemUri, hdfsUser, configPath);
 		fFileSystem = fAuthHelper.connect(fileSystemUri, hdfsUser, getConnectionProperties());
 		// check if the filesystem is available
 		fFileSystem.getStatus();
+		return fFileSystem;
 	}
 		
 	@Override

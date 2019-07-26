@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import com.ibm.streams.operator.AbstractOperator;
@@ -18,10 +19,11 @@ import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streams.operator.model.Parameter;
+import com.ibm.streams.operator.state.StateHandler;
 import com.ibm.streamsx.hdfs.client.HdfsJavaClient;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
-public abstract class AbstractHdfsOperator extends AbstractOperator {
+public abstract class AbstractHdfsOperator extends AbstractOperator implements StateHandler{
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AbstractHdfsOperator";
 	public static final String EMPTY_STR = "";
@@ -29,11 +31,11 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 //	private static final String SCHEME_HDFS = "hdfs";
 //	private static final String SCHEME_GPFS = "gpfs";
 //	private static final String SCHEME_WEBHDFS = "webhdfs";
-	public static final String RECONNPOLICY_NORETRY = "NoRetry";
-	public static final String RECONNPOLICY_BOUNDEDRETRY = "BoundedRetry";
-	public static final String RECONNPOLICY_INFINITERETRY = "InfiniteRetry";
-	public static final int RECONN_BOUND_DEFAULT = 5;
-	public static final double RECONN_INTERVAL_DEFAULT = 10;
+//	public static final String RECONNPOLICY_NORETRY = "NoRetry";
+//	public static final String RECONNPOLICY_BOUNDEDRETRY = "BoundedRetry";
+//	public static final String RECONNPOLICY_INFINITERETRY = "InfiniteRetry";
+//	public static final int RECONN_BOUND_DEFAULT = 5;
+//	public static final double RECONN_INTERVAL_DEFAULT = 10;
 
 	
 	
@@ -46,6 +48,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 	// Common parameters and variables for connection
 	private IHdfsClient fHdfsClient;
+	public  FileSystem fs;
 	private String fHdfsUri;
 	private String fHdfsUser;
 	private String fHdfsPassword;
@@ -54,17 +57,17 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	private String fCredFile;
 	private String fConfigPath;
 
-	private String fReconnectionPolicy = RECONNPOLICY_BOUNDEDRETRY;
+	private String fReconnectionPolicy = IHdfsConstants.RECONNPOLICY_BOUNDEDRETRY;
 	// This optional parameter reconnectionBound specifies the number of successive connection
 	// that will be attempted for this operator.
 	// It can appear only when the reconnectionPolicy parameter is set to BoundedRetry
 	// and cannot appear otherwise.
 	// If not present the default value is 5
-	private int fReconnectionBound = RECONN_BOUND_DEFAULT;
+	private int fReconnectionBound = IHdfsConstants.RECONN_BOUND_DEFAULT;
 	// This optional parameter reconnectionInterval specifies the time period in seconds which
 	// the operator will be wait before trying to reconnect.
 	// If not specified, the default value is 10.0.
-	private double fReconnectionInterval = RECONN_INTERVAL_DEFAULT;
+	private double fReconnectionInterval = IHdfsConstants.RECONN_INTERVAL_DEFAULT;
 
 	
 	
@@ -96,11 +99,11 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		System.out.println("createConnection  ReconnectionPolicy " +  fReconnectionPolicy 
 				+ "  ReconnectionBound " +  fReconnectionBound 
 				+ "  ReconnectionInterval " +  fReconnectionInterval);
-		if (fReconnectionPolicy == RECONNPOLICY_NORETRY) {
+		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_NORETRY) {
 			fReconnectionBound = 1;
 		}
 
-		if (fReconnectionPolicy == RECONNPOLICY_INFINITERETRY) {
+		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_INFINITERETRY) {
 			fReconnectionBound = 9999;
 		}
 
@@ -110,7 +113,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 			try 
 			{
 				fHdfsClient = createHdfsClient();
-				fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
+				fs = fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
 				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
 				break;
 			} catch (Exception e) 
@@ -259,7 +262,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fHdfsClient;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_URL)
 	public void setHdfsUri(String hdfsUri) {
 		TRACE.log(TraceLevel.DEBUG, "setHdfsUri: " + hdfsUri);
 		fHdfsUri = hdfsUri;
@@ -269,7 +272,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fHdfsUri;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description= IHdfsConstants.DESC_HDFS_USER)
 	public void setHdfsUser(String hdfsUser) {
 		this.fHdfsUser = hdfsUser;
 	}
@@ -279,7 +282,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	}
 
 	//Parameter reconnectionPolicy
-	@Parameter(optional = true, description="This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures.  The valid values are: `NoRetry`, `InfiniteRetry`, and `BoundedRetry`. The default value is `BoundedRetry`. If `NoRetry` is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again.  The operator shuts down at startup time if the initial connection attempt fails. If `BoundedRetry` is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times. The maximum number of connection attempts is specified in the **reconnectionBound** parameter.  The sequence of connection attempts occurs at startup time. If a connection does not exist, the sequence of connection attempts also occurs before each operator is run.  If `InfiniteRetry` is specified, the operator continues to try and connect indefinitely until a connection is made.  This behavior blocks all other operator operations while a connection is not successful.  For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.")
+	@Parameter(optional = true, description=IHdfsConstants.DESC_REC_POLICY)
 	public void setReconnectionPolicy(String reconnectionPolicy){
 		this.fReconnectionPolicy = reconnectionPolicy;
 	}
@@ -290,7 +293,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 
 	//Parameter reconnectionBound
-	@Parameter(optional = true, description="This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs.  It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry`; otherwise, it is ignored. The default value is `5`.")
+	@Parameter(optional = true, description=IHdfsConstants.DESC_REC_BOUND)
 	public void setReconnectionBound(int reconnectionBound){
 		this.fReconnectionBound = reconnectionBound;
 	}
@@ -301,7 +304,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 
 
 	//Parameter reconnectionInterval
-	@Parameter(optional = true, description="This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts.  It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry` or `InfiniteRetry`; othewise, it is ignored.  The default value is `10`.")
+	@Parameter(optional = true, description=IHdfsConstants.DESC_REC_INTERVAL)
 	public void setReconnectionInterval(double reconnectionInterval){
 		this.fReconnectionInterval = reconnectionInterval;
 	}
@@ -311,7 +314,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 	}
 	
 	
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_PRINCIPAL)
 	public void setAuthPrincipal(String authPrincipal) {
 		this.fAuthPrincipal = authPrincipal;
 	}
@@ -320,7 +323,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fAuthPrincipal;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_AUTH_KEY)
 	public void setAuthKeytab(String authKeytab) {
 		this.fAuthKeytab = authKeytab;
 	}
@@ -329,7 +332,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fAuthKeytab;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_CRED_FILE)
 	public void setCredFile(String credFile) {
 		this.fCredFile = credFile;
 	}
@@ -338,7 +341,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fCredFile;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_CONFIG_PATH)
 	public void setConfigPath(String configPath) {
 		this.fConfigPath = configPath;
 	}
@@ -366,26 +369,26 @@ public abstract class AbstractHdfsOperator extends AbstractOperator {
 		return fPolicyFilePath;
 	}
 
-	@Parameter(optional=true)	
-	public void setHdfsPassword(String pass) {
-		fHdfsPassword = pass;
+	@Parameter(optional=true , description=IHdfsConstants.DESC_HDFS_PASSWORD)	
+	public void setHdfsPassword(String hadfsPassword) {
+		fHdfsPassword = hadfsPassword;
 	}
 
-	@Parameter(optional=true)	
-	public void setKeyStorePath(String path) {
-		fKeyStorePath = path;
+	@Parameter(optional=true, description=IHdfsConstants.DESC_KEY_STOR_PATH)	
+	public void setKeyStorePath(String keyStorePath) {
+		fKeyStorePath = keyStorePath;
 	}
-	@Parameter(optional=true)	
-	public void setKeyStorePassword(String pass) {
-		fKeyStorePassword = pass;
+	@Parameter(optional=true ,description=IHdfsConstants.DESC_KEY_STOR_PASSWORD)	
+	public void setKeyStorePassword(String keyStorePassword) {
+		fKeyStorePassword = keyStorePassword;
 	}
 	
-	@Parameter(optional=true) 
+	@Parameter(optional=true , description=IHdfsConstants.DESC_LIB_PATH) 
 	public void setLibPath(String libPath) {
 		fLibPath = libPath;
 	}
 
-	@Parameter(optional=true)
+	@Parameter(optional=true , description=IHdfsConstants.DESC_POLICY_FILE_PATH)
 	public void setPolicyFilePath(String policyFilePath) {
 		fPolicyFilePath = policyFilePath;
 	}

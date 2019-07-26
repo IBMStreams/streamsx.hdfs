@@ -33,13 +33,34 @@ import com.ibm.streams.operator.logging.LogLevel;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
 import com.ibm.streams.operator.metrics.Metric;
+import com.ibm.streams.operator.model.Icons;
+import com.ibm.streams.operator.model.InputPortSet;
+import com.ibm.streams.operator.model.InputPorts;
+import com.ibm.streams.operator.model.OutputPortSet;
+import com.ibm.streams.operator.model.OutputPorts;
 import com.ibm.streams.operator.model.Parameter;
+import com.ibm.streams.operator.model.PrimitiveOperator;
 import com.ibm.streams.operator.model.SharedLoader;
 import com.ibm.streams.operator.state.Checkpoint;
 import com.ibm.streams.operator.state.ConsistentRegionContext;
 import com.ibm.streams.operator.state.StateHandler;
 import com.ibm.streams.operator.types.ValueFactory;
+import com.ibm.streams.operator.model.InputPortSet.WindowMode;
+import com.ibm.streams.operator.model.InputPortSet.WindowPunctuationInputMode;
+import com.ibm.streams.operator.model.OutputPortSet.WindowPunctuationOutputMode;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
+
+@PrimitiveOperator(name="HDFS2FileSource", namespace="com.ibm.streamsx.hdfs",
+	description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE)
+
+@Icons(location32 = "impl/java/icons/HDFS2FileSource_32.gif", location16 = "impl/java/icons/HDFS2FileSource_16.gif")
+
+@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE_INPUT, 
+cardinality=1, optional=true, controlPort=false,
+windowingMode=WindowMode.NonWindowed,windowPunctuationInputMode=WindowPunctuationInputMode.Oblivious)})
+
+@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE_OUTPUT, 
+cardinality=1, optional=false, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating)})
 
 @SharedLoader
 public class HDFS2FileSource extends AbstractHdfsOperator implements
@@ -585,22 +606,22 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements
 		}
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_SOURCE_FILE)
 	public void setFile(String file) {
 		this.fFileName = file;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_INIT_DELAY)
 	public void setInitDelay(double initDelay) {
 		this.fInitDelay = initDelay;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_ENCODING)
 	public void setEncoding(String encoding) {
 		this.fEncoding = encoding;
 	}
 	
-	@Parameter(name=BLOCKSIZE_PARAM,optional=true)
+	@Parameter(name=BLOCKSIZE_PARAM,optional=true, description=IHdfsConstants.DESC_BLOCK_SIZE)
 	public void setBlockSize (int inBlockSize) {
 		fBlockSize = inBlockSize;
 	}

@@ -10,11 +10,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileStatus;
 
 public interface IHdfsClient {
 	
-	public void connect(String fileSystemUri, String hdfsUser, String configPath) throws Exception;
+	public FileSystem connect(String fileSystemUri, String hdfsUser, String configPath) throws Exception;
 	
 	public InputStream getInputStream(String filePath) throws IOException;
 	

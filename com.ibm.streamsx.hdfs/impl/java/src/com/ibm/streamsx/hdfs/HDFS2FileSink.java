@@ -36,11 +36,33 @@ import com.ibm.streams.operator.Type.MetaType;
 import com.ibm.streams.operator.compile.OperatorContextChecker;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
+import com.ibm.streams.operator.model.Icons;
+import com.ibm.streams.operator.model.InputPortSet;
+import com.ibm.streams.operator.model.InputPorts;
+import com.ibm.streams.operator.model.OutputPortSet;
+import com.ibm.streams.operator.model.OutputPorts;
 import com.ibm.streams.operator.model.Parameter;
+import com.ibm.streams.operator.model.PrimitiveOperator;
 import com.ibm.streams.operator.model.SharedLoader;
+import com.ibm.streams.operator.model.InputPortSet.WindowMode;
+import com.ibm.streams.operator.model.InputPortSet.WindowPunctuationInputMode;
+import com.ibm.streams.operator.model.OutputPortSet.WindowPunctuationOutputMode;
 import com.ibm.streams.operator.state.Checkpoint;
 import com.ibm.streams.operator.state.ConsistentRegionContext;
 import com.ibm.streams.operator.state.StateHandler;
+
+
+@PrimitiveOperator(name="HDFS2FileSink", namespace="com.ibm.streamsx.hdfs",
+description=IHdfsConstants.DESC_HDFS_FIEL_SINK)
+
+@Icons(location32 = "impl/java/icons/HDFS2FileSink_32.gif", location16 = "impl/java/icons/HDFS2FileSink_16.gif")
+
+@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SINK_INPUT, 
+cardinality=1, optional=true, controlPort=false,
+windowingMode=WindowMode.NonWindowed,windowPunctuationInputMode=WindowPunctuationInputMode.Oblivious)})
+
+@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SINK_OUTPUT, 
+cardinality=1, optional=true, windowPunctuationOutputMode=WindowPunctuationOutputMode.Free)})
 
 @SharedLoader
 public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler {
@@ -150,12 +172,12 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		}
 	}
 
-	@Parameter(name = IHdfsConstants.PARAM_FILE_NAME_ATTR, optional = true, description = "The name of the attribute containing the filename.")
-	public void setFilenameAttr(String name) {
-		fileAttrName = name;
+	@Parameter(name = IHdfsConstants.PARAM_FILE_NAME_ATTR, optional = true, description = IHdfsConstants.DESC_SINK_FILE_ATTR)
+	public void setFilenameAttr(String fileAttr) {
+		fileAttrName = fileAttr;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_FILE)
 	public void setFile(String file) {
 		TRACE.log(TraceLevel.DEBUG, "setFile: " + file); 
 		this.file = file;
@@ -165,10 +187,10 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return file;
 	}
 
-	@Parameter(optional = true)
-	public void setTempFile(String tempFile) {
-		TRACE.log(TraceLevel.DEBUG, "setTempFile: " + tempFile); 
-		this.tempFile = tempFile;
+	@Parameter(optional = true , description = IHdfsConstants.DESC_SINK_TEMP_FILE)
+	public void setTempFile(String tempfile) {
+		TRACE.log(TraceLevel.DEBUG, "setTempFile: " + tempfile); 
+		this.tempFile = tempfile;
 	}
 
 	public String getTempFile() {
@@ -181,12 +203,12 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	}
 
 	// Optional parameter timeFormat
-	@Parameter(optional = true)
+	@Parameter(optional = true , description = IHdfsConstants.DESC_SINK_TIME_FORMAT)
 	public void setTimeFormat(String timeFormat) {
 		this.timeFormat = timeFormat;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true , description = IHdfsConstants.DESC_SINK_BYTES_PER_FILE)
 	public void setBytesPerFile(long bytesPerFile) {
 		this.bytesPerFile = bytesPerFile;
 	}
@@ -195,7 +217,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return bytesPerFile;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TUPELS_PER_FILE)
 	public void setTuplesPerFile(long tuplesPerFile) {
 		this.tuplesPerFile = tuplesPerFile;
 	}
@@ -204,7 +226,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return tuplesPerFile;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TIME_PER_FILE)
 	public void setTimePerFile(double timePerFile) {
 		this.timePerFile = timePerFile;
 	}
@@ -212,8 +234,8 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	public double getTimePerFile() {
 		return timePerFile;
 	}
-
-	@Parameter(optional = true)
+	
+	@Parameter(optional = true, description=IHdfsConstants.DESC_SINK_CLOSE_ON_PUNCT)
 	public void setCloseOnPunct(boolean closeOnPunct) {
 		this.closeOnPunct = closeOnPunct;
 	}
@@ -222,7 +244,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return closeOnPunct;
 	}
 
-	@Parameter(optional = true)
+	@Parameter(optional = true, description=IHdfsConstants.DESC_ENCODING)
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
