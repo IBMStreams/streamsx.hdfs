@@ -10,6 +10,7 @@
 /guava-11.0.2.jar
 /hadoop-annotations-2.7.3.jar
 /hadoop-auth-2.7.3.jar
+/hadoop-auth-2.8.5.jar
 /hadoop-common-2.7.3.jar
 /htrace-core-3.1.0-SNAPSHOT.jar
 /jackson-core-asl-1.9.13.jar
@@ -23,5 +24,6 @@
 /protobuf-java-2.5.0.jar
 /commons-codec-1.9.jar
 /hadoop-annotations-2.9.2.jar
+/hadoop-annotations-2.8.5.jar
 /hadoop-auth-2.9.2.jar
 /hadoop-common-2.9.2.jar
