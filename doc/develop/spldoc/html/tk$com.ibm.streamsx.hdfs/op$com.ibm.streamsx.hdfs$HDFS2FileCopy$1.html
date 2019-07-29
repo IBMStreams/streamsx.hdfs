@@ -28,14 +28,12 @@
 
 
 <div class="section">
-<p class="p">This example copies the file test.txt from local path ./data/ into /user/hdfs/ directory. 
+<p class="p">This example copies the file <tt class="ph tt">test.txt</tt> from local path ./data/ into <tt class="ph tt">/user/hdfs/</tt> directory. 
 </p>
 
 <div class="p">
 <pre class="pre codeblock">
 streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
-{
-
     param
         localFile                : "test.txt"; 
         hdfsFile                 : "/user/hdfs/test.txt"; 
@@ -48,9 +46,9 @@ streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
 
 </div>
 
-<div class="p">This example copies all files from local path /tmp/work into /user/hdfs/work directory. 
+<div class="p">This example copies all files from the local path <tt class="ph tt">/tmp/work</tt> into HDFS directory <tt class="ph tt">/user/hdfs/work</tt> . 
 <pre class="pre codeblock">
-// DirectoryScan operator with an absolute file argument and a file name pattern 
+// DirectoryScan operator with an absolute directory argument. 
 stream&lt;rstring localFile&gt; DirScan = DirectoryScan() 
 {  
     param 
@@ -58,8 +56,8 @@ stream&lt;rstring localFile&gt; DirScan = DirectoryScan()
         initDelay       : 1.0; 
 } 
 
-// copies all incoming files from input port into /user/hdfs/work directory. 
-stream&lt;rstring message, uint64 elapsedTime&gt; lineSink1 = HDFS2FileCopy(DirScan)
+// Copies all incoming files from input port into /user/hdfs/work directory. 
+stream&lt;rstring message, uint64 elapsedTime&gt; CopyFromLocal = HDFS2FileCopy(DirScan)
 { 
     param
           hdfsUser                 : "hdfs"; 
@@ -74,25 +72,21 @@ stream&lt;rstring message, uint64 elapsedTime&gt; lineSink1 = HDFS2FileCopy(DirS
 
 </div>
 
-<p class="p">This example copies all files from HDFS directory <tt class="ph tt">/user/hdfs/work</tt> into local directory <tt class="ph tt">/tmp/work2</tt> . 
+<p class="p">This example copies all files from the HDFS directory <tt class="ph tt">/user/hdfs/work</tt> into the local directory <tt class="ph tt">/tmp/work2</tt> . 
 </p>
 
-<div class="p">
+<div class="p">You have to perform the follwing steps for kerberos configuration:* 1- Copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. 
 <ul class="ul">
-<li class="li"> 1- copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. </li>
-
 <li class="li"> 2- Replace the kerberos principal with your hdsf principal. </li>
 
 <li class="li"> 3- Copy the <tt class="ph tt">core-site.xml</tt> file from your HDFS server into <tt class="ph tt">etc</tt> directory. </li>
 
-<li class="li"> 4- Copy the kerberos configuration file in <tt class="ph tt">/etc</tt> directory of your streams server. </li>
-
-</ul>
-
-</div>
-
-<div class="p"><tt class="ph tt">HDFS2DirectoryScan</tt> operator with an absolute directory argument and the kerberos authentication parameters. 
+<li class="li"> 4- Copy the kerberos configuration file in <tt class="ph tt">/etc</tt> directory of your streams server. 
+<div class="p">
 <pre class="pre codeblock">
+//`HDFS2DirectoryScan` operator with an absolute directory argument and with kerberos authentication 
+
+// parameters returns all HDFS file names. 
 stream&lt;rstring hdfsFile&gt; HdfsDirScan = HDFS2DirectoryScan() 
 {  
     param 
@@ -103,13 +97,8 @@ stream&lt;rstring hdfsFile&gt; HdfsDirScan = HDFS2DirectoryScan()
         directory                : "/user/hdfs/work"; 
         sleepTime                : 2.0; 
 } 
-</pre>
 
-
-</div>
-
-<div class="p"> // copies all incoming HDFS files from input port into /tmp/work2 directory. 
-<pre class="pre codeblock">
+// CopyToLocal copies all incoming HDFS files from input port into local directory /tmp/work2 . 
 stream&lt;rstring message, uint64 elapsedTime&gt; CopyToLocal = HDFS2FileCopy(HdfsDirScan) 
 { 
     param
@@ -125,6 +114,11 @@ stream&lt;rstring message, uint64 elapsedTime&gt; CopyToLocal = HDFS2FileCopy(Hd
 }
 </pre>
 
+
+</div>
+</li>
+
+</ul>
 
 </div>
 
