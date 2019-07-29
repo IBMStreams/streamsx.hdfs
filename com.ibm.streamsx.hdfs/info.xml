@@ -145,7 +145,7 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
  
 </description>
-    <version>4.4.1</version>
+    <version>4.5.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
