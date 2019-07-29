@@ -7,73 +7,45 @@
 <meta name="copyright" content="(C) Copyright 2005"/>
 <meta name="DC.rights.owner" content="(C) Copyright 2005"/>
 <meta name="DC.Type" content="reference"/>
-<meta name="DC.Title" content="Operator HDFS2DirectoryScan"/>
+<meta name="DC.Title" content="Operator HDFS2FileCopy"/>
 <meta name="DC.Format" content="XHTML"/>
 <meta name="DC.Identifier" content="spldoc_operator"/>
 <link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
 <link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
-<title>Operator HDFS2DirectoryScan</title>
+<title>Operator HDFS2FileCopy</title>
 </head>
 <body id="spldoc_operator">
 
 
-<h1 class="title topictitle1">Operator <tt class="ph tt">HDFS2DirectoryScan</tt></h1>
+<h1 class="title topictitle1">Operator <tt class="ph tt">HDFS2FileCopy</tt></h1>
 
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 4.4.1</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2DirectoryScan</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 4.5.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileCopy</p>
 
 </div>
 
 <div class="section splprimop">
-  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.svg" width="872" height="112"/>
+  <embed class="image" src="../../image/tk$com.ibm.streamsx.hdfs/op$com.ibm.streamsx.hdfs$HDFS2FileCopy.svg" width="872" height="112"/>
 </div>
 
 <div class="section">
 
-<p class="p">The <strong class="ph b">HDFS2DirectoryScan</strong> operator scans a Hadoop Distributed File System directory for new or modified files. 
+<p class="p">The <strong class="ph b">HDFS2FileCopy</strong> operator copies files from a HDFS fiel system to the loca disk and also from a local disk to the HDFS file system 
 </p>
 
-<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> is similar to the <tt class="ph tt">DirectoryScan</tt> operator.  The <tt class="ph tt">HDFS2DirectoryScan</tt> operator repeatedly scans an HDFS directory and writes the names of new or modified files  that are found in the directory to the output port. The operator sleeps between scans. 
-</p>
-
-</div>
-
-<div class="section"><h2 class="title sectiontitle">Behavior in a consistent region 
-</h2>
-
-<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> operator can participate in a consistent region.  The operator can be at the start of a consistent region if there is no input port.  The operator supports periodic and operator-driven consistent region policies. 
-</p>
-
-<p class="p">If consistent region policy is set as operator driven, the operator initiates a drain after each tuple is submitted.  This allows for a consistent state to be established after a file is fully processed.  If consistent region policy is set as periodic, the operator respects the period setting and establishes consistent states accordingly.  This means that multiple files can be processed before a consistent state is established. 
-</p>
-
-<p class="p">At checkpoint, the operator saves the last submitted filename and its modification timestamp to the checkpoint.  Upon application failures, the operator resubmits all files that are newer than the last submitted file at checkpoint. 
-</p>
-
-</div>
-
-<div class="section"><h2 class="title sectiontitle">Exceptions 
-</h2>
-
-<div class="p">The operator terminates in the following cases: 
+<div class="p">The  <tt class="ph tt">HDFS2FileCopy</tt>  uses the hadoop JAVA API functions <tt class="ph tt">copyFromLocalFile</tt> and <tt class="ph tt">copyToLocalFile</tt> to copy files in two directions. 
 <ul class="ul">
-<li class="li"> The operator cannot connect to HDFS. </li>
+<li class="li"> <tt class="ph tt">copyFromLocalFile</tt> : Copies a file from local disk to the HDFS file system. </li>
 
-<li class="li"> The <strong class="ph b">strictMode</strong> parameter is true but the directory is not found. </li>
-
-<li class="li"> The path that is given by the directory name exists, but is an ordinary file and not a directory. </li>
-
-<li class="li"> HDFS failed to give a list of files in the directory. </li>
-
-<li class="li"> The pattern that is specified in the pattern parameter fails to compile. </li>
+<li class="li"> <tt class="ph tt">copyToLocalFile</tt>   : Copies a file from HDFS file system to the local disk. </li>
 
 </ul>
 
 </div>
 
-  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan$1.html">Examples </a>
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileCopy$1.html">Examples </a>
 </dt>
 <dd class="dd">
 </dd>
@@ -99,9 +71,14 @@
  
   <dt class="dt dlterm">Parameters</dt>
 
-  <dd class="dd">This operator supports 19 parameters.
+  <dd class="dd">This operator supports 21 parameters.
+<p class="p"> Required: 
+<a class="xref" href="#spldoc_operator__parameter__direction">direction</a>
+
+</p>
+
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__directory">directory</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__pattern">pattern</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>, <a class="xref" href="#spldoc_operator__parameter__sleepTime">sleepTime</a>, <a class="xref" href="#spldoc_operator__parameter__strictMode">strictMode</a>
+<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__deleteSourceFile">deleteSourceFile</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsFile">hdfsFile</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsFileAttrName">hdfsFileAttrName</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__localFile">localFile</a>, <a class="xref" href="#spldoc_operator__parameter__localFileAttrName">localFileAttrName</a>, <a class="xref" href="#spldoc_operator__parameter__overwriteDestinationFile">overwriteDestinationFile</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 </dd>
@@ -137,7 +114,16 @@
 
    <dd class="dd">
 
-<p class="p">The <tt class="ph tt">HDFS2DirectoryScan</tt> operator has an optional control input port. You can use this port to change the directory that the operator scans at run time without restarting or recompiling the application.  The expected schema for the input port is of tuple&lt;rstring directory&gt;, a schema containing a single attribute of type rstring.  If a directory scan is in progress when a tuple is received, the scan completes and a new scan starts immediately after and uses the new directory that was specified.  If the operator is sleeping, the operator starts scanning the new directory immediately after it receives an input tuple.  
+<p class="p">The <tt class="ph tt">HDFS2FileCopy</tt> operator has one input port, which contents the file names that you specified.  The input port is non-mutating, and its punctuation mode is <tt class="ph tt">Oblivious</tt> &gt;. 
+</p>
+
+<p class="p">The schema of the input port is:
+</p>
+
+<p class="p"><tt class="ph tt">tuple&lt;rstring localFileAttrName, rstring hdfsFileAttrName&gt;</tt>
+</p>
+
+<p class="p">or one of them: <tt class="ph tt">tuple&lt;rstring localFileAttrName&gt;</tt> or <tt class="ph tt">tuple&lt;rstring hdfsFileAttrName&gt;</tt> , which specifies a rstring for file names.  
 </p>
    </dd>
 
@@ -153,7 +139,7 @@
    </ul>
 
    <ul class="sl simple">
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__controlport">ControlPort</a>: true
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__controlport">ControlPort</a>: false
 </li>
 
      <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__input_port_set__windowingmode">WindowingMode</a>: NonWindowed
@@ -189,7 +175,19 @@
 
    <dd class="dd">
 
-<p class="p">    The <tt class="ph tt">HDFS2DirectoryScan</tt> operator has one output port.  This port provides tuples of type rstring that are encoded in UTF-8 and represent the file names that are found in the directory, one file name per tuple.  The file names do not occur in any particular order.  The port is non-mutating and punctuation free.  
+<p class="p">The <tt class="ph tt">HDFS2FileCopy</tt> operator is configurable with an optional output port.  The output port is non-mutating and its punctuation mode is <tt class="ph tt">Free</tt>. 
+</p>
+
+<p class="p">The schema of the output port is:
+</p>
+
+<p class="p"> <tt class="ph tt">&lt;string result, uint64 elapsedTime&gt;</tt> 
+</p>
+
+<p class="p">, which delivers the result of copy process and the elapsed time in milisecunds. 
+</p>
+
+<p class="p">In case of any error it returns the error message as result
 </p>
 
 <p class="p"/>
@@ -200,7 +198,7 @@
 
       <dd class="dd">
    <ul class="sl simple">
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__optional">Optional</a>: false
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__output_port_set__optional">Optional</a>: true
      </li>
 
    </ul>
@@ -227,9 +225,14 @@
 
 <div class="section">
 <p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters">Parameters</a></strong></p>
-This operator supports 19 parameters.
+This operator supports 21 parameters.
+<p class="p"> Required: 
+<a class="xref" href="#spldoc_operator__parameter__direction">direction</a>
+
+</p>
+
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__directory">directory</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__pattern">pattern</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>, <a class="xref" href="#spldoc_operator__parameter__sleepTime">sleepTime</a>, <a class="xref" href="#spldoc_operator__parameter__strictMode">strictMode</a>
+<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__deleteSourceFile">deleteSourceFile</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsFile">hdfsFile</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsFileAttrName">hdfsFileAttrName</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__localFile">localFile</a>, <a class="xref" href="#spldoc_operator__parameter__localFileAttrName">localFileAttrName</a>, <a class="xref" href="#spldoc_operator__parameter__overwriteDestinationFile">overwriteDestinationFile</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 <dl class="dl">
@@ -369,10 +372,113 @@ This operator supports 19 parameters.
 
 
 
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__directory"><!-- --></a><tt class="ph tt">directory</tt></dt>
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__deleteSourceFile"><!-- --></a><tt class="ph tt">deleteSourceFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the name of the directory to be scanned.  If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/<em class="ph i">userid</em>/ directory. This parameter is mandatory if the input port is not specified.  
+<p class="p">This optional parameter specifies whether to delete the source file when processing is finished.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: boolean
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__direction"><!-- --></a><tt class="ph tt">direction</tt></dt>
+
+<dd class="dd">
+<div class="p">This parameter specifies the direction of copy. The parameter can be set with the following values. 
+<ul class="ul">
+<li class="li"> <tt class="ph tt">copyFromLocalFile</tt>  Copy a file from local disk to the HDFS file system. </li>
+
+<li class="li"> <tt class="ph tt">copyToLocalFile</tt> Copy a file from HDFS file system to the local disk.  </li>
+
+</ul>
+
+</div>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: com.ibm.streamsx.hdfs.HDFS2FileCopy.copyDirection
+ (<tt class="ph tt">copyFromLocalFile, copyToLocalFile</tt>)  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: false
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__expressionmode">ExpressionMode</a>: CustomLiteral
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsFile"><!-- --></a><tt class="ph tt">hdfsFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the name of HDFS file or directory.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyFromLocalFile</tt> and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/.  This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port.  
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsFileAttrName"><!-- --></a><tt class="ph tt">hdfsFileAttrName</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the value of hdfsFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  This parameter is mandatory if the 'hdfsFile' is not specified.  
 </p>
 <dl class="dl">
 
@@ -507,37 +613,6 @@ This operator supports 19 parameters.
 
 
 
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__initDelay"><!-- --></a><tt class="ph tt">initDelay</tt></dt>
-
-<dd class="dd">
-<p class="p">This parameter specifies the time to wait in seconds before the operator reads the first file.  The default value is <tt class="ph tt">0</tt>.
-</p>
-<dl class="dl">
-
- <dt class="dt dlterm">Properties </dt>
-
- <dd class="dd">
-  <ul class="sl simple">
-  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: float64
-  </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
-     </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
-     </li>
-
-  </ul>
-
- </dd>
-
-
-</dl>
-
-</dd>
-
-
-
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__keyStorePassword"><!-- --></a><tt class="ph tt">keyStorePassword</tt></dt>
 
 <dd class="dd">
@@ -631,10 +706,10 @@ This operator supports 19 parameters.
 
 
 
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__pattern"><!-- --></a><tt class="ph tt">pattern</tt></dt>
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__localFile"><!-- --></a><tt class="ph tt">localFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter limits the file names that are listed to the names that match the specified regular expression.  The <tt class="ph tt">HDFS2DirectoryScan</tt> operator ignores file names that do not match the specified regular expression.  
+<p class="p">This optional parameter specifies the name of local file to be copied.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyToLocalFile</tt> and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/.  This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port.  
 </p>
 <dl class="dl">
 
@@ -643,6 +718,68 @@ This operator supports 19 parameters.
  <dd class="dd">
   <ul class="sl simple">
   <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__localFileAttrName"><!-- --></a><tt class="ph tt">localFileAttrName</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the value of localFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  This parameter is mandatory if the 'localFile' is not specified.  
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__overwriteDestinationFile"><!-- --></a><tt class="ph tt">overwriteDestinationFile</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies whether to overwrite the destination file.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: boolean
   </li>
 
      <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
@@ -770,68 +907,6 @@ This operator supports 19 parameters.
  <dd class="dd">
   <ul class="sl simple">
   <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
-  </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
-     </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
-     </li>
-
-  </ul>
-
- </dd>
-
-
-</dl>
-
-</dd>
-
-
-
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__sleepTime"><!-- --></a><tt class="ph tt">sleepTime</tt></dt>
-
-<dd class="dd">
-<p class="p">This optional parameter specifies the minimum time between directory scans. The default value is 5.0 seconds.  
-</p>
-<dl class="dl">
-
- <dt class="dt dlterm">Properties </dt>
-
- <dd class="dd">
-  <ul class="sl simple">
-  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: float64
-  </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
-     </li>
-
-     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
-     </li>
-
-  </ul>
-
- </dd>
-
-
-</dl>
-
-</dd>
-
-
-
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__strictMode"><!-- --></a><tt class="ph tt">strictMode</tt></dt>
-
-<dd class="dd">
-<p class="p">This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist.  If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates.  If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error  
-</p>
-<dl class="dl">
-
- <dt class="dt dlterm">Properties </dt>
-
- <dd class="dd">
-  <ul class="sl simple">
-  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: boolean
   </li>
 
      <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
