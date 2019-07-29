@@ -53,15 +53,15 @@ import com.ibm.streams.operator.state.StateHandler;
 
 
 @PrimitiveOperator(name="HDFS2FileSink", namespace="com.ibm.streamsx.hdfs",
-description=IHdfsConstants.DESC_HDFS_FIEL_SINK)
+description=IHdfsConstants.DESC_HDFS_FILE_SINK)
 
 @Icons(location32 = "impl/java/icons/HDFS2FileSink_32.gif", location16 = "impl/java/icons/HDFS2FileSink_16.gif")
 
-@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SINK_INPUT, 
+@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FILE_SINK_INPUT, 
 cardinality=1, optional=true, controlPort=false,
 windowingMode=WindowMode.NonWindowed,windowPunctuationInputMode=WindowPunctuationInputMode.Oblivious)})
 
-@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SINK_OUTPUT, 
+@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FILE_SINK_OUTPUT, 
 cardinality=1, optional=true, windowPunctuationOutputMode=WindowPunctuationOutputMode.Free)})
 
 @SharedLoader

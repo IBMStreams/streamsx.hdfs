@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, International Business Machines Corporation
+ * Copyright (C) 2014-2019, International Business Machines Corporation
  * All Rights Reserved
  *******************************************************************************/
 
@@ -46,15 +46,15 @@ import com.ibm.streams.operator.state.Checkpoint;
 import com.ibm.streams.operator.state.ConsistentRegionContext;
 import com.ibm.streams.operator.state.StateHandler;
 
-@PrimitiveOperator(name = "HDFS2FileCopy", namespace = "com.ibm.streamsx.hdfs", description = IHdfsConstants.DESC_HDFS_FIEL_COPY)
+@PrimitiveOperator(name = "HDFS2FileCopy", namespace = "com.ibm.streamsx.hdfs", description = IHdfsConstants.DESC_HDFS_FILE_COPY)
 
 @Icons(location32 = "impl/java/icons/HDFS2FileCopy_32.gif", location16 = "impl/java/icons/HDFS2FileCopy_16.gif")
 
 @InputPorts({
-		@InputPortSet(description = IHdfsConstants.DESC_HDFS_FIEL_COPY_INPUT, cardinality = 1, optional = true, controlPort = false, windowingMode = WindowMode.NonWindowed, windowPunctuationInputMode = WindowPunctuationInputMode.Oblivious) })
+		@InputPortSet(description = IHdfsConstants.DESC_HDFS_FILE_COPY_INPUT, cardinality = 1, optional = true, controlPort = false, windowingMode = WindowMode.NonWindowed, windowPunctuationInputMode = WindowPunctuationInputMode.Oblivious) })
 
 @OutputPorts({
-		@OutputPortSet(description = IHdfsConstants.DESC_HDFS_FIEL_COPY_OUTPUT, cardinality = 1, optional = true, windowPunctuationOutputMode = WindowPunctuationOutputMode.Free) })
+		@OutputPortSet(description = IHdfsConstants.DESC_HDFS_FILE_COPY_OUTPUT, cardinality = 1, optional = true, windowPunctuationOutputMode = WindowPunctuationOutputMode.Free) })
 
 @SharedLoader
 public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler {
@@ -73,7 +73,7 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	private String hdfsFileAttrName = null;
 	private String localFile = null;
 	private String hdfsFile = null;
-	private boolean deleteSourceFiel = false;
+	private boolean deleteSourceFile = false;
 	private boolean overwriteDestinationFile = false;
 
 	public enum copyDirection {
@@ -137,8 +137,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	}
 
 	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_DELETE_SOURCE_FILE)
-	public void setDeleteSourceFiel(boolean deleteSourceFiel) {
-		this.deleteSourceFiel = deleteSourceFiel;
+	public void setDeleteSourceFile(boolean deleteSourceFile) {
+		this.deleteSourceFile = deleteSourceFile;
 	}
 
 	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_OVERWRITE_DEST_FILE)
@@ -243,6 +243,7 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 				dataAttribute = 1;
 			}
 		}
+/*
 		// now, check the data attribute is an okay type.
 		MetaType dataType = inputSchema.getAttribute(dataAttribute).getType().getMetaType();
 		// check that the data type is okay.
@@ -258,6 +259,7 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						inputSchema.getAttribute(1).getType().getMetaType()), null);
 			}
 		}
+	*/
 	}
 
 	/**
@@ -417,47 +419,66 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	@Override
 	synchronized public void process(StreamingInput<Tuple> stream, Tuple tuple) throws Exception {
 
-		if (localFileAttrName != null) {
-			localFile = tuple.getString(localFileAttrName);
-		}
-
-		if (hdfsFileAttrName != null) {
-			hdfsFile = tuple.getString(hdfsFileAttrName);
-		}
 		String message = "";
 		String hdfsFullPath = hdfsFile;
-		// get the start time
+		String localFileName = "";
+		String hdfsFileNmae = "";
 		long millisStart = Calendar.getInstance().getTimeInMillis();
-		
-		if ((localFile != null) && (hdfsFile != null)) {
-			if (fs != null) {
-				if (!localFile.startsWith(File.separator)) {
-					localFile = getOperatorContext().getPE().getDataDirectory() + File.separator + localFile;
-				}
-				fs.getHomeDirectory();
-				if (!hdfsFile.startsWith(File.separator)) {
-					hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFile;
-				}
-				Path localPath = new Path(localFile);
-				Path hdfsPath = new Path(hdfsFile);
-				if (direction == copyDirection.copyFromLocalFile) {
-					fs.copyFromLocalFile(deleteSourceFiel, overwriteDestinationFile, localPath, hdfsPath);
-					message = "Copied from " + localFile + "  to  " + hdfsFullPath;
-				}
-				
-				if (direction == copyDirection.copyToLocalFile) {
-					fs.copyToLocalFile(deleteSourceFiel, hdfsPath, localPath);
-					message = "Copied from "  + hdfsFullPath + "  to  " + localFile ;
-				}
+		try {
+			if (localFileAttrName != null) {
+				localFile = tuple.getString(localFileAttrName);
+			}
 
-				long elapsedTime = Calendar.getInstance().getTimeInMillis() - millisStart;
-				System.out.println("localFile " + localFile + " hdfsFile: " + hdfsFile + " elapsedTime "
-						+ elapsedTime / 1000);
-				if (hasOutputPort) {
-					submitOnOutputPort(message, elapsedTime);
+			if (hdfsFileAttrName != null) {
+				hdfsFile = tuple.getString(hdfsFileAttrName);
+			}
+			// get the start time
+
+			if ((localFile != null) && (hdfsFile != null)) {
+				if (fs != null) {
+					if (!localFile.startsWith(File.separator)) {
+						localFile = getOperatorContext().getPE().getDataDirectory() + File.separator + localFile;
+					}
+
+					localFileName = localFile.substring(localFile.lastIndexOf(File.separator) + 1);
+
+					if (hdfsFile.endsWith(File.separator)) {
+						hdfsFileNmae = hdfsFile + localFileName;
+					} else {
+						hdfsFileNmae = hdfsFile;
+					}
+					if (!hdfsFile.startsWith(File.separator)) {
+						hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFileNmae;
+					} else {
+						hdfsFullPath = fs.getUri().toString() + hdfsFileNmae;
+					}
+
+					Path localPath = new Path(localFile);
+					Path hdfsPath = new Path(hdfsFileNmae);
+					if (direction == copyDirection.copyFromLocalFile) {
+						fs.copyFromLocalFile(deleteSourceFile, overwriteDestinationFile, localPath, hdfsPath);
+						message = "successfully copied from " + localFile + "  to  " + hdfsFullPath;
+					}
+
+					if (direction == copyDirection.copyToLocalFile) {
+						System.out.println("kkkkkkkk localFile " + hdfsPath + " hdfsFileNmae " + localPath);
+						fs.copyToLocalFile(deleteSourceFile, hdfsPath, localPath, true);
+						
+						message = "successfully copied from " + hdfsFullPath + "  to  " + localFile;
+					}
 				}
 			}
+		} catch (Exception e) {
+			TRACE.log(TraceLevel.DEBUG, "Exception in copy process.", e);
+			LOGGER.log(TraceLevel.ERROR, e.getMessage());
+			message = "ERROR :" + e.getMessage();
 		}
+		long elapsedTime = Calendar.getInstance().getTimeInMillis() - millisStart;
+		// System.out.println("localFile " + localFile + " hdfsFile: " + hdfsFile + " elapsedTime " + elapsedTime / 1000);
+		if (hasOutputPort) {
+			submitOnOutputPort(message, elapsedTime);
+		}
+
 		// if operator is restarting in a consistent region, discard tuples
 		if (isRestarting()) {
 			if (TRACE.isLoggable(TraceLevel.DEBUG)) {

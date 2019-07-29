@@ -1,4 +1,4 @@
-#Thu Nov 29 13:13:32 CET 2018
+#Mon Jul 29 17:56:47 CEST 2019
 copytosourcelist=
 hreftargetslist=tk$HDFSFileSinkSamples/ns$hdfsexample.xml,tk$HDFSFileSinkSamples/tk$HDFSFileSinkSamples.xml,tk$HDFSFileSinkSamples/ix$Namespace.xml,toolkits/ix$Namespace.xml,toolkits/toolkits.xml
 fullditatopicfile=fullditatopic.list
@@ -37,7 +37,7 @@ codereffile=coderef.list
 keylist=
 codereflist=
 user.input.file.listfile=usr.input.file.list
-user.input.dir=/home/nouriahm/workspace/streamsx.hdfs/samples/HDFSFileSinkSamples/doc/spldoc/dita
+user.input.dir=/home/anouri/workspace/streamsx.hdfs/samples/HDFSFileSinkSamples/doc/spldoc/dita
 uplevels=
 tempdirToinputmapdir.relative.value=
 conrefpushfile=conrefpush.list

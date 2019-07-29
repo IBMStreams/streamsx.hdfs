@@ -51,15 +51,15 @@ import com.ibm.streams.operator.model.OutputPortSet.WindowPunctuationOutputMode;
 import com.ibm.streamsx.hdfs.client.IHdfsClient;
 
 @PrimitiveOperator(name="HDFS2FileSource", namespace="com.ibm.streamsx.hdfs",
-	description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE)
+	description=IHdfsConstants.DESC_HDFS_FILE_SOURCE)
 
 @Icons(location32 = "impl/java/icons/HDFS2FileSource_32.gif", location16 = "impl/java/icons/HDFS2FileSource_16.gif")
 
-@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE_INPUT, 
+@InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_FILE_SOURCE_INPUT, 
 cardinality=1, optional=true, controlPort=false,
 windowingMode=WindowMode.NonWindowed,windowPunctuationInputMode=WindowPunctuationInputMode.Oblivious)})
 
-@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FIEL_SOURCE_OUTPUT, 
+@OutputPorts({@OutputPortSet(description=IHdfsConstants.DESC_HDFS_FILE_SOURCE_OUTPUT, 
 cardinality=1, optional=false, windowPunctuationOutputMode=WindowPunctuationOutputMode.Generating)})
 
 @SharedLoader

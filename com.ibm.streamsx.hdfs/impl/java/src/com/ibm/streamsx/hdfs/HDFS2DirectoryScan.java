@@ -51,7 +51,9 @@ import com.ibm.streams.operator.state.StateHandler;
 
 @PrimitiveOperator(name="HDFS2DirectoryScan", namespace="com.ibm.streamsx.hdfs",
 description=IHdfsConstants.DESC_HDFS_DIR_SCAN)
-@Icons(location32 = "impl/java/icons/HDFS2FileSink_32.gif", location16 = "impl/java/icons/HDFS2FileSink_16.gif")
+
+@Icons(location32 = "impl/java/icons/HDFS2DirScan_32.gif", location16 = "impl/java/icons/HDFS2DirScan_16.gif")
+
 
 @InputPorts({@InputPortSet(description=IHdfsConstants.DESC_HDFS_DIR_SCAN_INPUT, 
 cardinality=1, optional=true, controlPort=true,
@@ -433,7 +435,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		initDelayMil = (long) (1000 * initDelay);
 
 		// TODO - Need to change following for annotation based metrics
-		nScans = context.getMetrics().getCustomMetric(NUM_SCANS_METRIC);
+		// nScans = context.getMetrics().getCustomMetric(NUM_SCANS_METRIC);
 
 		checkStrictMode(context);
 
@@ -848,7 +850,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 
 		FileStatus[] files = new FileStatus[0];
 
-		nScans.incrementValue(1);
+		// nScans.incrementValue(1);
 		files = getHdfsClient().scanDirectory(directory, getPattern());
 
 		Arrays.sort(files, new ModTimeComparator());
