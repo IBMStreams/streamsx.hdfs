@@ -1,0 +1,124 @@
+/*******************************************************************************
+* Copyright (C) 2019, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/                          
+namespace hdfsexample ;
+
+use com.ibm.streamsx.hdfs::HDFS2DirectoryScan ;
+use com.ibm.streamsx.hdfs::HDFS2FileCopy ;
+
+/**
+ * The [HdfsFileCopy] sample demonstrates how to use the HDFS2FileCopy
+ * operator to copy a file from HDFS in local disk and
+ * copy a local file to HDFS.
+*/
+
+composite HdfsFileCopy
+{
+	graph
+
+		// generates file names
+		stream<rstring localFile, rstring hdfsFile> GenFileNames = Beacon()
+		{
+			param
+				initDelay : 1.0 ;
+				period : 0.05 ;
+				iterations : 7u ;
+			output
+				GenFileNames : localFile = "local-test-" +(rstring) IterationCount() + ".txt", hdfsFile =
+				"hdfs-test-" +(rstring) IterationCount() + ".txt" ;
+		}
+
+		() as PrintGenFileNames = Custom(GenFileNames)
+		{
+			logic
+				onTuple GenFileNames : printStringLn("INPUT  : " +(rstring) GenFileNames) ;
+		}
+
+		// copies all incoming files from input port (./data/loca-test-x.txt) into /user/hdfs directory.
+		stream<rstring message, uint64 elapsedTime> CopyFromLocalAttr = HDFS2FileCopy(GenFileNames)
+		{
+			param
+				hdfsUser : "hdfs" ;
+				hdfsFileAttrName : "hdfsFile" ;
+				localFileAttrName : "localFile" ;
+				//				localFile : "test.txt" ;
+				deleteSourceFile : false ;
+				overwriteDestinationFile : true ;
+				direction : copyFromLocalFile ;
+		}
+
+		() as PrintCopyFromLocalAttr = Custom(CopyFromLocalAttr)
+		{
+			logic
+				onTuple CopyFromLocalAttr : printStringLn("Result of CopyFromLocalAttr  : " +(rstring)
+				CopyFromLocalAttr) ;
+		}
+
+		// DirectoryScan operator with an absolute file argument and a file name pattern           
+		stream<rstring localFile> DirScan = DirectoryScan()
+		{
+			param
+				directory : "/tmp/work" ;
+				// pattern : "^work.*";                                                                   
+				initDelay : 1.0 ;
+		}
+
+		() as PrintDirScan = Custom(DirScan)
+		{
+			logic
+				onTuple DirScan : printStringLn("DirScan File name  : " +(rstring) DirScan) ;
+		}
+
+		// copies all incoming local files from input port into /user/hdfs/work directory.
+		stream<rstring message, uint64 elapsedTime> CopyFromLocal = HDFS2FileCopy(DirScan)
+		{
+			param
+				hdfsUser : "hdfs" ;
+				hdfsFile : "work/" ;
+				deleteSourceFile : false ;
+				overwriteDestinationFile : false ;
+				direction : copyFromLocalFile ;
+				localFileAttrName : "localFile" ;
+		}
+
+		() as PrintCopyFromLocal = Custom(CopyFromLocal)
+		{
+			logic
+				onTuple CopyFromLocal : printStringLn("Result of CopyFromLocal : " +(rstring) CopyFromLocal) ;
+		}
+
+		// HDFS2DirectoryScan operator with an absolute directory argument 
+		stream<rstring hdfsFile> HdfsDirScan = HDFS2DirectoryScan()
+		{
+			param
+				hdfsUser : "hdfs" ;
+				directory : "/user/hdfs/work" ;
+				initDelay : 6.0 ;
+		}
+
+		() as PrintHdfsDirScan = Custom(HdfsDirScan)
+		{
+			logic
+				onTuple HdfsDirScan : printStringLn("HdfsDirScan File name : " +(rstring) HdfsDirScan) ;
+		}
+
+		// copies all incoming HDFSs from input port into /tmp/work2 directory.
+		stream<rstring message, uint64 elapsedTime> CopyToLocal = HDFS2FileCopy(HdfsDirScan)
+		{
+			param
+				hdfsUser : "hdfs" ;
+				hdfsFileAttrName : "hdfsFile" ;
+				deleteSourceFile : false ;
+				overwriteDestinationFile : false ;
+				direction : copyToLocalFile ;
+				localFile : "/tmp/work2/" ;
+		}
+
+		() as PrintCopyToLocal = Custom(CopyToLocal)
+		{
+			logic
+				onTuple CopyToLocal : printStringLn("Result of CopyToLocal : " +(rstring) CopyToLocal) ;
+		}
+
+}
