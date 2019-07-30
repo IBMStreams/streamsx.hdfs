@@ -450,7 +450,7 @@ This operator supports 21 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsFile"><!-- --></a><tt class="ph tt">hdfsFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the name of HDFS file or directory.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyFromLocalFile</tt> and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/.  This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port.  
+<p class="p">This optional parameter specifies the name of HDFS file or directory.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyFromLocalFile</tt> and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/.  This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port.  <tt class="ph tt">hdfsFile</tt> cannot be set when parameter <tt class="ph tt">hdfsFileAttrName</tt> is set.  
 </p>
 <dl class="dl">
 
@@ -481,7 +481,7 @@ This operator supports 21 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsFileAttrName"><!-- --></a><tt class="ph tt">hdfsFileAttrName</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the value of hdfsFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  This parameter is mandatory if the 'hdfsFile' is not specified.  
+<p class="p">This optional parameter specifies the value of hdfsFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to the '/user/<em class="ph i">userid</em>/hdfsFile.  This parameter is mandatory if the 'hdfsFile' is not specified.  <tt class="ph tt">hdfsFileAttrName</tt> cannot be set when parameter <tt class="ph tt">hdfsFile</tt> is set.
 </p>
 <dl class="dl">
 
@@ -712,7 +712,7 @@ This operator supports 21 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__localFile"><!-- --></a><tt class="ph tt">localFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the name of local file to be copied.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyToLocalFile</tt> and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/.  This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port.  
+<p class="p">This optional parameter specifies the name of local file to be copied.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  If you want to copy all incoming files from input port to a directory set the value of direction to <tt class="ph tt">copyToLocalFile</tt> and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/.  This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port.  <tt class="ph tt">localFile</tt> cannot be set when parameter <tt class="ph tt">localFileAttrName</tt> is set.  
 </p>
 <dl class="dl">
 
@@ -743,7 +743,7 @@ This operator supports 21 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__localFileAttrName"><!-- --></a><tt class="ph tt">localFileAttrName</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the value of localFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  This parameter is mandatory if the 'localFile' is not specified.  
+<p class="p">This optional parameter specifies the value of localFile that coming through input stream.  If the name starts with a slash, it is considered an absolute path of local file that you want to copy.  If it does not start with a slash, it is considered a relative path, relative to your project data directory.  This parameter is mandatory if the 'localFile' is not specified.  <tt class="ph tt">localFileAttrName</tt> cannot be set when parameter <tt class="ph tt">localFile</tt> is set.  
 </p>
 <dl class="dl">
 
