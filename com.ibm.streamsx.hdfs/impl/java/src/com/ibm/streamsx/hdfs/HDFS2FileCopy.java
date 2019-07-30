@@ -22,7 +22,6 @@ import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.OperatorContext.ContextCheck;
 import com.ibm.streams.operator.OutputTuple;
 import com.ibm.streams.operator.StreamSchema;
-import com.ibm.streams.operator.StreamingData.Punctuation;
 import com.ibm.streams.operator.StreamingInput;
 import com.ibm.streams.operator.StreamingOutput;
 import com.ibm.streams.operator.Tuple;
@@ -81,8 +80,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	}
 
 	private copyDirection direction = copyDirection.copyFromLocalFile;
-	// file num for generating FILENUM variable in filename
-	private int fileNum = 0;
 
 	// Variables required by the optional output port
 	// hasOutputPort signifies if the operator has output port defined or not
@@ -193,15 +190,15 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 				IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR);
 		checker.checkExcludedParameters(IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR, IHdfsConstants.PARAM_HDFS_FILE_NAME);
 
-		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME))
-				&& (!context.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR))) {
+		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME)) && (!context
+				.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR))) {
 			checker.setInvalidContext("One of these parameters must be set in opeartor: '"
 					+ IHdfsConstants.PARAM_LOCAL_FILE_NAME + "' or '" + IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR + "'",
 					null);
 		}
 
-		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME))
-				&& (!context.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR))) {
+		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME)) && (!context
+				.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR))) {
 			checker.setInvalidContext("One of these parameters must be set in opeartor: '"
 					+ IHdfsConstants.PARAM_HDFS_FILE_NAME + "' or '" + IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR + "'",
 					null);
@@ -227,40 +224,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 		}
 	}
 
-	@ContextCheck(compile = false)
-	public static void checkParameters(OperatorContextChecker checker) throws Exception {
-
-		int dataAttribute = 0;
-		int fileAttribute = -1;
-		StreamSchema inputSchema = checker.getOperatorContext().getStreamingInputs().get(0).getStreamSchema();
-		if (checker.getOperatorContext().getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR)) {
-			String fileNameAttr = checker.getOperatorContext()
-					.getParameterValues(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR).get(0);
-			fileAttribute = inputSchema.getAttribute(fileNameAttr).getIndex();
-			if (fileAttribute == 0) {
-				// default data attribute of 0 is not right, so need to fix
-				// that.
-				dataAttribute = 1;
-			}
-		}
-/*
-		// now, check the data attribute is an okay type.
-		MetaType dataType = inputSchema.getAttribute(dataAttribute).getType().getMetaType();
-		// check that the data type is okay.
-		if (dataType != MetaType.RSTRING && dataType != MetaType.USTRING && dataType != MetaType.BLOB) {
-			checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_DATA_ATTR_TYPE", dataType), null);
-		}
-		if (fileAttribute != -1) {
-			// If we have a filename attribute, let's check that it's the right
-			// type.
-			if (MetaType.RSTRING != inputSchema.getAttribute(1).getType().getMetaType()
-					&& MetaType.USTRING != inputSchema.getAttribute(1).getType().getMetaType()) {
-				checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME",
-						inputSchema.getAttribute(1).getType().getMetaType()), null);
-			}
-		}
-	*/
-	}
 
 	/**
 	 * Check that the fileAttributeName parameter is an attribute of the right
@@ -271,24 +234,35 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	@ContextCheck(compile = false)
 	public static void checkFileAttributeName(OperatorContextChecker checker) {
 		StreamSchema inputSchema = checker.getOperatorContext().getStreamingInputs().get(0).getStreamSchema();
-		List<String> localFileAttrNameList = checker.getOperatorContext()
-				.getParameterValues(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR);
-		if (localFileAttrNameList == null || localFileAttrNameList.size() == 0) {
-			// Nothing to check, because the parameter doesn't exist.
-			return;
+		List<String> localFileAttrNameList = checker.getOperatorContext().getParameterValues(
+				IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR);
+		if (localFileAttrNameList != null && localFileAttrNameList.size() > 0) {
+			String localFileAttrName = localFileAttrNameList.get(0);
+			Attribute localFileAttr = inputSchema.getAttribute(localFileAttrName);
+			if (localFileAttr == null) {
+				checker.setInvalidContext(Messages.getString("HDFS_SINK_NO_ATTRIBUTE"), new Object[] {
+						localFileAttrName });
+			} else if (MetaType.RSTRING != localFileAttr.getType().getMetaType() && MetaType.USTRING != localFileAttr.getType()
+					.getMetaType()) {
+				checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME", localFileAttr.getType()
+						.getMetaType()), new Object[] {});
+			}
+		}
+		List<String> hdfsFileAttrNameList = checker.getOperatorContext().getParameterValues(
+				IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR);
+		if (hdfsFileAttrNameList != null && hdfsFileAttrNameList.size() > 0) {
+			String hdfsFileAttrName = hdfsFileAttrNameList.get(0);
+			Attribute hdfsFileAttr = inputSchema.getAttribute(hdfsFileAttrName);
+			if (hdfsFileAttr == null) {
+				checker.setInvalidContext(Messages.getString("HDFS_SINK_NO_ATTRIBUTE"), new Object[] {
+						hdfsFileAttrName });
+			} else if (MetaType.RSTRING != hdfsFileAttr.getType().getMetaType() && MetaType.USTRING != hdfsFileAttr.getType()
+					.getMetaType()) {
+				checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME", hdfsFileAttr.getType()
+						.getMetaType()), new Object[] {});
+			}
 		}
 
-		String localFileAttrName = localFileAttrNameList.get(0);
-		Attribute fileAttr = inputSchema.getAttribute(localFileAttrName);
-		if (fileAttr == null) {
-			checker.setInvalidContext(Messages.getString("HDFS_SINK_NO_ATTRIBUTE"), new Object[] { localFileAttrName });
-		}
-		if (MetaType.RSTRING != fileAttr.getType().getMetaType()
-				&& MetaType.USTRING != fileAttr.getType().getMetaType()) {
-			checker.setInvalidContext(
-					Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME", fileAttr.getType().getMetaType()),
-					new Object[] {});
-		}
 	}
 
 	@ContextCheck(compile = false)
@@ -330,17 +304,16 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			if (fileUri.getScheme() != null) {
 				// must have the same scheme
 				if (!hdfsUri.getScheme().equals(fileUri.getScheme())) {
-					checker.setInvalidContext(
-							Messages.getString("HDFS_SINK_INVALID_SCHEMA", fileUri.getScheme(), hdfsUri.getScheme()),
-							null);
+					checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_SCHEMA", fileUri.getScheme(),
+							hdfsUri.getScheme()), null);
 					return;
 				}
 
 				// must have the same authority
-				if ((hdfsUri.getAuthority() == null && fileUri.getAuthority() != null)
-						|| (hdfsUri.getAuthority() != null && fileUri.getAuthority() == null)
-						|| (hdfsUri.getAuthority() != null && fileUri.getAuthority() != null
-								&& !hdfsUri.getAuthority().equals(fileUri.getAuthority()))) {
+				if ((hdfsUri.getAuthority() == null && fileUri.getAuthority() != null) || (hdfsUri
+						.getAuthority() != null && fileUri.getAuthority() == null) || (hdfsUri.getAuthority() != null
+								&& fileUri.getAuthority() != null && !hdfsUri.getAuthority().equals(fileUri
+										.getAuthority()))) {
 					checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_HOST", fileUri.getAuthority(),
 							hdfsUri.getAuthority()), null);
 					return;
@@ -364,55 +337,13 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			 * specified. Also set outputPort to the output port at index 0
 			 */
 			if (context.getNumberOfStreamingOutputs() == 1) {
-
 				hasOutputPort = true;
-
 				outputPort = context.getStreamingOutputs().get(0);
-
-				// create a queue and thread for submitting tuple on the output
-				// port
-				// this is done to allow us to properly support consistent
-				// region
-				// where we must acquire consistent region permit before doin
-				// submission.
-				// And allow us to submit tuples when a reset happens.
-				// outputPortQueue = new LinkedBlockingQueue<>();
-				// outputPortThread = createProcessThread();
-				// outputPortThread.start();
-
 			}
 		} catch (URISyntaxException e) {
 			TRACE.log(TraceLevel.DEBUG, "Unable to construct URI: " + e.getMessage());
 			throw e;
 		}
-
-		/*
-		 * if (localFileAttrName != null) { } catch (URISyntaxException e) {
-		 * 
-		 * // TRACE.log(TraceLevel.DEBUG, "Unable to construct URI: " +
-		 * e.getMessage());
-		 * 
-		 * // throw e;
-		 * 
-		 */
-
-	}
-
-	@Override
-	public void processPunctuation(StreamingInput<Tuple> arg0, Punctuation punct) throws Exception {
-
-		TRACE.log(TraceLevel.DEBUG, "Punctuation Received.");
-
-		if (punct == Punctuation.FINAL_MARKER) {
-			TRACE.log(TraceLevel.DEBUG, "Final Punctuation, close file.");
-			// If Optional output port is present and neither the closeOnPunt is
-			// true and other param
-			// bytesPerFile and tuplesPerFile is also not set then output the
-			// filename and file
-			// size
-		}
-		// set the file to expire after punctuation
-		// on the next write, the file will be recreated
 
 	}
 
@@ -423,6 +354,7 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 		String hdfsFullPath = hdfsFile;
 		String localFileName = "";
 		String hdfsFileNmae = "";
+		// get the start time
 		long millisStart = Calendar.getInstance().getTimeInMillis();
 		try {
 			if (localFileAttrName != null) {
@@ -432,7 +364,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			if (hdfsFileAttrName != null) {
 				hdfsFile = tuple.getString(hdfsFileAttrName);
 			}
-			// get the start time
 
 			if ((localFile != null) && (hdfsFile != null)) {
 				if (fs != null) {
@@ -440,32 +371,45 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						localFile = getOperatorContext().getPE().getDataDirectory() + File.separator + localFile;
 					}
 
-					localFileName = localFile.substring(localFile.lastIndexOf(File.separator) + 1);
-
-					if (hdfsFile.endsWith(File.separator)) {
-						hdfsFileNmae = hdfsFile + localFileName;
-					} else {
-						hdfsFileNmae = hdfsFile;
-					}
-					if (!hdfsFile.startsWith(File.separator)) {
-						hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFileNmae;
-					} else {
-						hdfsFullPath = fs.getUri().toString() + hdfsFileNmae;
-					}
-
-					Path localPath = new Path(localFile);
-					Path hdfsPath = new Path(hdfsFileNmae);
 					if (direction == copyDirection.copyFromLocalFile) {
+						localFileName = localFile.substring(localFile.lastIndexOf(File.separator) + 1);
+						if (hdfsFile.endsWith(File.separator)) {
+							hdfsFileNmae = hdfsFile + localFileName;
+						} else {
+							hdfsFileNmae = hdfsFile;
+						}
+						Path localPath = new Path(localFile);
+						Path hdfsPath = new Path(hdfsFileNmae);
+						// System.out.println("L --> H localFile " + localPath + " ---> hdfsPath " + hdfsPath);
 						fs.copyFromLocalFile(deleteSourceFile, overwriteDestinationFile, localPath, hdfsPath);
-						message = "successfully copied from " + localFile + "  to  " + hdfsFullPath;
+						if (!hdfsFile.startsWith(File.separator)) {
+							hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFileNmae;
+						} else {
+							hdfsFullPath = fs.getUri().toString() + hdfsFileNmae;
+						}
+						message = "Successfully copied from " + localFile + "  to  " + hdfsFullPath + " .";
 					}
 
 					if (direction == copyDirection.copyToLocalFile) {
-						System.out.println("kkkkkkkk localFile " + hdfsPath + " hdfsFileNmae " + localPath);
+						if (localFile.endsWith(File.separator)) {
+							hdfsFileNmae = hdfsFile.substring(hdfsFile.lastIndexOf(File.separator) + 1);
+							localFileName = localFile + hdfsFileNmae;
+						} else {
+							localFileName = localFile;
+						}
+						Path localPath = new Path(localFileName);
+						Path hdfsPath = new Path(hdfsFile);
+						// System.out.println("H --> L hdfsPath " + hdfsPath + "  --->  localPath " + localPath);
 						fs.copyToLocalFile(deleteSourceFile, hdfsPath, localPath, true);
-						
-						message = "successfully copied from " + hdfsFullPath + "  to  " + localFile;
+
+						if (!hdfsFile.startsWith(File.separator)) {
+							hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFileNmae;
+						} else {
+							hdfsFullPath = fs.getUri().toString() + hdfsFile;
+						}
+						message = "Successfully copied from " + hdfsFullPath + "  to  " + localFileName + " .";
 					}
+
 				}
 			}
 		} catch (Exception e) {
@@ -474,7 +418,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			message = "ERROR :" + e.getMessage();
 		}
 		long elapsedTime = Calendar.getInstance().getTimeInMillis() - millisStart;
-		// System.out.println("localFile " + localFile + " hdfsFile: " + hdfsFile + " elapsedTime " + elapsedTime / 1000);
 		if (hasOutputPort) {
 			submitOnOutputPort(message, elapsedTime);
 		}
@@ -530,10 +473,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	public void checkpoint(Checkpoint checkpoint) throws Exception {
 		TRACE.log(TraceLevel.DEBUG, "Checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
 
-		// get file size, tuple count and filename
-
-		checkpoint.getOutputStream().writeInt(fileNum);
-
 	}
 
 	@Override
@@ -556,15 +495,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	@Override
 	public void reset(Checkpoint checkpoint) throws Exception {
 		TRACE.log(TraceLevel.DEBUG, "Reset to checkpoint " + checkpoint.getSequenceId(), CONSISTEN_ASPECT);
-
-		String path = (String) checkpoint.getInputStream().readObject();
-		int fileNum = checkpoint.getInputStream().readInt();
-
-		// create HDFS file with path from checkpoint
-		// set as append mode to not overwrite content of file
-		// on reset
-
-		this.fileNum = fileNum;
 
 		unsetRestarting();
 	}

@@ -418,20 +418,23 @@ public class IHdfsConstants {
             + "The  `HDFS2FileCopy`  uses the hadoop JAVA API functions `copyFromLocalFile` and `copyToLocalFile` to copy files in two directions. \\n"
             + "* `copyFromLocalFile` : Copies a file from local disk to the HDFS file system. \\n"
             + "* `copyToLocalFile`   : Copies a file from HDFS file system to the local disk. \\n\\n"
+            + "The recursive copy of directories and subdirectories is not supported\\n\\n"
 
             + "+ Examples \\n\\n"
-            + "This example copies the file test.txt from local path ./data/ into /user/hdfs/ directory. \\n\\n"
+            
+            + "This example copies the file `test.txt` from local path ./data/ into `/user/hdfs/` directory. \\n\\n"
             + "    streams<boolean succeed> copyFromLocal =  HDFS2FileCopy()\\n"
-            + "    {\\n\\n" + "        param\\n"
+            + "        param\\n"
             + "            localFile                : \\\"test.txt\\\"; \\n"
             + "            hdfsFile                 : \\\"/user/hdfs/test.txt\\\"; \\n"
             + "            deleteSourceFile         : false; \\n"
             + "            overwriteDestinationFile : true; \\n"
             + "            direction                : copyFromLocalFile\\n"
             + "    }\\n\\n"
-            + "This example copies all files from local path /tmp/work into /user/hdfs/work directory. \\n"
+            
+            + "This example copies all files from the local path `/tmp/work` into HDFS directory `/user/hdfs/work` . \\n"
 
-            + "    // DirectoryScan operator with an absolute file argument and a file name pattern \\n"
+            + "    // DirectoryScan operator with an absolute directory argument. \\n"
             + "    stream<rstring localFile> DirScan = DirectoryScan() \\n"
             + "    {  \\n"
             + "        param \\n"
@@ -439,8 +442,8 @@ public class IHdfsConstants {
             + "            initDelay       : 1.0; \\n"
             + "    } \\n\\n"
 
-            + "    // copies all incoming files from input port into /user/hdfs/work directory. \\n"
-            + "    stream<rstring message, uint64 elapsedTime> lineSink1 = HDFS2FileCopy(DirScan)\\n"
+            + "    // Copies all incoming files from input port into /user/hdfs/work directory. \\n"
+            + "    stream<rstring message, uint64 elapsedTime> CopyFromLocal = HDFS2FileCopy(DirScan)\\n"
             + "    { \\n"
             + "        param\\n"
             + "              hdfsUser                 : \\\"hdfs\\\"; \\n"
@@ -452,13 +455,15 @@ public class IHdfsConstants {
 
             + "    }\\n\\n"
             
-            + "This example copies all files from HDFS directory `/user/hdfs/work` into local directory `/tmp/work2` . \\n\\n"
-            + "* 1- copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. \\n"
+            + "This example copies all files from the HDFS directory `/user/hdfs/work` into the local directory `/tmp/work2` . \\n\\n"
+            + "You have to perform the follwing steps for kerberos configuration:"
+            + "* 1- Copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. \\n"
             + "* 2- Replace the kerberos principal with your hdsf principal. \\n"
             + "* 3- Copy the `core-site.xml` file from your HDFS server into `etc` directory. \\n"
             + "* 4- Copy the kerberos configuration file in `/etc` directory of your streams server. \\n\\n\\n"
 
-            + "`HDFS2DirectoryScan` operator with an absolute directory argument and the kerberos authentication parameters. \\n"
+            + "    //`HDFS2DirectoryScan` operator with an absolute directory argument and with kerberos authentication \\n\\n"
+            + "    // parameters returns all HDFS file names. \\n"
             + "    stream<rstring hdfsFile> HdfsDirScan = HDFS2DirectoryScan() \\n"
             + "    {  \\n"
             + "        param \\n"
@@ -470,7 +475,7 @@ public class IHdfsConstants {
             + "            sleepTime                : 2.0; \\n" 
             + "    } \\n\\n"
 
-            + " // copies all incoming HDFS files from input port into /tmp/work2 directory. \\n"
+            + "    // CopyToLocal copies all incoming HDFS files from input port into local directory /tmp/work2 . \\n"
             + "    stream<rstring message, uint64 elapsedTime> CopyToLocal = HDFS2FileCopy(HdfsDirScan) \\n"
             + "    { \\n"
             + "        param\\n"
@@ -502,23 +507,27 @@ public class IHdfsConstants {
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n"
             + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyToLocalFile` and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/. \\n"
-            + "This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port. \\n";
+            + "This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port. \\n" 
+     		+ "`localFile` cannot be set when parameter `localFileAttrName` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_FILE = "This optional parameter specifies the name of HDFS file or directory. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n"
             + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyFromLocalFile` and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/. \\n"
-            + "This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port. \\n";
+            + "This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port. \\n" 
+    		+ "`hdfsFile` cannot be set when parameter `hdfsFileAttrName` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_LOCAL_ATTR_FILE = "This optional parameter specifies the value of localFile that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n"
-            + "This parameter is mandatory if the 'localFile' is not specified. \\n";
+            + "This parameter is mandatory if the 'localFile' is not specified. \\n"
+		    + "`localFileAttrName` cannot be set when parameter `localFile` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_ATTR_FILE = "This optional parameter specifies the value of hdfsFile that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n"
-            + "This parameter is mandatory if the 'hdfsFile' is not specified. \\n";
+            + "This parameter is mandatory if the 'hdfsFile' is not specified. \\n"
+            + "`hdfsFileAttrName` cannot be set when parameter `hdfsFile` is set.";
 
     public static final String DESC_HDFS_COPYY_DIRECTION = "This parameter specifies the direction of copy. The parameter can be set with the following values. \\n"
             + "* `copyFromLocalFile`  Copy a file from local disk to the HDFS file system. \\n"
