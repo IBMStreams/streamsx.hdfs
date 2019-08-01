@@ -135,6 +135,20 @@ public class IHdfsConstants {
 
     public static final String DESC_BLOCK_SIZE = "This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096`.";
 
+    public static final String DESC_CREDENTIALS ="This optional parameter specifies the JSON string that contains the hdfs credentials: **user**, **password** and **hdfsUri** or **webhdfs**. \\n\\n"
+			+ "This parameter can also be specified in an application configuration.\\n\\n"
+    		+ "The JSON string must to have the following format:\\n\\n"
+	        + "    {\\n"
+			+ "        \\\"user\\\"     : \\\"clsadmin\\\",\\n"
+			+ "        \\\"password\\\" : \\\"IAE-password\\\",\\n"
+			+ "        \\\"webhdfs\\\"  : \\\"webhdfs://ip-address:8443\\\"\\n"
+			+ "    }\\n";
+
+    
+    public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters. "
+    		+ " The 'credentials', 'hdfsUser' and 'hdfsPassword' and 'hdfsUrl' parameter can be set in an application configuration. "
+    		+ " If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ";
+    
     public static final String DESC_SOURCE_FILE = "This parameter specifies the name of the file that the operator opens and reads. \\n"
             + "This parameter must be specified when the optional input port is not configured. \\n"
             + "If the optional input port is used and the file name is specified, the operator generates an error.";
@@ -412,10 +426,10 @@ public class IHdfsConstants {
 
     public static final String DESC_HDFS_DIR_SCAN_STRICT_MODE = "This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. \\n"
             + "If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. \\n"
-            + "If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error \\n";
+            + "If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. \\n";
 
-    public static final String DESC_HDFS_FILE_COPY = "The **HDFS2FileCopy** operator copies files from a HDFS fiel system to the loca disk and also from a local disk to the HDFS file system \\n\\n"
-            + "The  `HDFS2FileCopy`  uses the hadoop JAVA API functions `copyFromLocalFile` and `copyToLocalFile` to copy files in two directions. \\n"
+    public static final String DESC_HDFS_FILE_COPY = "The **HDFS2FileCopy** operator copies files from a HDFS fiel system to the loca disk and also in the opposite direction from a local disk to the HDFS file system. \\n\\n"
+            + "The  `HDFS2FileCopy`  uses the `hadoop` JAVA API functions `copyFromLocalFile` and `copyToLocalFile` to copy files in two directions. \\n"
             + "* `copyFromLocalFile` : Copies a file from local disk to the HDFS file system. \\n"
             + "* `copyToLocalFile`   : Copies a file from HDFS file system to the local disk. \\n\\n"
             + "The recursive copy of directories and subdirectories is not supported\\n\\n"
@@ -492,42 +506,44 @@ public class IHdfsConstants {
 
     public static final String DESC_HDFS_FILE_COPY_INPUT = "The `HDFS2FileCopy` operator has one input port, which contents the file names that you specified. \\n"
             + "The input port is non-mutating, and its punctuation mode is `Oblivious` >. \\n\\n"
-            + "The schema of the input port is:\\n\\n"
-            + "`tuple<rstring localFileAttrName, rstring hdfsFileAttrName>`\\n\\n"
-            + "or one of them:\\n" + "`tuple<rstring localFileAttrName>` or "
-            + "`tuple<rstring hdfsFileAttrName>` "
-            + ", which specifies a rstring for file names. \\n";
+            + "The schema of the input port can have one the following formats:\\n\\n"
+            + "    <rstring localFileAttrName, rstring hdfsFileAttrName>  \\n"
+            + "    <rstring localFileAttrName>  \\n"
+            + "    <rstring hdfsFileAttrName>  \\n"
+            + ", which specifies the local and HDFS file names. \\n";
 
     public static final String DESC_HDFS_FILE_COPY_OUTPUT = "The `HDFS2FileCopy` operator is configurable with an optional output port. \\n"
             + "The output port is non-mutating and its punctuation mode is `Free`. \\n\\n"
-            + "The schema of the output port is:\\n\\n `<string result, uint64 elapsedTime>` \\n\\n, which delivers the result of copy process and the elapsed time in milisecunds. \\n\\n"
+            + "The schema of the output port is:\\n"
+            + "    <string result, uint64 elapsedTime>  \\n"
+            + ", which delivers the result of copy process and the elapsed time in milisecunds. \\n\\n"
             + "In case of any error it returns the error message as result";
 
     public static final String DESC_HDFS_COPYY_LOCAL_FILE = "This optional parameter specifies the name of local file to be copied. \\n"
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n"
-            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyToLocalFile` and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/. \\n"
-            + "This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port. \\n" 
-     		+ "`localFile` cannot be set when parameter `localFileAttrName` is set. \\n";
+            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyToLocalFile` and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/. \\n\\n"
+            + "This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port.\\n\\n" 
+     		+ "The parameter `localFile` cannot be set when parameter `localFileAttrName` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_FILE = "This optional parameter specifies the name of HDFS file or directory. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n"
-            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyFromLocalFile` and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/. \\n"
-            + "This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port. \\n" 
-    		+ "`hdfsFile` cannot be set when parameter `hdfsFileAttrName` is set. \\n";
+            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyFromLocalFile` and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/. \\n\\n"
+            + "This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port. \\n\\n" 
+    		+ "The parameter `hdfsFile` cannot be set when parameter `hdfsFileAttrName` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_LOCAL_ATTR_FILE = "This optional parameter specifies the value of localFile that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
-            + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n"
-            + "This parameter is mandatory if the 'localFile' is not specified. \\n"
-		    + "`localFileAttrName` cannot be set when parameter `localFile` is set. \\n";
+            + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n\\n"
+            + "This parameter is mandatory if the 'localFile' is not specified. \\n\\n"
+		    + "The parameter `localFileAttrName` cannot be set when parameter `localFile` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_ATTR_FILE = "This optional parameter specifies the value of hdfsFile that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy. \\n"
-            + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n"
-            + "This parameter is mandatory if the 'hdfsFile' is not specified. \\n"
-            + "`hdfsFileAttrName` cannot be set when parameter `hdfsFile` is set.";
+            + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n\\n"
+            + "This parameter is mandatory if the 'hdfsFile' is not specified. \\n\\n"
+            + "The parameter `hdfsFileAttrName` cannot be set when parameter `hdfsFile` is set.";
 
     public static final String DESC_HDFS_COPYY_DIRECTION = "This parameter specifies the direction of copy. The parameter can be set with the following values. \\n"
             + "* `copyFromLocalFile`  Copy a file from local disk to the HDFS file system. \\n"
