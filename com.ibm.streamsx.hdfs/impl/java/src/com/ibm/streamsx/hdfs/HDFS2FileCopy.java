@@ -30,6 +30,7 @@ import com.ibm.streams.operator.Type.MetaType;
 import com.ibm.streams.operator.compile.OperatorContextChecker;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
+import com.ibm.streams.operator.metrics.Metric;
 import com.ibm.streams.operator.model.Icons;
 import com.ibm.streams.operator.model.InputPortSet;
 import com.ibm.streams.operator.model.InputPorts;
@@ -72,6 +73,9 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	private String hdfsFileAttrName = null;
 	private String localFile = null;
 	private String hdfsFile = null;
+	private final String NUM_COPY_METRIC = "nCopiedFiles";
+	private Metric nCopiedFiles;
+
 	private boolean deleteSourceFile = false;
 	private boolean overwriteDestinationFile = false;
 
@@ -95,10 +99,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	private boolean isRestarting;
 	private ConsistentRegionContext crContext;
 
-	/*
-	 * The method checkOutputPort validates that the stream on output port
-	 * contains the mandatory attribute.
-	 */
+	/* The method checkOutputPort validates that the stream on output port
+	 * contains the mandatory attribute. */
 	@ContextCheck(compile = true)
 	public static void checkOutputPort(OperatorContextChecker checker) {
 		OperatorContext context = checker.getOperatorContext();
@@ -224,7 +226,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 		}
 	}
 
-
 	/**
 	 * Check that the fileAttributeName parameter is an attribute of the right
 	 * type.
@@ -242,8 +243,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			if (localFileAttr == null) {
 				checker.setInvalidContext(Messages.getString("HDFS_SINK_NO_ATTRIBUTE"), new Object[] {
 						localFileAttrName });
-			} else if (MetaType.RSTRING != localFileAttr.getType().getMetaType() && MetaType.USTRING != localFileAttr.getType()
-					.getMetaType()) {
+			} else if (MetaType.RSTRING != localFileAttr.getType().getMetaType() && MetaType.USTRING != localFileAttr
+					.getType().getMetaType()) {
 				checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME", localFileAttr.getType()
 						.getMetaType()), new Object[] {});
 			}
@@ -256,8 +257,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			if (hdfsFileAttr == null) {
 				checker.setInvalidContext(Messages.getString("HDFS_SINK_NO_ATTRIBUTE"), new Object[] {
 						hdfsFileAttrName });
-			} else if (MetaType.RSTRING != hdfsFileAttr.getType().getMetaType() && MetaType.USTRING != hdfsFileAttr.getType()
-					.getMetaType()) {
+			} else if (MetaType.RSTRING != hdfsFileAttr.getType().getMetaType() && MetaType.USTRING != hdfsFileAttr
+					.getType().getMetaType()) {
 				checker.setInvalidContext(Messages.getString("HDFS_SINK_INVALID_ATTR_FILENAME", hdfsFileAttr.getType()
 						.getMetaType()), new Object[] {});
 			}
@@ -332,10 +333,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 
 			super.initialize(context);
 
-			/*
-			 * Set appropriate variables if the optional output port is
-			 * specified. Also set outputPort to the output port at index 0
-			 */
+			/* Set appropriate variables if the optional output port is
+			 * specified. Also set outputPort to the output port at index 0 */
 			if (context.getNumberOfStreamingOutputs() == 1) {
 				hasOutputPort = true;
 				outputPort = context.getStreamingOutputs().get(0);
@@ -344,7 +343,12 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 			TRACE.log(TraceLevel.DEBUG, "Unable to construct URI: " + e.getMessage());
 			throw e;
 		}
+		initMetrics(context);
+	}
 
+	private void initMetrics(OperatorContext context) {
+		nCopiedFiles = context.getMetrics().createCustomMetric(NUM_COPY_METRIC, "Number of copied files ",
+				Metric.Kind.COUNTER);
 	}
 
 	@Override
@@ -380,7 +384,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						}
 						Path localPath = new Path(localFile);
 						Path hdfsPath = new Path(hdfsFileNmae);
-						// System.out.println("L --> H localFile " + localPath + " ---> hdfsPath " + hdfsPath);
 						fs.copyFromLocalFile(deleteSourceFile, overwriteDestinationFile, localPath, hdfsPath);
 						if (!hdfsFile.startsWith(File.separator)) {
 							hdfsFullPath = fs.getWorkingDirectory().toString() + File.separator + hdfsFileNmae;
@@ -388,6 +391,9 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 							hdfsFullPath = fs.getUri().toString() + hdfsFileNmae;
 						}
 						message = "Successfully copied from " + localFile + "  to  " + hdfsFullPath + " .";
+						nCopiedFiles.incrementValue(1);
+						System.out.println(localPath + " --> " + hdfsPath + "  " + nCopiedFiles.getValue()
+								+ " files copied.");
 					}
 
 					if (direction == copyDirection.copyToLocalFile) {
@@ -399,7 +405,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						}
 						Path localPath = new Path(localFileName);
 						Path hdfsPath = new Path(hdfsFile);
-						// System.out.println("H --> L hdfsPath " + hdfsPath + "  --->  localPath " + localPath);
 						fs.copyToLocalFile(deleteSourceFile, hdfsPath, localPath, true);
 
 						if (!hdfsFile.startsWith(File.separator)) {
@@ -408,6 +413,9 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 							hdfsFullPath = fs.getUri().toString() + hdfsFile;
 						}
 						message = "Successfully copied from " + hdfsFullPath + "  to  " + localFileName + " .";
+						nCopiedFiles.incrementValue(1);
+						System.out.println(hdfsPath + " --> " + localPath + "  " + nCopiedFiles.getValue()
+								+ " files copied.");
 					}
 
 				}
@@ -528,7 +536,6 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 	protected void process() throws Exception {
 		while (!shutdownRequested) {
 			try {
-				// System.out.println("process()!!!!!!.");
 				OutputTuple tuple = outputPortQueue.take();
 				if (outputPort != null) {
 
