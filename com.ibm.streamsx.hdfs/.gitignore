@@ -3,4 +3,5 @@
 /.toolkitList
 /bin/
 /doc/spldoc
-/com.ibm.streamsx.hdfs
+/com.ibm.streamsx.hdfs/
+

@@ -407,8 +407,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	 */
 	public void getCredentials(String credentials) throws IOException {
 		String jsonString = credentials;
-		System.out.println("HHHHHH getCredentials " + jsonString);
-		try {
+			try {
 			JSONObject obj = JSONObject.parse(jsonString);
 			fHdfsUser = (String) obj.get("user");
 			if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
@@ -428,10 +427,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 				LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
 				throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
 			}
-			System.out.println("HHHHHH getCredentials " + fHdfsUser + fHdfsPassword + fHdfsUri);
-			System.out.println("fHdfsUri from credentials in Operator '" + getOperatorContext().getName() + "' :"
-					+ fHdfsUri);
-
+		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -443,8 +439,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	 * @param context the operator context
 	 */
 	protected void loadAppConfig(OperatorContext context) {
-		System.out.println("HHHHHH loadAppConfig " + appConfigName);
-
+	
 		// if no appconfig name is specified, create empty map
 		if (appConfigName == null) {
 			appConfig = new HashMap<String, String>();
