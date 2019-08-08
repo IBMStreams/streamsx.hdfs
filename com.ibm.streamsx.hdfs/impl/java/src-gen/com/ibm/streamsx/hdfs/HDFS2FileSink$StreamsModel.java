@@ -70,6 +70,14 @@ public void setLibPath(java.lang.String libPath) {}
 @com.ibm.streams.operator.internal.model.MethodParameters({"policyFilePath"})
 public void setPolicyFilePath(java.lang.String policyFilePath) {}
 
+@com.ibm.streams.operator.model.Parameter(name="credentials", optional=true, description="This optional parameter specifies the JSON string that contains the hdfs credentials: **user**, **password** and **hdfsUri** or **webhdfs**. \n\nThis parameter can also be specified in an application configuration.\n\nThe JSON string must to have the following format:\n\n    {\n        \"user\"     : \"clsadmin\",\n        \"password\" : \"IAE-password\",\n        \"webhdfs\"  : \"webhdfs://ip-address:8443\"\n    }\n")
+@com.ibm.streams.operator.internal.model.MethodParameters({"credentials"})
+public void setcredentials(java.lang.String credentials) {}
+
+@com.ibm.streams.operator.model.Parameter(name="appConfigName", optional=true, description="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters.  The 'credentials', 'hdfsUser' and 'hdfsPassword' and 'hdfsUrl' parameter can be set in an application configuration.  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ")
+@com.ibm.streams.operator.internal.model.MethodParameters({"appConfigName"})
+public void setAppConfigName(java.lang.String appConfigName) {}
+
 @com.ibm.streams.operator.model.Parameter(name="fileAttributeName", optional=true, description="If set, this points to an attribute containing the filename.  The operator will close a file when value of this attribute changes. \nIf the string contains substitutions, the check for a change happens before substituations, and the filename contains the substitutions based on the first tuple.")
 @com.ibm.streams.operator.internal.model.MethodParameters({"fileAttr"})
 public void setFilenameAttr(java.lang.String fileAttr) {}

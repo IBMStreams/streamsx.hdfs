@@ -70,6 +70,14 @@ public void setLibPath(java.lang.String libPath) {}
 @com.ibm.streams.operator.internal.model.MethodParameters({"policyFilePath"})
 public void setPolicyFilePath(java.lang.String policyFilePath) {}
 
+@com.ibm.streams.operator.model.Parameter(name="credentials", optional=true, description="This optional parameter specifies the JSON string that contains the hdfs credentials: **user**, **password** and **hdfsUri** or **webhdfs**. \n\nThis parameter can also be specified in an application configuration.\n\nThe JSON string must to have the following format:\n\n    {\n        \"user\"     : \"clsadmin\",\n        \"password\" : \"IAE-password\",\n        \"webhdfs\"  : \"webhdfs://ip-address:8443\"\n    }\n")
+@com.ibm.streams.operator.internal.model.MethodParameters({"credentials"})
+public void setcredentials(java.lang.String credentials) {}
+
+@com.ibm.streams.operator.model.Parameter(name="appConfigName", optional=true, description="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters.  The 'credentials', 'hdfsUser' and 'hdfsPassword' and 'hdfsUrl' parameter can be set in an application configuration.  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ")
+@com.ibm.streams.operator.internal.model.MethodParameters({"appConfigName"})
+public void setAppConfigName(java.lang.String appConfigName) {}
+
 @com.ibm.streams.operator.model.Parameter(optional=true, description="This optional parameter specifies the name of the directory to be scanned. \nIf the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/*userid*/ directory. This parameter is mandatory if the input port is not specified. \n")
 @com.ibm.streams.operator.internal.model.MethodParameters({"directory"})
 public void setDirectory(java.lang.String directory) {}
@@ -86,7 +94,7 @@ public void setInitDelay(double initDelay) {}
 @com.ibm.streams.operator.internal.model.MethodParameters({"sleepTime"})
 public void setSleepTime(double sleepTime) {}
 
-@com.ibm.streams.operator.model.Parameter(optional=true, description="This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. \nIf you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. \nIf you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error \n")
+@com.ibm.streams.operator.model.Parameter(optional=true, description="This optional parameter determines whether the operator reports an error if the directory to be scanned does not exist. \nIf you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. \nIf you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. \n")
 @com.ibm.streams.operator.internal.model.MethodParameters({"strictMode"})
 public void setStrictMode(boolean strictMode) {}
 }
