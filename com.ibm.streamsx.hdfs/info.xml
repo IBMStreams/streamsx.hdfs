@@ -141,6 +141,9 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 * `HDFS2FileCopy` copies files in to directions:
 * `copyFromLocalFile` : Copies a file from local disk to the HDFS file system. \\n"
 * `copyToLocalFile`   : Copies a file from HDFS file system to the local disk. \\n\\n"
+
+* Adapting of streamsx.hdfs to support HDP 2.x and HDP 3.x file systems.
+* The pom.xml file has been upgraded to use hadoop version 3.1.0 libraries. 
  
 
  
