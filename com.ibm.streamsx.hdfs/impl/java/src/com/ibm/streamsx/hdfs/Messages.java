@@ -1,3 +1,8 @@
+/*******************************************************************************
+* Copyright (C) 2017-2019, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/
+
 package com.ibm.streamsx.hdfs;
 
 
