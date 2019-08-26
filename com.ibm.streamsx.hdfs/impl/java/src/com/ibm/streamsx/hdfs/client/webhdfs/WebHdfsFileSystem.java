@@ -80,7 +80,7 @@ import org.apache.hadoop.security.token.TokenSelector;
 import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenSelector;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.StringUtils;
-
+import org.apache.hadoop.hdfs.web.ByteRangeInputStream;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.annotations.VisibleForTesting;

@@ -20,6 +20,7 @@ import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.io.Text;
 
+
 /**
  * An implementation of a protocol for accessing filesystems over HTTPS. The
  * following implementation provides a limited, read-only interface to a
