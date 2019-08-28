@@ -99,9 +99,9 @@
  
   <dt class="dt dlterm">Parameters</dt>
 
-  <dd class="dd">This operator supports 18 parameters.
+  <dd class="dd">This operator supports 20 parameters.
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
+<a class="xref" href="#spldoc_operator__parameter__appConfigName">appConfigName</a>, <a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__credentials">credentials</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hadfsPassword">hadfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 </dd>
@@ -227,12 +227,43 @@
 
 <div class="section">
 <p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters">Parameters</a></strong></p>
-This operator supports 18 parameters.
+This operator supports 20 parameters.
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
+<a class="xref" href="#spldoc_operator__parameter__appConfigName">appConfigName</a>, <a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__credentials">credentials</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hadfsPassword">hadfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 <dl class="dl">
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__appConfigName"><!-- --></a><tt class="ph tt">appConfigName</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters.  The 'credentials', 'hdfsUser' and 'hdfsPassword' and 'hdfsUrl' parameter can be set in an application configuration.  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. 
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
 
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__authKeytab"><!-- --></a><tt class="ph tt">authKeytab</tt></dt>
 
@@ -400,6 +431,55 @@ This operator supports 18 parameters.
 
 
 
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__credentials"><!-- --></a><tt class="ph tt">credentials</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the JSON string that contains the hdfs credentials: <strong class="ph b">user</strong>, <strong class="ph b">password</strong> and <strong class="ph b">hdfsUri</strong> or <strong class="ph b">webhdfs</strong>. 
+</p>
+
+<p class="p">This parameter can also be specified in an application configuration.
+</p>
+
+<p class="p">The JSON string must to have the following format:
+</p>
+
+<div class="p">
+<pre class="pre codeblock">
+{
+    "user"     : "clsadmin",
+    "password" : "IAE-password",
+    "webhdfs"  : "webhdfs://ip-address:8443"
+}
+</pre>
+
+
+</div>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__encoding"><!-- --></a><tt class="ph tt">encoding</tt></dt>
 
 <dd class="dd">
@@ -462,7 +542,7 @@ This operator supports 18 parameters.
 
 
 
-<dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsPassword"><!-- --></a><tt class="ph tt">hdfsPassword</tt></dt>
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__hadfsPassword"><!-- --></a><tt class="ph tt">hadfsPassword</tt></dt>
 
 <dd class="dd">
 <p class="p">This parameter specifies the password to use when you connecting to a Hadoop instance deployed on IBM Analytics Engine.  If this parameter is not specified, attempts to connect to a Hadoop instance deployed on IBM Analytics Engine will cause an exception.

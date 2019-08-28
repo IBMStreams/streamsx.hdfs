@@ -33,7 +33,7 @@
 
 <div class="p">
 <pre class="pre codeblock">
- () as Sink= HDFS2FileSink(Input){ 
+ stream&lt;rstring fileName, uint64 size&gt; HdfsSink= HDFS2FileSink(Input){ 
       param 
          file          : "/user/clsadmin/myfile.txt"; 
          hdfsUri       : "webhdfs://server_host_name:port"; 

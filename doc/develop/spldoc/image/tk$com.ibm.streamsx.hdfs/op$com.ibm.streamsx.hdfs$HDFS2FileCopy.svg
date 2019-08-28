@@ -90,21 +90,21 @@ vy/rV8AnRZRYHF0mNFkAAAAASUVORK5CYII="
       ><set attributeName="visibility" from="hidden" end="sdt1.mouseout" to="visible" begin="sdt1.mouseover"
     /></g
     ><g visibility="hidden" style="stroke:none;font-style:italic;font-size:12px;font-family:&apos;Helvetica&apos;,&apos;SansSerif&apos;;"
-    ><rect x="47.65" y="0.0" width="385.71997" style="fill:rgb(230,230,255);stroke:rgb(0,0,80);" rx="2.0" ry="2.0" height="107.0"
+    ><rect x="47.65" y="0.0" width="406.91998" style="fill:rgb(230,230,255);stroke:rgb(0,0,80);" rx="2.0" ry="2.0" height="107.0"
       /><text x="48.65" y="13.0"
-      >Required: direction / Optional: authKeytab, </text
+      >Required: direction / Optional: appConfigName, </text
       ><text x="48.65" y="28.0"
-      >authPrincipal, configPath, credFile, deleteSourceFile, </text
+      >authKeytab, authPrincipal, configPath, credFile, </text
       ><text x="48.65" y="43.0"
-      >hdfsFile, hdfsFileAttrName, hdfsPassword, hdfsUri, </text
+      >credentials, deleteSourceFile, hdfsFile, hdfsFileAttrName, </text
       ><text x="48.65" y="58.0"
-      >hdfsUser, keyStorePassword, keyStorePath, libPath, </text
+      >hadfsPassword, hdfsUri, hdfsUser, keyStorePassword, </text
       ><text x="48.65" y="73.0"
-      >localFile, localFileAttrName, overwriteDestinationFile, </text
+      >keyStorePath, libPath, localFile, localFileAttrName, </text
       ><text x="48.65" y="88.0"
-      >policyFilePath, reconnectionBound, reconnectionInterval, </text
+      >overwriteDestinationFile, policyFilePath, reconnectionBound, </text
       ><text x="48.65" y="103.0"
-      >reconnectionPolicy</text
+      >reconnectionInterval, reconnectionPolicy</text
       ><set attributeName="visibility" from="hidden" end="sdt2.mouseout" to="visible" begin="sdt2.mouseover"
     /></g
     ><g visibility="hidden" style="stroke:none;font-style:italic;font-size:12px;font-family:&apos;Helvetica&apos;,&apos;SansSerif&apos;;"
