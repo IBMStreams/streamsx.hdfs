@@ -63,11 +63,11 @@ stream&lt;rstring message, uint64 elapsedTime&gt; CopyFromLocal = HDFS2FileCopy(
 { 
     param
           hdfsUser                 : "hdfs"; 
+          localFileAttrName        : "localFile"; 
           hdfsFile                 : "/user/hdfs/work/"; 
           deleteSourceFile         : false; 
           overwriteDestinationFile : true; 
           direction                : copyFromLocalFile; 
-          localFileAttrName        : "localFile"; 
 }
 </pre>
 
@@ -90,12 +90,12 @@ stream&lt;rstring message, uint64 elapsedTime&gt; CopyFromLocal = HDFS2FileCopy(
 </ul>
 The output port of <tt class="ph tt">HDFS2FileCopy</tt> operator returns the result of copy action and the elapsed time. 
 <pre class="pre codeblock">
-//HDFS2DirectoryScan operator with an absolute directory argument and with kerberos authentication 
+// HDFS2DirectoryScan operator with an absolute directory argument and with kerberos authentication 
 // The output port returns all HDFS file names. 
 stream&lt;rstring hdfsFile&gt; HdfsDirScan = HDFS2DirectoryScan() 
 {  
     param 
-        configPath               : "etc1"; 
+        configPath               : "etc"; 
         authKeytab               : "etc/hdfs.headless.keytab"; 
         authPrincipal            : "hdfs-hdpcluster@HDP2.COM"; 
         directory                : "/user/hdfs/work"; 
@@ -103,18 +103,19 @@ stream&lt;rstring hdfsFile&gt; HdfsDirScan = HDFS2DirectoryScan()
         vmArg                    : "-Djava.security.krb5.conf=/etc/krb5.conf"; 
 } 
 
+
 // CopyToLocal copies all incoming HDFS files from input port into local directory /tmp/work2 . 
 stream&lt;rstring message, uint64 elapsedTime&gt; CopyToLocal = HDFS2FileCopy(HdfsDirScan) 
 { 
     param
+        configPath               : "etc"; 
         authKeytab               : "etc/hdfs.headless.keytab"; 
         authPrincipal            : "hdfs-hdpcluster@HDP2.COM"; 
-        configPath               : "etc1"; 
         hdfsFileAttrName         : "hdfsFile"; 
+        localFile                : "/tmp/work2"; 
         deleteSourceFile         : false; 
         overwriteDestinationFile : true; 
         direction                : copyToLocalFile; 
-        localFile                : "/tmp/work2"; 
         vmArg                    : "-Djava.security.krb5.conf=/etc/krb5.conf"; 
 }
 </pre>
