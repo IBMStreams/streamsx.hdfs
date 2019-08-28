@@ -112,16 +112,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		checker.checkDependentParameters("reconnectionBound", "reconnectionPolicy");
 		checker.checkDependentParameters("reconnectionInterval", "reconnectionPolicy");
 
-		// check parameters hdfsUrl 
-		OperatorContext context = checker.getOperatorContext();
-		if ((!context.getParameterNames().contains("credentials"))
-				&& (!context.getParameterNames().contains("appConfigName"))
-				&& (!context.getParameterNames().contains("hdfsUrl"))
-				&& (!context.getParameterNames().contains("configPath"))
-				&& (!context.getParameterNames().contains("credFile"))) {
-					checker.setInvalidContext("The parameter 'hdfsUrl' is not defined. It must be set in one of these parameters: 'hdfsUrl' or 'credentials' or via the credentials parameter in an application configuration or via 'credFile' file or vi core-site.xml file in 'configPath'.", null);
-			}				
-
 	}
 
 	
