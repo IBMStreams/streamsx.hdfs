@@ -36,12 +36,34 @@
 (stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan() 
 { 
     param 
-        directory     : "/user/myuser/"; 
+        directory     : "/user/clsadmin/works"; 
         hdfsUri       : "webhdfs://hdfsServer:8443"; 
         hdfsPassword  : "password"; 
-        hdfsUser      : "biuser"; 
+        hdfsUser      : "clsadmin"; 
         sleepTime     : 2.0; 
 } 
+</pre>
+
+
+</div>
+
+<div class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory On IBM Cloud.  The <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters are now difined in credentials JSON string. 
+<pre class="pre codeblock">
+param 
+    expression&lt;rstring&gt; $credentials : getSubmissionTimeValue("credentials", "{
+        \"user\"     : \"clsadmin\",
+        \"password\" : \"IAE-password\",
+        \"webhdfs\"  : \"webhdfs://ip-address:8443\"
+   }"
+
+
+    (stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_2 = HDFS2DirectoryScan() 
+    { 
+        param 
+            directory     : "/user/clsadmin/works"; 
+            credentials   : $credentials; 
+            sleepTime     : 2.0; 
+    } 
 </pre>
 
 
@@ -52,7 +74,7 @@
 
 <div class="p">
 <pre class="pre codeblock">
-(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan() 
+(stream&lt;rstring filename&gt; Files) as HDFS2DirectoryScan_3 = HDFS2DirectoryScan() 
 { 
     param 
         directory     : "/user/myuser/"; 

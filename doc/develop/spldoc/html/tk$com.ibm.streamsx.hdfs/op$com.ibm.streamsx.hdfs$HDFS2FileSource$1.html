@@ -31,17 +31,16 @@
 <p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory every two seconds and the <tt class="ph tt">HDFS2FileSource</tt> operator to read the files that are output by the <tt class="ph tt">HDFS2DirectoryScan</tt> operator. 
 </p>
 
-<p class="p">//// HDFS2DirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds
+<p class="p">//// HDFS2DirectoryScan operator scans the /user/streamsadmin/works directory from HDFS every 2.0 seconds
 </p>
 
 <div class="p">
 <pre class="pre codeblock">
 (stream&lt;rstring filename&gt;; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){
     param
-        directory     : "/user/myuser/"; 
-        hdfsUri: "hdfs : //hdfsServer:1883"; 
+        directory     : "/user/streamsadmin/works"; 
+        hdfsUri: "hdfs : //hdfsServer:8020"; 
         hdfsUser: "streamsadmin"; 
-        hdfsPassword: "Password"; 
         sleepTime     : 2.0; 
 }
 

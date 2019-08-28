@@ -37,9 +37,18 @@
 </p>
 </li>
 
-<li class="li"> <tt class="ph tt">copyFromLocalFile</tt> : Copies a file from local disk to the HDFS file system. \n"</li>
+<li class="li"> <tt class="ph tt">copyFromLocalFile</tt> : Copies a file from local disk to the HDFS file system.</li>
 
-<li class="li"> <tt class="ph tt">copyToLocalFile</tt>   : Copies a file from HDFS file system to the local disk. \n\n"</li>
+<li class="li"> <tt class="ph tt">copyToLocalFile</tt>   : Copies a file from HDFS file system to the local disk. </li>
+
+<li class="li">
+<p class="p"> It supports also two new parameters for all operators:
+</p>
+</li>
+
+<li class="li"> <tt class="ph tt">credentials</tt>        : A JSON string that contains <strong class="ph b">user</strong>, <strong class="ph b">password</strong>, <strong class="ph b">webhdfs</strong></li>
+
+<li class="li"> <tt class="ph tt">appConfigName</tt>     : Streams application configuration that defines <strong class="ph b">user</strong>, <strong class="ph b">password</strong>, and <strong class="ph b">webhdfs</strong></li>
 
 <li class="li">
 <p class="p"> Adapting of streamsx.hdfs to support HDP 2.x and HDP 3.x file systems.
