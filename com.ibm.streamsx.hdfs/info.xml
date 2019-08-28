@@ -58,7 +58,8 @@ For example:
  This example copies the file test.txt from local path ./data/ into /user/hdfs/works directory of HDFS. 
  The parameter **credentials** is a JSON string that contains `user`, `password` and `webhdsf`.
  
-      streams<boolean succeed> copyFromLocal =  HDFS2FileCopy()
+
+      streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
       {
              param
                   localFile                : "test.txt"; 
