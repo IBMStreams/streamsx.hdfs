@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This java source file is originally from org.apache.hadoop.hdfs.web package
+ * It is modified to support HttpURLConnection with knox password and get WebHdfsFileSystem
+ */
+
 package com.ibm.streamsx.hdfs.client.webhdfs;
 
 import org.apache.hadoop.util.StringUtils;
@@ -282,42 +288,7 @@ public class JsonUtil {
 	}
 
 	/**
-	 * Convert a Json map to a HdfsFileStatus object.
-	 * public static HdfsFileStatus toFileStatus1(final Map<?, ?> json, boolean
-	 * includesType) {
-	 * if (json == null) {
-	 * return null;
-	 * }
-	 * final Map<?, ?> m = includesType ?
-	 * (Map<?, ?>)json.get(FileStatus.class.getSimpleName()) : json;
-	 * final String localName = (String) m.get("pathSuffix");
-	 * final PathType type = PathType.valueOf((String) m.get("type"));
-	 * final byte[] symlink = type != PathType.SYMLINK? null
-	 * : DFSUtil.string2Bytes((String)m.get("symlink"));
-	 * final long len = ((Number) m.get("length")).longValue();
-	 * final String owner = (String) m.get("owner");
-	 * final String group = (String) m.get("group");
-	 * final FsPermission permission = toFsPermission((String)
-	 * m.get("permission"),
-	 * (Boolean)m.get("aclBit"), (Boolean)m.get("encBit"));
-	 * final long aTime = ((Number) m.get("accessTime")).longValue();
-	 * final long mTime = ((Number) m.get("modificationTime")).longValue();
-	 * final long blockSize = ((Number) m.get("blockSize")).longValue();
-	 * final short replication = ((Number) m.get("replication")).shortValue();
-	 * final long fileId = m.containsKey("fileId") ?
-	 * ((Number) m.get("fileId")).longValue() :
-	 * HdfsConstants.GRANDFATHER_INODE_ID;
-	 * final int childrenNum = getInt(m, "childrenNum", -1);
-	 * final byte storagePolicy = m.containsKey("storagePolicy") ?
-	 * (byte) ((Number) m.get("storagePolicy")).longValue() :
-	 * HdfsConstants.BLOCK_STORAGE_POLICY_ID_UNSPECIFIED;
-	 * // BlockStoragePolicySuite.ID_UNSPECIFIED;
-	 * return new HdfsFileStatus(len, type == PathType.DIRECTORY, replication,
-	 * blockSize, mTime, aTime, permission, owner, group, symlink,
-	 * DFSUtil.string2Bytes(localName), fileId, childrenNum, null,
-	 * storagePolicy);
-	 * }
-	 * /** Convert an ExtendedBlock to a Json map.
+	 * Convert an ExtendedBlock to a Json map.
 	 */
 	private static Map<String, Object> toJsonMap(final ExtendedBlock extendedblock) {
 		if (extendedblock == null) {

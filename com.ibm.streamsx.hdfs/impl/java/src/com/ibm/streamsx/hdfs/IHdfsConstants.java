@@ -7,18 +7,39 @@ package com.ibm.streamsx.hdfs;
 
 public class IHdfsConstants {
 
-    public static final String PARAM_TIME_PER_FILE = "timePerFile";
+
+    // HDFSFileSink parameters
+	public static final String PARAM_TIME_PER_FILE = "timePerFile";
     public static final String PARAM_CLOSE_ON_PUNCT = "closeOnPunct";
     public static final String PARAM_TUPLES_PER_FILE = "tuplesPerFile";
     public static final String PARAM_BYTES_PER_FILE = "bytesPerFile";
     public static final String PARAM_FILE_NAME_ATTR = "fileAttributeName";
+    public static final String PARAM_TEMP_FILE = "tempfile";
+    public static final String PARAM_TIME_FORMAT = "timeFormat";
+  
+    // HDFSFileCopy parameters
     public static final String PARAM_LOCAL_FILE_NAME_ATTR = "localFileAttrName";
     public static final String PARAM_HDFS_FILE_NAME_ATTR = "hdfsFileAttrName";
     public static final String PARAM_LOCAL_FILE_NAME = "localFile";
     public static final String PARAM_HDFS_FILE_NAME = "hdfsFile";
-    public static final String PARAM_SLEEP_TIME = "sleepTime";
+    public static final String PARAM_HDFS_FILE_DELETE_SOURCE_FILE = "deleteSourceFile";
+    public static final String PARAM_HDFS_FILE_OVERWRITE_DEST_FILE = "overwriteDestinationFile";
+    public static final String PARAM_HDFS_FILE_COPY_DIRECTION = "direction";
+   
+    // HDFSFileSource parameters
+	public static final String PARAM_SOURCE_BLOCKSIZE_PARAM = "blockSize";
     public static final String PARAM_INITDELAY = "initDelay";
     public static final String PARAM_ENCODING = "encoding";
+    public static final String PARAM_FILE = "file";
+
+         
+   
+    public static final String PARAM_DIRECTORY = "directory";
+    public static final String PARAM_SLEEP_TIME = "sleepTime";
+    public static final String PARAM_STRICT_MODE = "strictMode";
+    public static final String PARAM_PATERN = "pattern";
+    
+    
     public static final String FILE_VAR_PREFIX = "%";
     public static final String FILE_VAR_FILENUM = "%FILENUM";
     public static final String FILE_VAR_TIME = "%TIME";
@@ -311,7 +332,7 @@ public class IHdfsConstants {
             "+ Examples \\n\\n" +
 
             "This is a basic example using the `HDFS2FileSink` operator to write output to a Hadoop filesystem deployed on IBM Cloud (IBM Analytics Engine). \\n\\n"
-            + "     () as Sink= HDFS2FileSink(Input){ \\n"
+            + "     stream<rstring fileName, uint64 size> HdfsSink= HDFS2FileSink(Input){ \\n"
             + "          param \\n"
             + "             file          : \\\"/user/clsadmin/myfile.txt\\\"; \\n"
             + "             hdfsUri       : \\\"webhdfs://server_host_name:port\\\"; \\n"
@@ -401,7 +422,7 @@ public class IHdfsConstants {
             + "    { \\n" 
             + "        param \\n"
             + "            directory     : \\\"/user/myuser/\\\"; \\n"
-            + "            hdfsUri       : \\\"hdfs://hdfsServer:1883\\\"; \\n"
+            + "            hdfsUri       : \\\"hdfs://hdfsServer:8020\\\"; \\n"
             + "            sleepTime     : 2.0; \\n" + "    } \\n";
 
     public static final String DESC_HDFS_DIR_SCAN_INPUT = "The `HDFS2DirectoryScan` operator has an optional control input port. You can use this port to change the directory "

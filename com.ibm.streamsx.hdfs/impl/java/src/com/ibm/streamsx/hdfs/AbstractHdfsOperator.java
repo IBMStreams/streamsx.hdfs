@@ -20,6 +20,8 @@ import org.apache.hadoop.fs.Path;
 import com.ibm.json.java.JSONObject;
 import com.ibm.streams.operator.AbstractOperator;
 import com.ibm.streams.operator.OperatorContext;
+import com.ibm.streams.operator.OperatorContext.ContextCheck;
+import com.ibm.streams.operator.compile.OperatorContextChecker;
 import com.ibm.streams.operator.logging.LogLevel;
 import com.ibm.streams.operator.logging.LoggerNames;
 import com.ibm.streams.operator.logging.TraceLevel;
@@ -31,7 +33,6 @@ import com.ibm.streamsx.hdfs.client.IHdfsClient;
 public abstract class AbstractHdfsOperator extends AbstractOperator implements StateHandler {
 
 	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs.AbstractHdfsOperator";
-	public static final String EMPTY_STR = "";
 
 	/** Create a logger specific to this class */
 	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME);
@@ -40,26 +41,22 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 	// Common parameters and variables for connection
 	private IHdfsClient fHdfsClient;
-	public FileSystem fs;
-	private String fHdfsUri;
-	private String fHdfsUser;
-	private String fHdfsPassword;
-	private String fAuthPrincipal;
-	private String fAuthKeytab;
-	private String fCredFile;
-	private String fConfigPath;
+	public FileSystem fs = null;
+	private String fHdfsUri = null;
+	private String fHdfsUser = null;
+	private String fHdfsPassword = null;
+	private String fAuthPrincipal = null;
+	private String fAuthKeytab = null;
+	private String fCredFile = null;
+	private String fConfigPath = null;
 
 	private String fReconnectionPolicy = IHdfsConstants.RECONNPOLICY_BOUNDEDRETRY;
-	// This optional parameter reconnectionBound specifies the number of
-	// successive connection
+	// This optional parameter reconnectionBound specifies the number of successive connection
 	// that will be attempted for this operator.
-	// It can appear only when the reconnectionPolicy parameter is set to
-	// BoundedRetry
-	// and cannot appear otherwise.
-	// If not present the default value is 5
+	// It can appear only when the reconnectionPolicy parameter is set to BoundedRetry
+	// and cannot appear otherwise.  If not present the default value is 5
 	private int fReconnectionBound = IHdfsConstants.RECONN_BOUND_DEFAULT;
-	// This optional parameter reconnectionInterval specifies the time period in
-	// seconds which
+	// This optional parameter reconnectionInterval specifies the time period in seconds which
 	// the operator will be wait before trying to reconnect.
 	// If not specified, the default value is 10.0.
 	private double fReconnectionInterval = IHdfsConstants.RECONN_INTERVAL_DEFAULT;
@@ -83,20 +80,221 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	@Override
 	public synchronized void initialize(OperatorContext context) throws Exception {
 		super.initialize(context);
-		setupClassPaths(context);
 		setJavaSystemProperty();
 		loadAppConfig(context);
 		if (credentials != null) {
 			this.getCredentials(credentials);
 		}
+		setupClassPaths(context);
 		createConnection();
 	}
 
+	
+	/*
+	 * The method checkParameters
+	 */
+	@ContextCheck(compile = true)
+	public static void checkParameters(OperatorContextChecker checker) {
+		// If credFile is set as parameter, hdfsUser, hdfsPassword and hdfsUrl can not be set
+		checker.checkExcludedParameters("hdfsUser", "credFile");
+		checker.checkExcludedParameters("hdfsPassword", "credFile");
+		checker.checkExcludedParameters("hdfsUrl", "credFile");
+
+		// If credentials is set as parameter, hdfsUser, hdfsPassword and hdfsUrl can not be set.
+		checker.checkExcludedParameters("hdfsUser", "credentials");
+		checker.checkExcludedParameters("hdfsPassword", "credentials");
+		checker.checkExcludedParameters("hdfsUri", "credentials");
+
+		// If credentials is set as parameter, credFile can not be set
+		checker.checkExcludedParameters("credFile", "credentials");
+		
+		// check reconnection related parameters
+		checker.checkDependentParameters("reconnectionBound", "reconnectionPolicy");
+		checker.checkDependentParameters("reconnectionInterval", "reconnectionPolicy");
+
+		// check parameters hdfsUrl 
+		OperatorContext context = checker.getOperatorContext();
+		if ((!context.getParameterNames().contains("credentials"))
+				&& (!context.getParameterNames().contains("appConfigName"))
+				&& (!context.getParameterNames().contains("hdfsUrl"))
+				&& (!context.getParameterNames().contains("configPath"))
+				&& (!context.getParameterNames().contains("credFile"))) {
+					checker.setInvalidContext("The parameter 'hdfsUrl' is not defined. It must be set in one of these parameters: 'hdfsUrl' or 'credentials' or via the credentials parameter in an application configuration or via 'credFile' file or vi core-site.xml file in 'configPath'.", null);
+			}				
+
+	}
+
+	
+	@Parameter(name = "hdfsUri", optional = true, description = IHdfsConstants.DESC_HDFS_URL)
+	public void setHdfsUri(String hdfsUri) {
+		TRACE.log(TraceLevel.DEBUG, "setHdfsUri: " + hdfsUri);
+		fHdfsUri = hdfsUri;
+	}
+
+	public String getHdfsUri() {
+		return fHdfsUri;
+	}
+
+	
+	@Parameter(name = "hdfsUser", optional = true, description = IHdfsConstants.DESC_HDFS_USER)
+	public void setHdfsUser(String hdfsUser) {
+		this.fHdfsUser = hdfsUser;
+	}
+
+	public String getHdfsUser() {
+		return fHdfsUser;
+	}
+
+	
+	@Parameter(name = "hadfsPassword", optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
+	public void setHdfsPassword(String hadfsPassword) {
+		fHdfsPassword = hadfsPassword;
+	}
+
+	public String getHdfsPassword() {
+		return fHdfsPassword;
+	}
+
+
+	// Parameter reconnectionPolicy
+	@Parameter(name = "reconnectionPolicy", optional = true, description = IHdfsConstants.DESC_REC_POLICY)
+	public void setReconnectionPolicy(String reconnectionPolicy) {
+		this.fReconnectionPolicy = reconnectionPolicy;
+	}
+
+	public String getReconnectionPolicy() {
+		return fReconnectionPolicy;
+	}
+
+	
+	// Parameter reconnectionBound
+	@Parameter(name = "reconnectionBound", optional = true, description = IHdfsConstants.DESC_REC_BOUND)
+	public void setReconnectionBound(int reconnectionBound) {
+		this.fReconnectionBound = reconnectionBound;
+	}
+
+	public int getReconnectionBound() {
+		return fReconnectionBound;
+	}
+
+	// Parameter reconnectionInterval
+	@Parameter(name = "reconnectionInterval", optional = true, description = IHdfsConstants.DESC_REC_INTERVAL)
+	public void setReconnectionInterval(double reconnectionInterval) {
+		this.fReconnectionInterval = reconnectionInterval;
+	}
+
+	public double getReconnectionInterval() {
+		return fReconnectionInterval;
+	}
+
+	// Parameter authPrincipal
+	@Parameter(name = "authPrincipal", optional = true, description = IHdfsConstants.DESC_PRINCIPAL)
+	public void setAuthPrincipal(String authPrincipal) {
+		this.fAuthPrincipal = authPrincipal;
+	}
+
+	public String getAuthPrincipal() {
+		return fAuthPrincipal;
+	}
+	
+	// Parameter authKeytab
+	@Parameter(name = "authKeytab", optional = true, description = IHdfsConstants.DESC_AUTH_KEY)
+	public void setAuthKeytab(String authKeytab) {
+		this.fAuthKeytab = authKeytab;
+	}
+
+	public String getAuthKeytab() {
+		return fAuthKeytab;
+	}
+
+	// Parameter CredFile
+	@Parameter(name = "credFile", optional = true, description = IHdfsConstants.DESC_CRED_FILE)
+	public void setCredFile(String credFile) {
+		this.fCredFile = credFile;
+	}
+
+	public String getCredFile() {
+		return fCredFile;
+	}
+
+	// Parameter ConfigPath
+	@Parameter(name = "configPath", optional = true, description = IHdfsConstants.DESC_CONFIG_PATH)
+	public void setConfigPath(String configPath) {
+		this.fConfigPath = configPath;
+	}
+
+	public String getConfigPath() {
+		return fConfigPath;
+	}
+
+	// Parameter keyStorePath
+	@Parameter(name = "keyStorePath", optional = true, description = IHdfsConstants.DESC_KEY_STOR_PATH)
+	public void setKeyStorePath(String keyStorePath) {
+		fKeyStorePath = keyStorePath;
+	}
+
+	public String getKeyStorePath() {
+		return fKeyStorePath;
+	}
+
+	// Parameter keyStorePassword
+	@Parameter(name = "keyStorePassword", optional = true, description = IHdfsConstants.DESC_KEY_STOR_PASSWORD)
+	public void setKeyStorePassword(String keyStorePassword) {
+		fKeyStorePassword = keyStorePassword;
+	}
+
+	public String getKeyStorePassword() {
+		return fKeyStorePassword;
+	}
+
+	// Parameter libPath
+	@Parameter(name = "libPath", optional = true, description = IHdfsConstants.DESC_LIB_PATH)
+	public void setLibPath(String libPath) {
+		fLibPath = libPath;
+	}
+
+	public String getLibPath() {
+		return fLibPath;
+	}
+
+	// Parameter policyFilePath
+	@Parameter(name = "policyFilePath" ,optional = true, description = IHdfsConstants.DESC_POLICY_FILE_PATH)
+	public void setPolicyFilePath(String policyFilePath) {
+		fPolicyFilePath = policyFilePath;
+	}
+
+	public String getPolicyFilePath() {
+		return fPolicyFilePath;
+	}
+
+	// Parameter credentials
+	@Parameter(name = "credentials", optional = true, description = IHdfsConstants.DESC_CREDENTIALS)
+	public void setcredentials(String credentials) {
+		this.credentials = credentials;
+	}
+
+	public String getCredentials() {
+		return this.credentials;
+	}
+
+	
+	// Parameter appConfigName
+	@Parameter(name = "appConfigName", optional = true, description = IHdfsConstants.DESC_APP_CONFIG_NAME)
+	public void setAppConfigName(String appConfigName) {
+		this.appConfigName = appConfigName;
+	}
+
+	public String getAppConfigName() {
+		return this.appConfigName;
+	}
+
+	
+	
 	/** createConnection creates a connection to the hadoop file system. */
 	private synchronized void createConnection() throws Exception {
 		// Delay in miliseconds as specified in fReconnectionInterval parameter
 		final long delay = TimeUnit.MILLISECONDS.convert((long) fReconnectionInterval, TimeUnit.SECONDS);
-		System.out.println("createConnection  ReconnectionPolicy " + fReconnectionPolicy + "  ReconnectionBound "
+		LOGGER.log(TraceLevel.INFO, "createConnection  ReconnectionPolicy " + fReconnectionPolicy + "  ReconnectionBound "
 				+ fReconnectionBound + "  ReconnectionInterval " + fReconnectionInterval);
 		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_NORETRY) {
 			fReconnectionBound = 1;
@@ -121,19 +319,17 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		}
 
 	}
-	
-	
 
-	/** set policy file path and https.protocols in JAVA system properties*/
+	/** set policy file path and https.protocols in JAVA system properties */
 	private void setJavaSystemProperty() {
 		String policyFilePath = getAbsolutePath(getPolicyFilePath());
 		if (policyFilePath != null) {
 			TRACE.log(TraceLevel.INFO, "Policy file path: " + policyFilePath);
 			System.setProperty("com.ibm.security.jurisdictionPolicyDir", policyFilePath);
 		}
-		System.setProperty("https.protocols","TLSv1.2");
+		System.setProperty("https.protocols", "TLSv1.2");
 		String httpsProtocol = System.getProperty("https.protocols");
-		TRACE.log(TraceLevel.INFO, "streamsx.hdfs https.protocols " + httpsProtocol);	
+		TRACE.log(TraceLevel.INFO, "streamsx.hdfs https.protocols " + httpsProtocol);
 	}
 
 	private void setupClassPaths(OperatorContext context) {
@@ -145,28 +341,23 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
 			libList.add(user_defined_path);
 		} else {
-			// add class path for delivered jar files from /impl/lib/ext/
-			// directory
+			// add class path for delivered jar files from ./impl/lib/ext/ directory
 			String default_dir = context.getToolkitDirectory() + "/impl/lib/ext/*";
 			TRACE.log(TraceLevel.INFO, "Adding /impl/lib/ext/* to classpath");
 			libList.add(default_dir);
 
 			if (HADOOP_HOME != null) {
 				// if no config path and no HdfsUri is defined it checks the
-				// HADOOP_HOME/config
-				// directory for default core-site.xml file
-				if ((getConfigPath() == null) && (getHdfsUri() == null)) {
+				// HADOOP_HOME/config directory for default core-site.xml file
+				if ((fConfigPath == null) && (fHdfsUri == null)) {
 					libList.add(HADOOP_HOME + "/conf");
 					libList.add(HADOOP_HOME + "/../hadoop-conf");
 					libList.add(HADOOP_HOME + "/etc/hadoop");
-					libList.add(HADOOP_HOME + "/share/hadoop/hdfs/*");
-					libList.add(HADOOP_HOME + "/share/hadoop/common/*");
-					libList.add(HADOOP_HOME + "/share/hadoop/common/lib/*");
 					libList.add(HADOOP_HOME + "/*");
 					libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+					libList.add(HADOOP_HOME + "/lib/*");
+					libList.add(HADOOP_HOME + "/client/*");
 				}
-				libList.add(HADOOP_HOME + "/lib/*");
-				libList.add(HADOOP_HOME + "/client/*");
 
 			}
 		}
@@ -260,148 +451,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		return fHdfsClient;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_URL)
-	public void setHdfsUri(String hdfsUri) {
-		TRACE.log(TraceLevel.DEBUG, "setHdfsUri: " + hdfsUri);
-		fHdfsUri = hdfsUri;
-	}
-
-	public String getHdfsUri() {
-		return fHdfsUri;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_USER)
-	public void setHdfsUser(String hdfsUser) {
-		this.fHdfsUser = hdfsUser;
-	}
-
-	public String getHdfsUser() {
-		return fHdfsUser;
-	}
-
-	// Parameter reconnectionPolicy
-	@Parameter(optional = true, description = IHdfsConstants.DESC_REC_POLICY)
-	public void setReconnectionPolicy(String reconnectionPolicy) {
-		this.fReconnectionPolicy = reconnectionPolicy;
-	}
-
-	public String getReconnectionPolicy() {
-		return fReconnectionPolicy;
-	}
-
-	// Parameter reconnectionBound
-	@Parameter(optional = true, description = IHdfsConstants.DESC_REC_BOUND)
-	public void setReconnectionBound(int reconnectionBound) {
-		this.fReconnectionBound = reconnectionBound;
-	}
-
-	public int getReconnectionBound() {
-		return fReconnectionBound;
-	}
-
-	// Parameter reconnectionInterval
-	@Parameter(optional = true, description = IHdfsConstants.DESC_REC_INTERVAL)
-	public void setReconnectionInterval(double reconnectionInterval) {
-		this.fReconnectionInterval = reconnectionInterval;
-	}
-
-	public double getReconnectionInterval() {
-		return fReconnectionInterval;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_PRINCIPAL)
-	public void setAuthPrincipal(String authPrincipal) {
-		this.fAuthPrincipal = authPrincipal;
-	}
-
-	public String getAuthPrincipal() {
-		return fAuthPrincipal;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_AUTH_KEY)
-	public void setAuthKeytab(String authKeytab) {
-		this.fAuthKeytab = authKeytab;
-	}
-
-	public String getAuthKeytab() {
-		return fAuthKeytab;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_CRED_FILE)
-	public void setCredFile(String credFile) {
-		this.fCredFile = credFile;
-	}
-
-	public String getCredFile() {
-		return fCredFile;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_CONFIG_PATH)
-	public void setConfigPath(String configPath) {
-		this.fConfigPath = configPath;
-	}
-
-	public String getConfigPath() {
-		return fConfigPath;
-	}
-
-	public String getLibPath() {
-		return fLibPath;
-	}
-
-	public String getHdfsPassword() {
-		return fHdfsPassword;
-	}
-
-	public String getKeyStorePath() {
-		return fKeyStorePath;
-	}
-
-	public String getKeyStorePassword() {
-		return fKeyStorePassword;
-	}
-
-	public String getPolicyFilePath() {
-		return fPolicyFilePath;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
-	public void setHdfsPassword(String hadfsPassword) {
-		fHdfsPassword = hadfsPassword;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_KEY_STOR_PATH)
-	public void setKeyStorePath(String keyStorePath) {
-		fKeyStorePath = keyStorePath;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_KEY_STOR_PASSWORD)
-	public void setKeyStorePassword(String keyStorePassword) {
-		fKeyStorePassword = keyStorePassword;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_LIB_PATH)
-	public void setLibPath(String libPath) {
-		fLibPath = libPath;
-	}
-
-	@Parameter(optional = true, description = IHdfsConstants.DESC_POLICY_FILE_PATH)
-	public void setPolicyFilePath(String policyFilePath) {
-		fPolicyFilePath = policyFilePath;
-	}
-
-	// Parameter credentials
-	@Parameter(name = "credentials", optional = true, description = IHdfsConstants.DESC_CREDENTIALS)
-	public void setcredentials(String credentials) {
-		this.credentials = credentials;
-	}
-
-	// Parameter appConfigName
-	@Parameter(name = "appConfigName", optional = true, description = IHdfsConstants.DESC_APP_CONFIG_NAME)
-	public void setAppConfigName(String appConfigName) {
-		this.appConfigName = appConfigName;
-	}
-
 	/**
 	 * read the credentials and set user name fHdfsUser, fHfsPassword and
 	 * hdfsUrl.
@@ -410,7 +459,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	 */
 	public void getCredentials(String credentials) throws IOException {
 		String jsonString = credentials;
-			try {
+		try {
 			JSONObject obj = JSONObject.parse(jsonString);
 			fHdfsUser = (String) obj.get("user");
 			if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
@@ -430,7 +479,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 				LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
 				throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
 			}
-		
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -442,7 +491,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	 * @param context the operator context
 	 */
 	protected void loadAppConfig(OperatorContext context) {
-	
+
 		// if no appconfig name is specified, create empty map
 		if (appConfigName == null) {
 			appConfig = new HashMap<String, String>();

@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
+ /**
+ * This java source file is originally from org.apache.hadoop.hdfs.web package
+ * It is modified to support HttpURLConnection with knox password and get WebHdfsFileSystem
+ */
+
 package com.ibm.streamsx.hdfs.client.webhdfs;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.io.Text;
-
 
 /**
  * An implementation of a protocol for accessing filesystems over HTTPS. The

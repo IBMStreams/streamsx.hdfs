@@ -1,3 +1,8 @@
+/*******************************************************************************
+ * Copyright (C) 2017-2019, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
+
 package com.ibm.streamsx.hdfs.client.webhdfs;
 
 import java.io.IOException;
@@ -44,7 +49,6 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 		final String path = getPathPrefix() + (fspath == null ? "/" : makeQualified(fspath).toUri().getRawPath());
 		final String query = op.toQueryString() + (authString == null ? Param.toSortedString("&", getAuthParameters(op))
 				: "") + Param.toSortedString("&", parameters);
-		// final URL url = getNamenodeURL(path, query);
 		final URL url = getNamenodeURL(path, query);
 		if (LOG.isTraceEnabled()) {
 			LOG.trace("url=" + url);
@@ -70,8 +74,7 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 			configureCertValidation();
 
 		}
-		// we use our own URL connection factory to allow us to set the Auth
-		// parameters
+		// we use our own URL connection factory to allow us to set the Auth parameters
 		ConnectionConfigurator configurator = URLConnectionFactory.DEFAULT_TIMEOUT_CONN_CONFIGURATOR;
 		connectionFactory = new URLConnectionFactory(configurator) {
 			@Override
@@ -108,8 +111,8 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 
 			@Override
 			public boolean verify(String host, SSLSession session) {
-				// boolean valid = SSLHostnameVerifier.DEFAULT.verify(host,
-				// session);
+				// boolean valid = SSLHostnameVerifier.DEFAULT.verify(host, session);
+				// return true 
 				boolean valid = true;
 				if (!valid) {
 					LOG.warn("Cannot verify host " + host);

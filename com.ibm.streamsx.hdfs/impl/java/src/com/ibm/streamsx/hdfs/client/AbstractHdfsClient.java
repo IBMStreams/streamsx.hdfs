@@ -29,8 +29,6 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 
 	@Override
 	public FileSystem connect(String fileSystemUri, String hdfsUser, String configPath) throws Exception {
-		System.out.println("AbstractHdfsClient connect  " + fileSystemUri + " " + hdfsUser + " " + configPath + " "
-				+ getConnectionProperties());
 		fAuthHelper = AuthenticationHelperFactory.createAuthenticationHelper(fileSystemUri, hdfsUser, configPath);
 		fFileSystem = fAuthHelper.connect(fileSystemUri, hdfsUser, getConnectionProperties());
 		// check if the filesystem is available

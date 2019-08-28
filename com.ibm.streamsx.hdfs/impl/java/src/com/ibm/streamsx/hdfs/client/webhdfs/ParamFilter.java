@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * This java source file is originally from org.apache.hadoop.hdfs.web package
+ * It is modified to support HttpURLConnection with knox password and get WebHdfsFileSystem
+ */
+
 package com.ibm.streamsx.hdfs.client.webhdfs;
 
 import java.net.URI;

@@ -131,7 +131,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		}
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_DIRECTORY)
+	@Parameter(name = IHdfsConstants.PARAM_DIRECTORY, optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_DIRECTORY)
 	public void setDirectory(String directory) {
 		TRACE.entering(CLASS_NAME, "setDirectory", directory);
 		this.directory = directory;
@@ -141,7 +141,7 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		return directory;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_PATTERN)
+	@Parameter(name = IHdfsConstants.PARAM_PATERN, optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_PATTERN)
 	public void setPattern(String pattern) {
 		this.pattern = pattern;
 	}
@@ -150,17 +150,17 @@ public class HDFS2DirectoryScan extends AbstractHdfsOperator implements StateHan
 		return pattern;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_INIT_DELAY)
+	@Parameter(name = IHdfsConstants.PARAM_INITDELAY, optional = true, description = IHdfsConstants.DESC_INIT_DELAY)
 	public void setInitDelay(double initDelay) {
 		this.initDelay = initDelay;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_SLEEP_TIME)
+	@Parameter(name = IHdfsConstants.PARAM_SLEEP_TIME, optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_SLEEP_TIME)
 	public void setSleepTime(double sleepTime) {
 		this.sleepTime = sleepTime;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_STRICT_MODE)
+	@Parameter(name = IHdfsConstants.PARAM_STRICT_MODE, optional = true, description = IHdfsConstants.DESC_HDFS_DIR_SCAN_STRICT_MODE)
 	public void setStrictMode(boolean strictMode) {
 		this.isStrictMode = strictMode;
 	}
