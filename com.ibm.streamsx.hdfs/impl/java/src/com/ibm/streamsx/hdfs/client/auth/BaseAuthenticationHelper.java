@@ -1,7 +1,7 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014-2019, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs.client.auth;
 
@@ -25,30 +25,30 @@ import com.ibm.streamsx.hdfs.Messages;
 import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public abstract class BaseAuthenticationHelper implements IAuthenticationHelper {
-	
+
 	enum AuthType {
 		SIMPLE, KERBEROS
 	}
 
-	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs..client.auth"; 
+	private static final String CLASS_NAME = "com.ibm.streamsx.hdfs..client.auth";
 
-	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME); 
-	
+	private static Logger LOGGER = Logger.getLogger(LoggerNames.LOG_FACILITY + "." + CLASS_NAME);
+
 	public static final String SIMPLE_AUTH = "simple";
 	public static final String KERBEROS_AUTH = "kerberos";
 
 	protected Configuration fConfiguration;
 	protected URI fHdfsUri;
-	
+
 	public BaseAuthenticationHelper() {
 		fConfiguration = new Configuration();
 
 	}
-	
+
 	public BaseAuthenticationHelper(String configPath) {
 		fConfiguration = new Configuration();
-		
-		if(configPath != null && !configPath.isEmpty()) {
+
+		if (configPath != null && !configPath.isEmpty()) {
 			try {
 				URL url = new URL("file", null, configPath + "/core-site.xml");
 				fConfiguration.addResource(url);
@@ -59,8 +59,8 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 	}
 
 	@Override
-	public FileSystem connect(String fileSystemUri, String hdfsUser,
-			Map<String, String> connectionProperties) throws Exception {
+	public FileSystem connect(String fileSystemUri, String hdfsUser, Map<String, String> connectionProperties)
+			throws Exception {
 		if (fileSystemUri != null && !fileSystemUri.isEmpty()) {
 			fConfiguration.set("fs.defaultFS", fileSystemUri);
 		}
@@ -76,9 +76,10 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 
 		setHdfsUri(new URI(uri));
-		
+
 		if (isConnectionToBluemix(hdfsUser, connectionProperties)) {
-			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class.getName());
+			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class
+					.getName());
 			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
 			String keyStore = connectionProperties.get(IHdfsConstants.KEYSTORE);
 			if (keyStore != null) {
@@ -89,24 +90,24 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 				}
 				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
 			} else {
-//				LOGGER.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
+				// LOGGER.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
 				LOGGER.log(TraceLevel.DEBUG, Messages.getString("INSECURE_SSL_CONNECTION"));
 			}
 			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
-		} 		
-		LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT" , getHdfsUri().toString()));
-		
+		}
+		LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT", getHdfsUri()
+				.toString()));
+
 		return null;
 	}
-	
-	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties){
+
+	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties) {
 		return hdfsUser != null && connectionProperties.get(IHdfsConstants.HDFS_PASSWORD) != null;
 	}
-	
-	
+
 	protected FileSystem internalGetFileSystem(URI hdfsUri, String hdfsUser) throws Exception {
 		FileSystem fs = null;
-		
+
 		if (HDFSOperatorUtils.isValidHdfsUser(hdfsUser)) {
 			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", hdfsUri + " " + hdfsUser));
 			fs = FileSystem.get(hdfsUri, fConfiguration, hdfsUser);
@@ -116,51 +117,45 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 		}
 		// check if root path /user exist
 		try {
-			if (!fs.exists(new Path( hdfsUri + "/user" ))) {
+			if (!fs.exists(new Path(hdfsUri + "/user"))) {
 				throw new FileNotFoundException("Path not found.");
-			}
-			else{
+			} else {
 				FsStatus fsStatus = fs.getStatus();
 				LOGGER.log(TraceLevel.INFO, "Number of remaining bytes on the file system: " + fsStatus.getRemaining());
-				System.out.println("Filysytem URL " + fs.getUri());
+				System.out.println("Filesystem  Home Directory :  " + fs.getHomeDirectory() + "   \ttotal size of all files : " + fs.getUsed());
 			}
-				
-			
+
 		} catch (FileNotFoundException e) {
 			LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
 		}
 
 		return fs;
 	}
-	
-	protected UserGroupInformation authenticateWithKerberos(final String hdfsUser,
-			final String kerberosPrincipal, final String kerberosKeytab)
-			throws Exception {
+
+	protected UserGroupInformation authenticateWithKerberos(final String hdfsUser, final String kerberosPrincipal,
+			final String kerberosKeytab) throws Exception {
 		UserGroupInformation.setConfiguration(fConfiguration);
 		UserGroupInformation ugi;
 		if (HDFSOperatorUtils.isValidHdfsUser(hdfsUser)) {
-			UserGroupInformation.loginUserFromKeytab(kerberosPrincipal,
-					kerberosKeytab);
-			ugi = UserGroupInformation.createProxyUser(hdfsUser,
-					UserGroupInformation.getLoginUser());
-			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_PROXY_CONNECT" , hdfsUser));
+			UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytab);
+			ugi = UserGroupInformation.createProxyUser(hdfsUser, UserGroupInformation.getLoginUser());
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_PROXY_CONNECT", hdfsUser));
 		} else {
-			ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(
-					kerberosPrincipal, kerberosKeytab);
-			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_USING_KERBOSER" , kerberosPrincipal));
+			ugi = UserGroupInformation.loginUserFromKeytabAndReturnUGI(kerberosPrincipal, kerberosKeytab);
+			LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_USING_KERBOSER", kerberosPrincipal));
 		}
 
 		return ugi;
 	}
-	
+
 	public URI getHdfsUri() {
 		return fHdfsUri;
 	}
-	
+
 	public void setHdfsUri(URI fHdfsUri) {
 		this.fHdfsUri = fHdfsUri;
 	}
-	
+
 	public Configuration getConfiguration() {
 		return fConfiguration;
 	}

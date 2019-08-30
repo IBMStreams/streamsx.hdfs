@@ -165,7 +165,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		fileAttrName = fileAttr;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_FILE, optional = true, description = IHdfsConstants.DESC_SINK_FILE)
 	public void setFile(String file) {
 		TRACE.log(TraceLevel.DEBUG, "setFile: " + file);
 		this.file = file;
@@ -175,7 +175,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return file;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TEMP_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_TEMP_FILE, optional = true, description = IHdfsConstants.DESC_SINK_TEMP_FILE)
 	public void setTempFile(String tempfile) {
 		TRACE.log(TraceLevel.DEBUG, "setTempFile: " + tempfile);
 		this.tempFile = tempfile;
@@ -190,12 +190,12 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	}
 
 	// Optional parameter timeFormat
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TIME_FORMAT)
+	@Parameter(name = IHdfsConstants.PARAM_TIME_FORMAT, optional = true, description = IHdfsConstants.DESC_SINK_TIME_FORMAT)
 	public void setTimeFormat(String timeFormat) {
 		this.timeFormat = timeFormat;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_BYTES_PER_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_BYTES_PER_FILE, optional = true, description = IHdfsConstants.DESC_SINK_BYTES_PER_FILE)
 	public void setBytesPerFile(long bytesPerFile) {
 		this.bytesPerFile = bytesPerFile;
 	}
@@ -204,7 +204,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return bytesPerFile;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TUPELS_PER_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_TUPLES_PER_FILE, optional = true, description = IHdfsConstants.DESC_SINK_TUPELS_PER_FILE)
 	public void setTuplesPerFile(long tuplesPerFile) {
 		this.tuplesPerFile = tuplesPerFile;
 	}
@@ -213,7 +213,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return tuplesPerFile;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_TIME_PER_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_TIME_PER_FILE, optional = true, description = IHdfsConstants.DESC_SINK_TIME_PER_FILE)
 	public void setTimePerFile(double timePerFile) {
 		this.timePerFile = timePerFile;
 	}
@@ -222,7 +222,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return timePerFile;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SINK_CLOSE_ON_PUNCT)
+	@Parameter(name = IHdfsConstants.PARAM_CLOSE_ON_PUNCT, optional = true, description = IHdfsConstants.DESC_SINK_CLOSE_ON_PUNCT)
 	public void setCloseOnPunct(boolean closeOnPunct) {
 		this.closeOnPunct = closeOnPunct;
 	}
@@ -231,7 +231,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 		return closeOnPunct;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_ENCODING)
+	@Parameter(name = IHdfsConstants.PARAM_ENCODING, optional = true, description = IHdfsConstants.DESC_ENCODING)
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
@@ -327,7 +327,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 	}
 
 	@ContextCheck(compile = false)
-	public static void checkParameters(OperatorContextChecker checker) throws Exception {
+	public static void checkParametersRuntime(OperatorContextChecker checker) throws Exception {
 		List<String> paramValues = checker.getOperatorContext().getParameterValues("file");
 		List<String> tempFileValues = checker.getOperatorContext().getParameterValues("tempFile");
 		List<String> timeFormatValue = checker.getOperatorContext().getParameterValues("timeFormat");

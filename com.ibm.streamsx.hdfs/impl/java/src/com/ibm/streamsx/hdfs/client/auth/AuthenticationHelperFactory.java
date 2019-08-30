@@ -1,7 +1,7 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014-2019, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs.client.auth;
 
@@ -10,8 +10,7 @@ import com.ibm.streamsx.hdfs.IHdfsConstants;
 
 public class AuthenticationHelperFactory {
 
-	public static IAuthenticationHelper createAuthenticationHelper(
-			String hdfsUri, String hdfsUser, String configPath)
+	public static IAuthenticationHelper createAuthenticationHelper(String hdfsUri, String hdfsUser, String configPath)
 			throws Exception {
 		IAuthenticationHelper authHelper = null;
 

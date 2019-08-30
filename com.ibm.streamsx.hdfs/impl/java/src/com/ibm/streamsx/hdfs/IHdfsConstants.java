@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2017, International Business Machines Corporation
+* Copyright (C) 2017-2019, International Business Machines Corporation
 * All Rights Reserved
 *******************************************************************************/
 
@@ -7,18 +7,39 @@ package com.ibm.streamsx.hdfs;
 
 public class IHdfsConstants {
 
-    public static final String PARAM_TIME_PER_FILE = "timePerFile";
+
+    // HDFSFileSink parameters
+	public static final String PARAM_TIME_PER_FILE = "timePerFile";
     public static final String PARAM_CLOSE_ON_PUNCT = "closeOnPunct";
     public static final String PARAM_TUPLES_PER_FILE = "tuplesPerFile";
     public static final String PARAM_BYTES_PER_FILE = "bytesPerFile";
     public static final String PARAM_FILE_NAME_ATTR = "fileAttributeName";
+    public static final String PARAM_TEMP_FILE = "tempfile";
+    public static final String PARAM_TIME_FORMAT = "timeFormat";
+  
+    // HDFSFileCopy parameters
     public static final String PARAM_LOCAL_FILE_NAME_ATTR = "localFileAttrName";
     public static final String PARAM_HDFS_FILE_NAME_ATTR = "hdfsFileAttrName";
     public static final String PARAM_LOCAL_FILE_NAME = "localFile";
     public static final String PARAM_HDFS_FILE_NAME = "hdfsFile";
-    public static final String PARAM_SLEEP_TIME = "sleepTime";
+    public static final String PARAM_HDFS_FILE_DELETE_SOURCE_FILE = "deleteSourceFile";
+    public static final String PARAM_HDFS_FILE_OVERWRITE_DEST_FILE = "overwriteDestinationFile";
+    public static final String PARAM_HDFS_FILE_COPY_DIRECTION = "direction";
+   
+    // HDFSFileSource parameters
+	public static final String PARAM_SOURCE_BLOCKSIZE_PARAM = "blockSize";
     public static final String PARAM_INITDELAY = "initDelay";
     public static final String PARAM_ENCODING = "encoding";
+    public static final String PARAM_FILE = "file";
+
+         
+   
+    public static final String PARAM_DIRECTORY = "directory";
+    public static final String PARAM_SLEEP_TIME = "sleepTime";
+    public static final String PARAM_STRICT_MODE = "strictMode";
+    public static final String PARAM_PATERN = "pattern";
+    
+    
     public static final String FILE_VAR_PREFIX = "%";
     public static final String FILE_VAR_FILENUM = "%FILENUM";
     public static final String FILE_VAR_TIME = "%TIME";
@@ -234,13 +255,12 @@ public class IHdfsConstants {
             + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory every two seconds and the `HDFS2FileSource`\\n"
             + "operator to read the files that are output by the `HDFS2DirectoryScan` operator. \\n\\n"
 
-            + "//// HDFS2DirectoryScan operator scans /user/myser/ directory from HDFS every 2.0 seconds\\n\\n"
+            + "//// HDFS2DirectoryScan operator scans the /user/streamsadmin/works directory from HDFS every 2.0 seconds\\n\\n"
             + "    (stream<rstring filename>; Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan(){\\n"
             + "        param\\n"
-            + "            directory     : \\\"/user/myuser/\\\"; \\n"
-            + "            hdfsUri: \\\"hdfs : //hdfsServer:1883\\\"; \\n"
+            + "            directory     : \\\"/user/streamsadmin/works\\\"; \\n"
+            + "            hdfsUri: \\\"hdfs : //hdfsServer:8020\\\"; \\n"
             + "            hdfsUser: \\\"streamsadmin\\\"; \\n"
-            + "            hdfsPassword: \\\"Password\\\"; \\n"
             + "            sleepTime     : 2.0; \\n" 
             + "    }\\n\\n"
             
@@ -311,7 +331,7 @@ public class IHdfsConstants {
             "+ Examples \\n\\n" +
 
             "This is a basic example using the `HDFS2FileSink` operator to write output to a Hadoop filesystem deployed on IBM Cloud (IBM Analytics Engine). \\n\\n"
-            + "     () as Sink= HDFS2FileSink(Input){ \\n"
+            + "     stream<rstring fileName, uint64 size> HdfsSink= HDFS2FileSink(Input){ \\n"
             + "          param \\n"
             + "             file          : \\\"/user/clsadmin/myfile.txt\\\"; \\n"
             + "             hdfsUri       : \\\"webhdfs://server_host_name:port\\\"; \\n"
@@ -387,21 +407,36 @@ public class IHdfsConstants {
             + "    (stream<rstring filename> Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan() \\n"
             + "    { \\n" 
             + "        param \\n"
-            + "            directory     : \\\"/user/myuser/\\\"; \\n"
+            + "            directory     : \\\"/user/clsadmin/works\\\"; \\n"
             + "            hdfsUri       : \\\"webhdfs://hdfsServer:8443\\\"; \\n"
             + "            hdfsPassword  : \\\"password\\\"; \\n"
-            + "            hdfsUser      : \\\"biuser\\\"; \\n"
-            + "            sleepTime     : 2.0; \\n" + "    } \\n\\n" +
+            + "            hdfsUser      : \\\"clsadmin\\\"; \\n"
+            + "            sleepTime     : 2.0; \\n" + "    } \\n\\n" 
 
-            "This example uses the `HDFS2DirectoryScan` operator to scan a HDFS directory every two seconds. \\n"
+            + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The **hdfsUser** and **hdfsPassword** parameters are now difined in credentials JSON string. \\n"
+            + "    param \\n" 
+            + "        expression<rstring> $credentials : getSubmissionTimeValue(\\\"credentials\\\", \\\"{\\n"
+			+ "            \\\\\\\"user\\\\\\\"     : \\\\\\\"clsadmin\\\\\\\",\\n"
+			+ "            \\\\\\\"password\\\\\\\" : \\\\\\\"IAE-password\\\\\\\",\\n"
+			+ "            \\\\\\\"webhdfs\\\\\\\"  : \\\\\\\"webhdfs://ip-address:8443\\\\\\\"\\n"
+			+ "       }\\\"\\n\\n\\n"
+  
+            + "        (stream<rstring filename> Files) as HDFS2DirectoryScan_2 = HDFS2DirectoryScan() \\n"
+            + "        { \\n" 
+            + "            param \\n"
+            + "                directory     : \\\"/user/clsadmin/works\\\"; \\n"
+            + "                credentials   : $credentials; \\n"
+            + "                sleepTime     : 2.0; \\n" + "        } \\n\\n" 
+                    
+            + "This example uses the `HDFS2DirectoryScan` operator to scan a HDFS directory every two seconds. \\n"
             + "The **hdfsUri** parameter in this case overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`. \\n\\n\\n"
             +
 
-            "    (stream<rstring filename> Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan() \\n"
+            "    (stream<rstring filename> Files) as HDFS2DirectoryScan_3 = HDFS2DirectoryScan() \\n"
             + "    { \\n" 
             + "        param \\n"
             + "            directory     : \\\"/user/myuser/\\\"; \\n"
-            + "            hdfsUri       : \\\"hdfs://hdfsServer:1883\\\"; \\n"
+            + "            hdfsUri       : \\\"hdfs://hdfsServer:8020\\\"; \\n"
             + "            sleepTime     : 2.0; \\n" + "    } \\n";
 
     public static final String DESC_HDFS_DIR_SCAN_INPUT = "The `HDFS2DirectoryScan` operator has an optional control input port. You can use this port to change the directory "
@@ -449,6 +484,7 @@ public class IHdfsConstants {
             + "This example copies all files from the local path `/tmp/work` into HDFS directory `/user/hdfs/work` . \\n"
 
             + "    // DirectoryScan operator with an absolute directory argument. \\n"
+            + "    // The output port returns all local file names in directory /tmp/work. \\n"
             + "    stream<rstring localFile> DirScan = DirectoryScan() \\n"
             + "    {  \\n"
             + "        param \\n"
@@ -457,51 +493,51 @@ public class IHdfsConstants {
             + "    } \\n\\n"
 
             + "    // Copies all incoming files from input port into /user/hdfs/work directory. \\n"
+            + "    // The output port returns the result of copy action and the elapsed time \\n"
             + "    stream<rstring message, uint64 elapsedTime> CopyFromLocal = HDFS2FileCopy(DirScan)\\n"
             + "    { \\n"
             + "        param\\n"
             + "              hdfsUser                 : \\\"hdfs\\\"; \\n"
+            + "              localFileAttrName        : \\\"localFile\\\"; \\n"
             + "              hdfsFile                 : \\\"/user/hdfs/work/\\\"; \\n"
             + "              deleteSourceFile         : false; \\n"
             + "              overwriteDestinationFile : true; \\n"
             + "              direction                : copyFromLocalFile; \\n"
-            + "              localFileAttrName        : \\\"localFile\\\"; \\n"
-
-            + "    }\\n\\n"
+ 
+            + "    }\\n\\n\\n"
             
             + "This example copies all files from the HDFS directory `/user/hdfs/work` into the local directory `/tmp/work2` . \\n\\n"
-            + "You have to perform the follwing steps for kerberos configuration:"
-            + "* 1- Copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. \\n"
-            + "* 2- Replace the kerberos principal with your hdsf principal. \\n"
-            + "* 3- Copy the `core-site.xml` file from your HDFS server into `etc` directory. \\n"
-            + "* 4- Copy the kerberos configuration file in `/etc` directory of your streams server. \\n\\n\\n"
-
-            + "    //`HDFS2DirectoryScan` operator with an absolute directory argument and with kerberos authentication \\n\\n"
-            + "    // parameters returns all HDFS file names. \\n"
+            + "You have to perform the follwing steps for kerberos configuration:\\n"
+            + "* Copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. \\n"
+            + "* Replace the kerberos principal with your hdsf principal. \\n"
+            + "* Copy the `core-site.xml` file from your HDFS server into local `etc` directory. \\n"
+            + "* Copy the kerberos configuration file `krb5.conf` into main `/etc` directory of your streams server. \\n"
+            + "The output port of `HDFS2FileCopy` operator returns the result of copy action and the elapsed time. \\n"
+            + "    // HDFS2DirectoryScan operator with an absolute directory argument and with kerberos authentication \\n"
+            + "    // The output port returns all HDFS file names. \\n"
             + "    stream<rstring hdfsFile> HdfsDirScan = HDFS2DirectoryScan() \\n"
             + "    {  \\n"
             + "        param \\n"
-            + "            configPath               : \\\"etc1\\\"; \\n"
+            + "            configPath               : \\\"etc\\\"; \\n"
             + "            authKeytab               : \\\"etc/hdfs.headless.keytab\\\"; \\n"
             + "            authPrincipal            : \\\"hdfs-hdpcluster@HDP2.COM\\\"; \\n"
-            + "            vmArg                    : \\\"-Djava.security.krb5.conf=/etc/krb5.conf\\\"; \\n"
             + "            directory                : \\\"/user/hdfs/work\\\"; \\n"
             + "            sleepTime                : 2.0; \\n" 
-            + "    } \\n\\n"
-
+            + "            vmArg                    : \\\"-Djava.security.krb5.conf=/etc/krb5.conf\\\"; \\n"
+            + "    } \\n\\n\\n"
             + "    // CopyToLocal copies all incoming HDFS files from input port into local directory /tmp/work2 . \\n"
             + "    stream<rstring message, uint64 elapsedTime> CopyToLocal = HDFS2FileCopy(HdfsDirScan) \\n"
             + "    { \\n"
             + "        param\\n"
+            + "            configPath               : \\\"etc\\\"; \\n"
             + "            authKeytab               : \\\"etc/hdfs.headless.keytab\\\"; \\n"
             + "            authPrincipal            : \\\"hdfs-hdpcluster@HDP2.COM\\\"; \\n"
-            + "            configPath               : \\\"etc1\\\"; \\n"
-            + "            vmArg                    : \\\"-Djava.security.krb5.conf=/etc/krb5.conf\\\"; \\n"
             + "            hdfsFileAttrName         : \\\"hdfsFile\\\"; \\n"
+            + "            localFile                : \\\"/tmp/work2\\\"; \\n"
             + "            deleteSourceFile         : false; \\n"
             + "            overwriteDestinationFile : true; \\n"
             + "            direction                : copyToLocalFile; \\n"
-            + "            localFile                : \\\"/tmp/work2\\\"; \\n"
+            + "            vmArg                    : \\\"-Djava.security.krb5.conf=/etc/krb5.conf\\\"; \\n"
             + "    }\\n";
 
     public static final String DESC_HDFS_FILE_COPY_INPUT = "The `HDFS2FileCopy` operator has one input port, which contents the file names that you specified. \\n"

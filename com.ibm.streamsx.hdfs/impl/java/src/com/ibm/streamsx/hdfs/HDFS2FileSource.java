@@ -70,9 +70,8 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements StateHandle
 
 	private static Logger TRACE = Logger.getLogger(HDFS2FileSource.class.getName());
 
-	private static final String FILES_OPENED_METRIC = "nOpenedFiles";
-	private static final String BLOCKSIZE_PARAM = "blockSize";
 	private Metric nOpenedFiles;
+	private static final String FILES_OPENED_METRIC = "nOpenedFiles";
 
 	private String fFileName;
 	private double fInitDelay;
@@ -148,9 +147,10 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements StateHandle
 		MetaType outType = outputSchema.getAttribute(0).getType().getMetaType();
 		// If we ever switch to the generated xml files, we'll be able to delete
 		// this.
-		if (context.getParameterNames().contains(BLOCKSIZE_PARAM)) {
+		if (context.getParameterNames().contains(IHdfsConstants.PARAM_SOURCE_BLOCKSIZE_PARAM)) {
 			TRACE.fine("Blocksize parameter is supplied, setting blocksize based on that.");
-			fBlockSize = Integer.parseInt(context.getParameterValues(BLOCKSIZE_PARAM).get(0));
+			fBlockSize = Integer.parseInt(context.getParameterValues(IHdfsConstants.PARAM_SOURCE_BLOCKSIZE_PARAM).get(
+					0));
 		} else {
 			TRACE.fine("Blocksize parameter not supplied, using default " + fBlockSize);
 		}
@@ -243,7 +243,7 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements StateHandle
 		}
 
 		if (MetaType.BLOB != outputSchema.getAttribute(0).getType().getMetaType() && checker.getOperatorContext()
-				.getParameterNames().contains(BLOCKSIZE_PARAM)) {
+				.getParameterNames().contains(IHdfsConstants.PARAM_SOURCE_BLOCKSIZE_PARAM)) {
 			checker.setInvalidContext(Messages.getString("HDFS_SOURCE_INVALID_BLOCKSIZE_PARAM", "BLOCKSIZE_PARAM"),
 					null);
 		}
@@ -533,22 +533,22 @@ public class HDFS2FileSource extends AbstractHdfsOperator implements StateHandle
 		}
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_SOURCE_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_FILE, optional = true, description = IHdfsConstants.DESC_SOURCE_FILE)
 	public void setFile(String file) {
 		this.fFileName = file;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_INIT_DELAY)
+	@Parameter(name = IHdfsConstants.PARAM_INITDELAY, optional = true, description = IHdfsConstants.DESC_INIT_DELAY)
 	public void setInitDelay(double initDelay) {
 		this.fInitDelay = initDelay;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_ENCODING)
+	@Parameter(name = IHdfsConstants.PARAM_ENCODING, optional = true, description = IHdfsConstants.DESC_ENCODING)
 	public void setEncoding(String encoding) {
 		this.fEncoding = encoding;
 	}
 
-	@Parameter(name = BLOCKSIZE_PARAM, optional = true, description = IHdfsConstants.DESC_BLOCK_SIZE)
+	@Parameter(name = IHdfsConstants.PARAM_SOURCE_BLOCKSIZE_PARAM, optional = true, description = IHdfsConstants.DESC_BLOCK_SIZE)
 	public void setBlockSize(int inBlockSize) {
 		fBlockSize = inBlockSize;
 	}

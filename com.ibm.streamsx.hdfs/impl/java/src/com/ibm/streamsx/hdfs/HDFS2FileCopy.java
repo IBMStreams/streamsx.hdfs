@@ -135,17 +135,18 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 		this.hdfsFile = hdfsFile;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_DELETE_SOURCE_FILE)
+	
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_FILE_DELETE_SOURCE_FILE, optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_DELETE_SOURCE_FILE)
 	public void setDeleteSourceFile(boolean deleteSourceFile) {
 		this.deleteSourceFile = deleteSourceFile;
 	}
 
-	@Parameter(optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_OVERWRITE_DEST_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_FILE_OVERWRITE_DEST_FILE, optional = true, description = IHdfsConstants.DESC_HDFS_COPYY_OVERWRITE_DEST_FILE)
 	public void setOverwriteDestinationFile(boolean overwriteDestinationFile) {
 		this.overwriteDestinationFile = overwriteDestinationFile;
 	}
-
-	@Parameter(optional = false, description = IHdfsConstants.DESC_HDFS_COPYY_DIRECTION)
+	
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_FILE_COPY_DIRECTION, optional = false, description = IHdfsConstants.DESC_HDFS_COPYY_DIRECTION)
 	public void setDirection(copyDirection direction) {
 		this.direction = direction;
 	}

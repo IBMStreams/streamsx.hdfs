@@ -2,7 +2,7 @@ streamsx.hdfs
 =============
 This toolkit provides operators and functions for interacting with Hadoop File System.
 
-HDFS Toolkit v4.4.0 is officially released to support IBM Streams on IBM Cloud:
+HDFS Toolkit v4.5.0 is officially released to support IBM Streams on IBM Cloud:
 * https://github.com/IBMStreams/streamsx.hdfs/releases
 
 Check out what's new with IBM Streams:
