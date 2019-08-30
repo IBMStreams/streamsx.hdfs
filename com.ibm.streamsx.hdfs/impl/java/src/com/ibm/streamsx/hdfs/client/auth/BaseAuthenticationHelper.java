@@ -122,7 +122,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 			} else {
 				FsStatus fsStatus = fs.getStatus();
 				LOGGER.log(TraceLevel.INFO, "Number of remaining bytes on the file system: " + fsStatus.getRemaining());
-				System.out.println("Filesystem  Home Directory :  " + fs.c() );
+				System.out.println("Filesystem  Home Directory :  " + fs.getHomeDirectory() );
 				}
 
 		} catch (FileNotFoundException e) {
