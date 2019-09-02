@@ -1,4 +1,6 @@
+/output
+/toolkit.xml
+/impl
+/.toolkitList
 /bin/
-toolkit.xml
-.toolkitList
-/output/
+/doc/

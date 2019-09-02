@@ -1,7 +1,7 @@
 /*******************************************************************************
-* Copyright (C) 2014, International Business Machines Corporation
-* All Rights Reserved
-*******************************************************************************/
+ * Copyright (C) 2014-2019, International Business Machines Corporation
+ * All Rights Reserved
+ *******************************************************************************/
 
 package com.ibm.streamsx.hdfs.client;
 
@@ -20,35 +20,32 @@ import com.ibm.streamsx.hdfs.client.auth.AuthenticationHelperFactory;
 import com.ibm.streamsx.hdfs.client.auth.IAuthenticationHelper;
 
 abstract class AbstractHdfsClient implements IHdfsClient {
-	
 
-	protected FileSystem fFileSystem;
+	public FileSystem fFileSystem;
 	protected boolean fIsDisconnected;
 	protected IAuthenticationHelper fAuthHelper;
-	
+
 	private HashMap<String, String> fConnectionProperties = new HashMap<String, String>();
 
 	@Override
-	public void connect(String fileSystemUri, String hdfsUser, String configPath)
-			throws Exception {
-		System.out.println("AbstractHdfsClient connect  " + fileSystemUri + " " + hdfsUser + " " + configPath + " " + getConnectionProperties());
+	public FileSystem connect(String fileSystemUri, String hdfsUser, String configPath) throws Exception {
 		fAuthHelper = AuthenticationHelperFactory.createAuthenticationHelper(fileSystemUri, hdfsUser, configPath);
 		fFileSystem = fAuthHelper.connect(fileSystemUri, hdfsUser, getConnectionProperties());
 		// check if the filesystem is available
 		fFileSystem.getStatus();
+		return fFileSystem;
 	}
-		
+
 	@Override
 	public InputStream getInputStream(String filePath) throws IOException {
 		if (fIsDisconnected) {
 			return null;
-		}		
+		}
 		return fFileSystem.open(new Path(filePath));
 	}
 
 	@Override
-	public OutputStream getOutputStream(String filePath, boolean append)
-			throws IOException {
+	public OutputStream getOutputStream(String filePath, boolean append) throws IOException {
 
 		if (fIsDisconnected)
 			return null;
@@ -70,8 +67,7 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 	}
 
 	@Override
-	public FileStatus[] scanDirectory(String dirPath, String filter)
-			throws IOException {
+	public FileStatus[] scanDirectory(String dirPath, String filter) throws IOException {
 
 		FileStatus[] files = new FileStatus[0];
 
@@ -121,7 +117,7 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 		Path dstPath = new Path(dst);
 		Path parentPath = dstPath.getParent();
 		if (parentPath != null) {
-			if ( ! fFileSystem.mkdirs(parentPath)) {
+			if (!fFileSystem.mkdirs(parentPath)) {
 				return false;
 			}
 		}
@@ -132,7 +128,7 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 	public boolean delete(String filePath, boolean recursive) throws IOException {
 		if (fIsDisconnected)
 			return false;
-		
+
 		Path f = new Path(filePath);
 		return fFileSystem.delete(f, recursive);
 	}
@@ -144,25 +140,25 @@ abstract class AbstractHdfsClient implements IHdfsClient {
 			return false;
 		return fFileSystem.getFileStatus(new Path(filePath)).isDirectory();
 	}
-	
+
 	@Override
 	public void disconnect() throws Exception {
 		fFileSystem.close();
 		fIsDisconnected = true;
-		if(fAuthHelper != null)
+		if (fAuthHelper != null)
 			fAuthHelper.disconnect();
 	}
-	
+
 	@Override
 	public void setConnectionProperty(String name, String value) {
 		fConnectionProperties.put(name, value);
 	}
-	
+
 	@Override
 	public String getConnectionProperty(String name) {
 		return fConnectionProperties.get(name);
 	}
-	
+
 	@Override
 	public Map<String, String> getConnectionProperties() {
 		return new HashMap<String, String>(fConnectionProperties);
