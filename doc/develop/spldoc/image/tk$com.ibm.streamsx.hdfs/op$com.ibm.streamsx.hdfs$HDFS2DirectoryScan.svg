@@ -94,7 +94,7 @@ vy/rV8AnRZRYHF0mNFkAAAAASUVORK5CYII="
       /><text x="48.65" y="28.0"
       >Optional: appConfigName, authKeytab, authPrincipal, </text
       ><text x="48.65" y="43.0"
-      >configPath, credFile, credentials, directory, hadfsPassword, </text
+      >configPath, credFile, credentials, directory, hdfsPassword, </text
       ><text x="48.65" y="58.0"
       >hdfsUri, hdfsUser, initDelay, keyStorePassword, keyStorePath, </text
       ><text x="48.65" y="73.0"

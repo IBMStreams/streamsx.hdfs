@@ -98,7 +98,7 @@ vy/rV8AnRZRYHF0mNFkAAAAASUVORK5CYII="
       ><text x="48.65" y="43.0"
       >credentials, deleteSourceFile, hdfsFile, hdfsFileAttrName, </text
       ><text x="48.65" y="58.0"
-      >hadfsPassword, hdfsUri, hdfsUser, keyStorePassword, </text
+      >hdfsPassword, hdfsUri, hdfsUser, keyStorePassword, </text
       ><text x="48.65" y="73.0"
       >keyStorePath, libPath, localFile, localFileAttrName, </text
       ><text x="48.65" y="88.0"

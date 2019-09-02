@@ -96,7 +96,7 @@ vy/rV8AnRZRYHF0mNFkAAAAASUVORK5CYII="
       ><text x="48.65" y="28.0"
       >bytesPerFile, closeOnPunct, configPath, credFile, </text
       ><text x="48.65" y="43.0"
-      >credentials, encoding, file, fileAttributeName, hadfsPassword, </text
+      >credentials, encoding, file, fileAttributeName, hdfsPassword, </text
       ><text x="48.65" y="58.0"
       >hdfsUri, hdfsUser, keyStorePassword, keyStorePath, </text
       ><text x="48.65" y="73.0"
