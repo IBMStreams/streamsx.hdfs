@@ -46,14 +46,16 @@
 </p>
 </li>
 
-<li class="li"> <tt class="ph tt">credentials</tt>        : A JSON string that contains <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt>, <tt class="ph tt">webhdfs</tt>.</li>
+<li class="li"> <tt class="ph tt">credentials</tt>        : credentials is a JSON string that contains key/value pairs for <tt class="ph tt">user</tt> and <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> . </li>
 
-<li class="li"> <tt class="ph tt">appConfigName</tt>      : Streams application configuration that defines <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt>, and <tt class="ph tt">webhdfs</tt>.</li>
+<li class="li"> <tt class="ph tt">appConfigName</tt>      : Streams application configuration that support <tt class="ph tt">credentials</tt>. And <tt class="ph tt">credentials</tt> is a JSON string that contains   <tt class="ph tt">user</tt> and <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt>.</li>
 
 <li class="li">
 <p class="p"> Adapting of streamsx.hdfs to support HDP 2.x and HDP 3.x file systems.
 </p>
 </li>
+
+<li class="li"> Adapting of com.ibm.streamsx.hdfs.client.webhdfs java package to support <tt class="ph tt">knox</tt> HttpURLConnection.</li>
 
 <li class="li"> The pom.xml file has been upgraded to use Hadoop version 3.1.0 libraries. </li>
 

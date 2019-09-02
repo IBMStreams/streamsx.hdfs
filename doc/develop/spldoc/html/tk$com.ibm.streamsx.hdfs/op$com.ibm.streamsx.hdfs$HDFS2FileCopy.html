@@ -246,7 +246,7 @@ This operator supports 23 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__appConfigName"><!-- --></a><tt class="ph tt">appConfigName</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter 'credentials'.  The <tt class="ph tt">credentials</tt> is a JSON string that contains <tt class="ph tt">user</tt> and <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> .  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. 
+<p class="p">This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter <tt class="ph tt">credentials</tt>.  The <tt class="ph tt">credentials</tt> is a JSON string that contains key/value pairs for <tt class="ph tt">user</tt> and <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> .  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence.  An application configuration can be created in the Streams Console or using the <tt class="ph tt">streamtool mkappconfig ... &lt;configObject name&gt;</tt>.
 </p>
 <dl class="dl">
 
@@ -412,7 +412,7 @@ This operator supports 23 parameters.
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__credentials"><!-- --></a><tt class="ph tt">credentials</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the JSON string that contains the hdfs credentials: <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">hdfsUri</tt> or <tt class="ph tt">webhdfs</tt> . 
+<p class="p">This optional parameter specifies the JSON string that contains the hdfs credentials key/value pairs for <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> . 
 </p>
 
 <p class="p">This parameter can also be specified in an application configuration.
