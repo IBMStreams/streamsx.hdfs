@@ -9,7 +9,7 @@
   <identity>
     <name>com.ibm.streamsx.hdfs</name>
     <description>
-The **streamsx.hdfs** toolkit provides operators that can read and write data from Hadoop Distributed File System **(HDFS)** version 2 or later. It support also copy files from local file system to the remote HDFS and from HDFS to the local file system. 
+The **streamsx.hdfs** toolkit provides operators that can read and write data from Hadoop Distributed File System **(HDFS)** version 2 or later. It supports also copy files from local file system to the remote HDFS and from HDFS to the local file system. 
 
 **HDFS2FileSource**     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
 
@@ -31,7 +31,7 @@ The operators in this toolkit use Hadoop Java APIs to access HDFS and WEBHDFS. T
 
 Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 
-You can access Hadoop remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to GPFS.
+You can access Hadoop remotely by specifying the `webhdfs://hdfshost:webhdfsport` schema in the URI that you use to connect to WEBHDFS.
 
 For example:
  
@@ -56,7 +56,7 @@ For example:
       }
  
  This example copies the file test.txt from local path ./data/ into /user/hdfs/works directory of HDFS. 
- The parameter **credentials** is a JSON string that contains `user`, `password` and `webhdsf`.
+ The parameter **credentials** is a JSON string that contains `user`, `password` and `webhdfs`.
  
 
       streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
@@ -93,7 +93,7 @@ More details about Kerberos configuration:
 
       https://developer.ibm.com/hadoop/2016/08/18/overview-of-kerberos-in-iop-4-2/
 
-Copy the created keytab into local streams server for example in etc directory of your SPL application.
+Copy the created keytab into local streams server for example in `etc` directory of your SPL application.
 
 Before you start your SPL application, you can check the keytab with **kinit** tool
 

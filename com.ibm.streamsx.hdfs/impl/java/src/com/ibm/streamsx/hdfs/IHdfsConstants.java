@@ -115,8 +115,8 @@ public class IHdfsConstants {
 
     public static final String DESC_CRED_FILE = "This parameter specifies a file that contains login credentials. The credentials are used to "
             + "connect to GPFS remotely by using the `webhdfs://hdfshost:webhdfsport` schema.  The credentials file must contain information "
-            + "about how to authenticate with IBM Analytics Engine when using the webhdfs schema. \\n"
-            + "For example, the file must contain the user name and password for an IBM Analytics Engine user. \\n"
+            + "about how to authenticate with IBM Analytics Engine when using the `webhdfs` schema. \\n"
+            + "For example, the file must contain the username and password for an IBM Analytics Engine user. \\n"
             + "When connecting to HDFS instances deployed on IBM Analytics Engine, \\n"
             + "the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.";
 
@@ -143,7 +143,7 @@ public class IHdfsConstants {
 
     public static final String DESC_KEY_STOR_PATH = "This optional parameter is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine. \\n"
             + "It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. \\n"
-            + "**Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.**  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates.. \\n"
+            + "**Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.**  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. \\n"
             + "The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory. \\n"
             + "See the section on 'SSL Configuration' in the main page of this toolkit's documentation for information on how to configure the keystore. \\n"
             + "The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.";
@@ -463,7 +463,7 @@ public class IHdfsConstants {
             + "If you set this parameter to true and the specified directory does not exist or there is a problem accessing the directory, the operator reports an error and terminates. \\n"
             + "If you set this parameter to false and the specified directory does not exist or there is a problem accessing the directory, the operator treats it as an empty directory and does not report an error. \\n";
 
-    public static final String DESC_HDFS_FILE_COPY = "The **HDFS2FileCopy** operator copies files from a HDFS fiel system to the loca disk and also in the opposite direction from a local disk to the HDFS file system. \\n\\n"
+    public static final String DESC_HDFS_FILE_COPY = "The **HDFS2FileCopy** operator copies files from a HDFS file system to the local disk and also in the opposite direction from a local disk to the HDFS file system. \\n\\n"
             + "The  `HDFS2FileCopy`  uses the `hadoop` JAVA API functions `copyFromLocalFile` and `copyToLocalFile` to copy files in two directions. \\n"
             + "* `copyFromLocalFile` : Copies a file from local disk to the HDFS file system. \\n"
             + "* `copyToLocalFile`   : Copies a file from HDFS file system to the local disk. \\n\\n"
@@ -552,7 +552,7 @@ public class IHdfsConstants {
             + "The output port is non-mutating and its punctuation mode is `Free`. \\n\\n"
             + "The schema of the output port is:\\n"
             + "    <string result, uint64 elapsedTime>  \\n"
-            + ", which delivers the result of copy process and the elapsed time in milisecunds. \\n\\n"
+            + ", which delivers the result of copy process and the elapsed time in miliseconds. \\n\\n"
             + "In case of any error it returns the error message as result";
 
     public static final String DESC_HDFS_COPYY_LOCAL_FILE = "This optional parameter specifies the name of local file to be copied. \\n"
