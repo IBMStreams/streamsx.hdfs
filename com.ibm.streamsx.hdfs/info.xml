@@ -147,6 +147,8 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 3. Start the InfoSphere Streams instance. 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
 
++ What is new
+
 ++ What is new in version 4.3.0
 
 * The operator HDFS2FileSink provides a new parameter 'tempFile'.

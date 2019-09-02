@@ -166,8 +166,8 @@ public class IHdfsConstants {
 			+ "    }\\n";
 
     
-    public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters. "
-    		+ " The `credentials`, `hdfsUser` and `hdfsPassword` and `hdfsUrl` parameter can be set in an application configuration. "
+    public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter 'credentials'. "
+    		+ " The `credentials` is a JSON string that contains `user` and `password` and `webhdfs` . "
     		+ " If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ";
     
     public static final String DESC_SOURCE_FILE = "This parameter specifies the name of the file that the operator opens and reads. \\n"

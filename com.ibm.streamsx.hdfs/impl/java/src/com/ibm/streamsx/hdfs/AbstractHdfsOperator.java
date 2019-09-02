@@ -136,9 +136,9 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	
-	@Parameter(name = "hadfsPassword", optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
-	public void setHdfsPassword(String hadfsPassword) {
-		fHdfsPassword = hadfsPassword;
+	@Parameter(name = "hdfsPassword", optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
+	public void setHdfsPassword(String hdfsPassword) {
+		fHdfsPassword = hdfsPassword;
 	}
 
 	public String getHdfsPassword() {
