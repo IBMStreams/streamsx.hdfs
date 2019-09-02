@@ -22,13 +22,13 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 4.5.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; <a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a> &gt; Examples </p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 5.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; <a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a> &gt; Examples </p>
 
 </div>
 
 
 <div class="section">
-<p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory On IBM Cloud.  The <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters are used to provide the username and password for authentication. 
+<p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory On IBM Cloud.  The <tt class="ph tt">hdfsUser</tt> and <tt class="ph tt">hdfsPassword</tt> parameters are used to provide the username and password for authentication. 
 </p>
 
 <div class="p">
@@ -47,7 +47,7 @@
 
 </div>
 
-<div class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory On IBM Cloud.  The <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters are now difined in credentials JSON string. 
+<div class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan the HDFS directory On IBM Cloud.  The <tt class="ph tt">hdfsUser</tt> and <tt class="ph tt">hdfsPassword</tt> parameters are now difined in credentials JSON string. 
 <pre class="pre codeblock">
 param 
     expression&lt;rstring&gt; $credentials : getSubmissionTimeValue("credentials", "{
@@ -69,7 +69,7 @@ param
 
 </div>
 
-<p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan a HDFS directory every two seconds.  The <strong class="ph b">hdfsUri</strong> parameter in this case overrides the value that is specified by the <tt class="ph tt">fs.defaultFS</tt> option in the <tt class="ph tt">core-site.xml</tt>. 
+<p class="p">This example uses the <tt class="ph tt">HDFS2DirectoryScan</tt> operator to scan a HDFS directory every two seconds.  The <tt class="ph tt">hdfsUri</tt> parameter in this case overrides the value that is specified by the <tt class="ph tt">fs.defaultFS</tt> option in the <tt class="ph tt">core-site.xml</tt>. 
 </p>
 
 <div class="p">
