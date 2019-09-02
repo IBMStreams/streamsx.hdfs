@@ -139,11 +139,11 @@ Alternatively, you can fully qualify the operators that are provided by toolkit 
 
 # Procedure
 
-1. If InfoSphere Streams has access to the impl/lib/ext where Hadoop libraries located.
-   The JAR libraries will be download via maven. 
+1. If InfoSphere Streams has access to the `impl/lib/ext` where Hadoop libraries located.
+   The JAR libraries will be download via `maven`. 
    The new version of HDFS toolkit need not necessarily a Hadoop client installation.
 
-2. Build your application.  You can use the **sc** command or Streams Studio.  
+2. Build your application.  You can use the `sc` command or Streams Studio.  
 3. Start the InfoSphere Streams instance. 
 4. Run the application. You can submit the application as a job by using the **streamtool submitjob** command or by using Streams Studio. 
 
@@ -155,9 +155,9 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 ++ What is new in version 4.4.1
 
-* The pom.xml file has been upgraded to use hadoop version 2.8.5 libraries. 
+* The pom.xml file has been upgraded to use Hadoop version 2.8.5 libraries. 
 
-++ What is new in version 4.5.0
+++ What is new in version 5.0.0
 
 * The streamsx.hdfs toolkit has been improved with a new operator **HDFS2FileCopy**.
 
@@ -166,16 +166,16 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 * `copyToLocalFile`   : Copies a file from HDFS file system to the local disk. 
 
 * It supports also two new parameters for all operators:
-* `credentials`        : A JSON string that contains **user**, **password**, **webhdfs**
-* `appConfigName`     : Streams application configuration that defines **user**, **password**, and **webhdfs**
+* `credentials`        : A JSON string that contains `user`, `password`, `webhdfs`.
+* `appConfigName`      : Streams application configuration that defines `user`, `password`, and `webhdfs`.
 
 * Adapting of streamsx.hdfs to support HDP 2.x and HDP 3.x file systems.
-* The pom.xml file has been upgraded to use hadoop version 3.1.0 libraries. 
+* The pom.xml file has been upgraded to use Hadoop version 3.1.0 libraries. 
  
 
  
 </description>
-    <version>4.5.0</version>
+    <version>5.0.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>

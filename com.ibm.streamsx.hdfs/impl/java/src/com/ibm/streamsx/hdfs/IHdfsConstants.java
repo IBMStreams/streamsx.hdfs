@@ -71,45 +71,45 @@ public class IHdfsConstants {
             + "If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. \\n"
             + "When connecting to Hadoop instances on IBM Analytics Engine, this parameter must be specified otherwise the connection will be unsuccessful. \\n"
             + "When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the \\n"
-            + "values that are specified in the **authPrincipal** and **authKeytab** parameters.  After successful authentication, the \\n"
-            + "operator uses the user ID that is specified by the **hdfsUser** parameter to perform all other operations on the file system.";
+            + "values that are specified in the `authPrincipal` and `authKeytab` parameters.  After successful authentication, the \\n"
+            + "operator uses the user ID that is specified by the `hdfsUser` parameter to perform all other operations on the file system.";
 
     public static final String DESC_HDFS_URL = "This parameter specifies the uniform resource identifier (URI) that you can use to connect to \\n"
             + "the HDFS file system.  The URI has the following format:\\n"
             + "* To access HDFS locally or remotely, use `hdfs://hdfshost:hdfsport` \\n"
-            + "* To access GPFS locally, use `gpfs:///`. \\n"
-            + "* To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport`. \\n"
-            + "* To access HDFS via a web connection for HDFS deployed on IBM Analytics Engine, use `webhdfs://webhdfshost:webhdfsport`. \\n\\n"
+            + "* To access GPFS locally, use `gpfs:///` . \\n"
+            + "* To access GPFS remotely, use `webhdfs://hdfshost:webhdfsport` . \\n"
+            + "* To access HDFS via a web connection for HDFS deployed on IBM Analytics Engine, use `webhdfs://webhdfshost:webhdfsport` . \\n\\n"
             + "If this parameter is not specified, the operator expects that the HDFS URI is specified as the `fs.defaultFS` or "
             + "`fs.default.name` property in the `core-site.xml` HDFS configuration file.  The operator expects the `core-site.xml` \\n"
-            + "file to be in `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`  or in the directory specified by the **configPath** parameter. \\n"
-            + "**Note:** For connections to HDFS on IBM Analytics Engine, the `$HADOOP_HOME` environment variable is not supported and so either  **hdfsUri** or **configPath**  must be specified.";
+            + "file to be in `$HADOOP_HOME/../hadoop-conf` or `$HADOOP_HOME/etc/hadoop`  or in the directory specified by the `configPath` parameter. \\n"
+            + "**Note:** For connections to HDFS on IBM Analytics Engine, the `$HADOOP_HOME` environment variable is not supported and so either  `hdfsUri` or `configPath`  must be specified.";
 
     public static final String DESC_INIT_DELAY = "This parameter specifies the time to wait in seconds before the operator reads the first file. \\n"
-            + "The default value is `0`.";
+            + "The default value is `0` .";
 
     public static final String DESC_REC_POLICY = "This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures. \\n"
-            + "The valid values are: `NoRetry`, `InfiniteRetry`, and `BoundedRetry`. The default value is `BoundedRetry`. \\n"
+            + "The valid values are: `NoRetry`, `InfiniteRetry` , and `BoundedRetry` . The default value is `BoundedRetry` . \\n"
             + "If `NoRetry` is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again. \\n"
             + "The operator shuts down at startup time if the initial connection attempt fails. \\n"
             + "If `BoundedRetry` is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times. \\n"
-            + "The maximum number of connection attempts is specified in the **reconnectionBound** parameter.  The sequence of connection attempts occurs at startup time. \\n"
+            + "The maximum number of connection attempts is specified in the `reconnectionBound` parameter.  The sequence of connection attempts occurs at startup time. \\n"
             + "If a connection does not exist, the sequence of connection attempts also occurs before each operator is run. \\n"
             + "If `InfiniteRetry` is specified, the operator continues to try and connect indefinitely until a connection is made. \\n"
             + "This behavior blocks all other operator operations while a connection is not successful. \\n"
             + "For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.";
 
     public static final String DESC_REC_INTERVAL = "This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts. \\n"
-            + "It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry` or `InfiniteRetry`; othewise, it is ignored.  The default value is `10`.";
+            + "It is used only when the `reconnectionPolicy` parameter is set to `BoundedRetry` or `InfiniteRetry`; othewise, it is ignored.  The default value is `10` .";
 
     public static final String DESC_REC_BOUND = "This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs. \\n"
-            + "It is used only when the **reconnectionPolicy** parameter is set to `BoundedRetry`; otherwise, it is ignored. The default value is `5`.";
+            + "It is used only when the `reconnectionPolicy` parameter is set to `BoundedRetry`; otherwise, it is ignored. The default value is `5` .";
 
     public static final String DESC_PRINCIPAL = "This parameter specifies the Kerberos principal that you use for authentication. \\n"
             + "This value is set to the principal that is created for the IBM Streams instance owner. \\n"
             + "You must specify this parameter if you want to use Kerberos authentication.";
 
-    public static final String DESC_AUTH_KEY = "This parameter specifies the file that contains the encrypted keys for the user that is specified by the **authPrincipal** parameter. \\n"
+    public static final String DESC_AUTH_KEY = "This parameter specifies the file that contains the encrypted keys for the user that is specified by the `authPrincipal` parameter. \\n"
             + "The operator uses this keytab file to authenticate the user. \\n"
             + "The keytab file is generated by the administrator.  You must specify this parameter to use Kerberos authentication.";
 
@@ -118,7 +118,7 @@ public class IHdfsConstants {
             + "about how to authenticate with IBM Analytics Engine when using the `webhdfs` schema. \\n"
             + "For example, the file must contain the username and password for an IBM Analytics Engine user. \\n"
             + "When connecting to HDFS instances deployed on IBM Analytics Engine, \\n"
-            + "the credentials are provided using the **hdfsUser** and **hdfsPassword** parameters.";
+            + "the credentials are provided using the `hdfsUser` and `hdfsPassword` parameters.";
 
     public static final String DESC_CONFIG_PATH = "This parameter specifies the path to the directory that contains the `core-site.xml` file, which is an HDFS\\n"
             + "configuration file. If this parameter is not specified, by default the operator looks for the `core-site.xml` file in the following locations:\\n"
@@ -129,7 +129,7 @@ public class IHdfsConstants {
     public static final String DESC_POLICY_FILE_PATH = "This optional parameter is relevant when connecting to IBM Analytics Engine on IBM Cloud. \\n"
             + "It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). \\n"
             + "The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. \\n"
-            + "See the section on 'Policy file configuration' in the main page of this toolkit's documentation for information on how to configure the policy files. \\n"
+            + "See the section on `Policy file configuration` in the main page of this toolkit's documentation for information on how to configure the policy files. \\n"
             + "If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. \\n\\n"
             + "**Note:** This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. \\n"
             + "The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.";
@@ -145,18 +145,18 @@ public class IHdfsConstants {
             + "It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to. \\n"
             + "**Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.**  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. \\n"
             + "The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory. \\n"
-            + "See the section on 'SSL Configuration' in the main page of this toolkit's documentation for information on how to configure the keystore. \\n"
+            + "See the section on `SSL Configuration` in the main page of this toolkit's documentation for information on how to configure the keystore. \\n"
             + "The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.";
 
     public static final String DESC_KEY_STOR_PASSWORD = "This optional parameter is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine. \\n"
-            + "It specifies the password for the keystore file. This attribute is specified when the **keyStore** attribute is specified and the keystore file is protected by a password. \\n"
+            + "It specifies the password for the keystore file. This attribute is specified when the `keyStore` attribute is specified and the keystore file is protected by a password. \\n"
             + "If the keyStorePassword is invalid the operator terminates.";
 
-    public static final String DESC_ENCODING = "This optional parameter specifies the encoding to use when reading files. The default value is `UTF-8`.";
+    public static final String DESC_ENCODING = "This optional parameter specifies the encoding to use when reading files. The default value is `UTF-8` .";
 
-    public static final String DESC_BLOCK_SIZE = "This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096`.";
+    public static final String DESC_BLOCK_SIZE = "This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096` .";
 
-    public static final String DESC_CREDENTIALS ="This optional parameter specifies the JSON string that contains the hdfs credentials: **user**, **password** and **hdfsUri** or **webhdfs**. \\n\\n"
+    public static final String DESC_CREDENTIALS ="This optional parameter specifies the JSON string that contains the hdfs credentials: `user`, `password` and `hdfsUri` or `webhdfs` . \\n\\n"
 			+ "This parameter can also be specified in an application configuration.\\n\\n"
     		+ "The JSON string must to have the following format:\\n\\n"
 	        + "    {\\n"
@@ -167,7 +167,7 @@ public class IHdfsConstants {
 
     
     public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameters. "
-    		+ " The 'credentials', 'hdfsUser' and 'hdfsPassword' and 'hdfsUrl' parameter can be set in an application configuration. "
+    		+ " The `credentials`, `hdfsUser` and `hdfsPassword` and `hdfsUrl` parameter can be set in an application configuration. "
     		+ " If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ";
     
     public static final String DESC_SOURCE_FILE = "This parameter specifies the name of the file that the operator opens and reads. \\n"
@@ -178,52 +178,52 @@ public class IHdfsConstants {
             + "If the string contains substitutions, the check for a change happens before substituations, and the filename contains the substitutions based on the first tuple.";
 
     public static final String DESC_SINK_FILE = "This parameter specifies the name of the file that the operator writes to. \\n"
-            + "The **file** parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:\\n"
+            + "The `file` parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:\\n"
             + "* %HOST         The host that is running the processing element (PE) of this operator. \\n"
             + "* %FILENUM        The file number, which starts at 0 and counts up as a new file is created for writing. \\n"
             + "* %PROCID        The process ID of the processing element. \\n"
             + "* %PEID         The processing element ID. \\n"
             + "* %PELAUNCHNUM    The PE launch count. \\n"
-            + "* %TIME         The time when the file is created.  If the **timeFormat** parameter is not specified, the default time format is `yyyyMMdd_HHmmss`. \\n\\n"
+            + "* %TIME         The time when the file is created.  If the `timeFormat` parameter is not specified, the default time format is `yyyyMMdd_HHmmss` . \\n\\n"
             +
 
-            "For example, if you specify a **file** parameter of `myFile%FILENUM%TIME.txt`, and the first three files are created in the afternoon on November 30, 2014, \\n"
-            + "the file names are `myFile020141130_132443.txt`, `myfile120141130_132443.txt`, and `myFile220141130_132443.txt`. \\n\\n"
+            "For example, if you specify a `file` parameter of `myFile%FILENUM%TIME.txt`, and the first three files are created in the afternoon on November 30, 2014, \\n"
+            + "the file names are `myFile020141130_132443.txt`, `myfile120141130_132443.txt`, and `myFile220141130_132443.txt` . \\n\\n"
             +
 
             "**Important:** If the %FILENUM specification is not included, the file is overwritten every time a new file is created. \\n";
 
     public static final String DESC_SINK_TEMP_FILE = "This parameter specifies the name of the file that the operator writes to. \\n"
-            + "When the file is closed the file is renamed to the final filename defined by the **file** parameter or **fileAttributeName** parameter. \\n"
-            + "The **tempFile** parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:\\n"
+            + "When the file is closed the file is renamed to the final filename defined by the `file` parameter or `fileAttributeName` parameter. \\n"
+            + "The `tempFile` parameter can optionally contain the following variables, which the operator evaluates at runtime to generate the file name:\\n"
             + "* %HOST         The host that is running the processing element (PE) of this operator. \\n"
             + "* %PROCID        The process ID of the processing element. \\n"
             + "* %PEID         The processing element ID. \\n"
             + "* %PELAUNCHNUM    The PE launch count. \\n"
-            + "* %TIME         The time when the file is created.  If the **timeFormat** parameter is not specified, the default time format is `yyyyMMdd_HHmmss`. \\n"
+            + "* %TIME         The time when the file is created.  If the `timeFormat` parameter is not specified, the default time format is `yyyyMMdd_HHmmss` . \\n"
             + "**Important:** This parameter must not be used in a consistent region. \\n";
 
-    public static final String DESC_SINK_TIME_FORMAT = "This parameter specifies the time format to use when the **file** parameter value contains `%TIME`. \\n"
+    public static final String DESC_SINK_TIME_FORMAT = "This parameter specifies the time format to use when the `file` parameter value contains `%TIME` . \\n"
             + "The parameter value must contain conversion specifications that are supported by the java.text.SimpleDateFormat. \\n"
-            + "The default format is `yyyyMMdd_HHmmss`.";
+            + "The default format is `yyyyMMdd_HHmmss` .";
 
     public static final String DESC_SINK_BYTES_PER_FILE = "This parameter specifies the approximate size of the output file, in bytes. \\n"
             + "When the file size exceeds the specified number of bytes, the current output file is closed and a new file is opened. \\n"
-            + "The **bytesPerFile**, **timePerFile**, and **tuplesPerFile** parameters are mutually exclusive; you can specify only one of these parameters at a time.";
+            + "The `bytesPerFile`, `timePerFile`, and `tuplesPerFile` parameters are mutually exclusive; you can specify only one of these parameters at a time.";
 
     public static final String DESC_SINK_TUPELS_PER_FILE = "This parameter specifies the maximum number of tuples that can be received for each output file. \\n"
             + "When the specified number of tuples are received, the current output file is closed and a new file is opened for writing. \\n"
-            + "The **bytesPerFile**, **timePerFile**, and **tuplesPerFile** parameters are mutually exclusive; you can specify only one of these parameters at a time.";
+            + "The `bytesPerFile`, `timePerFile`, and `tuplesPerFile` parameters are mutually exclusive; you can specify only one of these parameters at a time.";
 
     public static final String DESC_SINK_TIME_PER_FILE = "This parameter specifies the approximate time, in seconds, after which the current output file is closed and a new file is opened for writing. \\n"
-            + "The **bytesPerFile**, **timePerFile**, and **tuplesPerFile** parameters are mutually exclusive; you can specify only one of these parameters.";
+            + "The `bytesPerFile`, `timePerFile`, and `tuplesPerFile` parameters are mutually exclusive; you can specify only one of these parameters.";
 
     public static final String DESC_SINK_CLOSE_ON_PUNCT = "This parameter specifies whether the operator closes the current output file and creates a new file when a punctuation marker is received. \\n"
-            + "The default value is `false`.";
+            + "The default value is `false` .";
 
-    public static final String DESC_HDFS_FILE_SOURCE = "The `HDFS2FileSource` operator reads files from a Hadoop Distributed File System (HDFS)\\n\\n"
+    public static final String DESC_HDFS_FILE_SOURCE = "The **HDFS2FileSource** operator reads files from a Hadoop Distributed File System (HDFS)\\n\\n"
             + "The operator opens a file on HDFS and sends out its contents in tuple format on its output port. \\n\\n"
-            + "If the optional input port is not specified, the operator reads the HDFS file that is specified in the **file** parameter and \\n"
+            + "If the optional input port is not specified, the operator reads the HDFS file that is specified in the `file` parameter and \\n"
             + "provides the file contents on the output port.  If the optional input port is configured, the operator reads the files that are \\n"
             + "named by the attribute in the tuples that arrive on its input port and places a punctuation marker between each file. \\n\\n"
 
@@ -265,7 +265,7 @@ public class IHdfsConstants {
             + "    }\\n\\n"
             
             + "    // HDFS2FileSource operator reads from files discovered by HDFS2DirectoryScan operator\\n"
-            + "    //If the **keyStorePath** and **keyStorePassword** are omitted, the operator will accept all certificates as valid\\n"
+            + "    //If the `keyStorePath` and `keyStorePassword` are omitted, the operator will accept all certificates as valid\\n"
             + "    (stream<rstring data> FileContent) as HDFS2FileSource_2 =    HDFS2FileSource(Files){\\n"
             + "         param\\n"
             + "            hdfsUri: \\\"hdfs://hdfsSever:8020\\\"; \\n"
@@ -275,7 +275,7 @@ public class IHdfsConstants {
             
             + "The following example shows the operator configured to access a HDFS instance on IBM Analytics Engine to read a file specified by the *file* parameter. \\n"
             
-            + "The **hdfsUser** and **hdfsPassword** are the username and password that have access to the Hadoop instance. \\n\\n"
+            + "The `hdfsUser` and `hdfsPassword` are the username and password that have access to the Hadoop instance. \\n\\n"
             
             + "    stream<rstring data> FileContent) as HDFS2FileSource_2 = HDFS2FileSource(){\\n"
             + "        param\\n"
@@ -296,9 +296,9 @@ public class IHdfsConstants {
             + "To read a file as binary, the expected output schema of the output port is tuple<blob data>.  Use the blockSize parameter to control how much data to retrieve on each read. \\n"
             + "The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.";
 
-    public static final String DESC_HDFS_FILE_SINK = "The `HDFS2FileSink` operator writes files to a Hadoop Distributed File System. \\n\\n"
+    public static final String DESC_HDFS_FILE_SINK = "The **HDFS2FileSink** operator writes files to a Hadoop Distributed File System. \\n\\n"
             + "The `HDFS2FileSink` operator is similar to the `FileSink` operator. \\n"
-            + "This operator writes tuples that arrive on its input port to the output file that is named by the **file** parameter. \\n"
+            + "This operator writes tuples that arrive on its input port to the output file that is named by the `file` parameter. \\n"
             + "You can optionally control whether the operator closes the current output file and creates a new file for writing based on the size \\n"
             + "of the file in bytes, the number of tuples that are written to the file, or the time in seconds that the file is open for writing, \\n\\n"
             + "or when the operator receives a punctuation marker. \\n" 
@@ -339,7 +339,7 @@ public class IHdfsConstants {
             + "             hdfsPassword  : \\\"IAEPassword\\\"; \\n"
             + "     } \\n\\n\\n" +
 
-            "This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt`. SSL certificate validation is enabled. \\n\\n"
+            "This example uses the `HDFS2FileSink` operator to write tuples to output files that have names like `output0.txt` . SSL certificate validation is enabled. \\n\\n"
             +
 
             "     stream<PersonSchema> In = FileSource(){ \\n"
@@ -364,12 +364,12 @@ public class IHdfsConstants {
             + "     }";
 
     public static final String DESC_HDFS_FILE_SINK_INPUT = "The `HDFS2FileSink` operator has one input port, which writes the contents of the input stream to the file that you specified. \\n"
-            + "The input port is non-mutating, and its punctuation mode is `Oblivious`.  The HDFS2FileSink supports writing data into HDFS in two formats. \\n"
+            + "The input port is non-mutating, and its punctuation mode is `Oblivious` .  The HDFS2FileSink supports writing data into HDFS in two formats. \\n"
             + "For line format, the schema of the input port is tuple<rstring line> or tuple<ustring line>, which specifies a single rstring or ustring attribute that represents \\n"
             + "a line to be written to the file. For binary format, the schema of the input port is tuple<blob data>, which specifies a block of data to be written to the file.";
 
     public static final String DESC_HDFS_FILE_SINK_OUTPUT = "The `HDFS2FileSink` operator is configurable with an optional output port. \\n"
-            + "The output port is non-mutating and its punctuation mode is `Free`. \\n"
+            + "The output port is non-mutating and its punctuation mode is `Free` . \\n"
             + "The schema of the output port is <string fileName, uint64 fileSize>, which specifies the name and size of files that are written to HDFS.";
 
     public static final String DESC_HDFS_DIR_SCAN = "The **HDFS2DirectoryScan** operator scans a Hadoop Distributed File System directory for new or modified files. \\n"
@@ -395,14 +395,14 @@ public class IHdfsConstants {
             
             + "The operator terminates in the following cases: \\n"
             + "* The operator cannot connect to HDFS. \\n"
-            + "* The **strictMode** parameter is true but the directory is not found. \\n"
+            + "* The `strictMode` parameter is true but the directory is not found. \\n"
             + "* The path that is given by the directory name exists, but is an ordinary file and not a directory. \\n"
             + "* HDFS failed to give a list of files in the directory. \\n"
             + "* The pattern that is specified in the pattern parameter fails to compile. \\n\\n"
             
             + "+ Examples \\n\\n" 
             
-            + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The **hdfsUser** and **hdfsPassword** parameters are used to provide the username and password for authentication. \\n"
+            + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The `hdfsUser` and `hdfsPassword` parameters are used to provide the username and password for authentication. \\n"
             + " \\n"
             + "    (stream<rstring filename> Files) as HDFS2DirectoryScan_1 = HDFS2DirectoryScan() \\n"
             + "    { \\n" 
@@ -413,7 +413,7 @@ public class IHdfsConstants {
             + "            hdfsUser      : \\\"clsadmin\\\"; \\n"
             + "            sleepTime     : 2.0; \\n" + "    } \\n\\n" 
 
-            + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The **hdfsUser** and **hdfsPassword** parameters are now difined in credentials JSON string. \\n"
+            + "This example uses the `HDFS2DirectoryScan` operator to scan the HDFS directory On IBM Cloud.  The `hdfsUser` and `hdfsPassword` parameters are now difined in credentials JSON string. \\n"
             + "    param \\n" 
             + "        expression<rstring> $credentials : getSubmissionTimeValue(\\\"credentials\\\", \\\"{\\n"
 			+ "            \\\\\\\"user\\\\\\\"     : \\\\\\\"clsadmin\\\\\\\",\\n"
@@ -429,7 +429,7 @@ public class IHdfsConstants {
             + "                sleepTime     : 2.0; \\n" + "        } \\n\\n" 
                     
             + "This example uses the `HDFS2DirectoryScan` operator to scan a HDFS directory every two seconds. \\n"
-            + "The **hdfsUri** parameter in this case overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml`. \\n\\n\\n"
+            + "The `hdfsUri` parameter in this case overrides the value that is specified by the `fs.defaultFS` option in the `core-site.xml` . \\n\\n\\n"
             +
 
             "    (stream<rstring filename> Files) as HDFS2DirectoryScan_3 = HDFS2DirectoryScan() \\n"
@@ -452,7 +452,7 @@ public class IHdfsConstants {
             + "The port is non-mutating and punctuation free. \\n";
 
     public static final String DESC_HDFS_DIR_SCAN_DIRECTORY = "This optional parameter specifies the name of the directory to be scanned. \\n"
-            + "If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the '/user/*userid*/ directory. This parameter is mandatory if the input port is not specified. \\n";
+            + "If the name starts with a slash, it is considered an absolute directory that you want to scan. If it does not start with a slash, it is considered a relative directory, relative to the `/user/*userid*/` directory. This parameter is mandatory if the input port is not specified. \\n";
 
     public static final String DESC_HDFS_DIR_SCAN_SLEEP_TIME = "This optional parameter specifies the minimum time between directory scans. The default value is 5.0 seconds. \\n";
 
@@ -549,7 +549,7 @@ public class IHdfsConstants {
             + ", which specifies the local and HDFS file names. \\n";
 
     public static final String DESC_HDFS_FILE_COPY_OUTPUT = "The `HDFS2FileCopy` operator is configurable with an optional output port. \\n"
-            + "The output port is non-mutating and its punctuation mode is `Free`. \\n\\n"
+            + "The output port is non-mutating and its punctuation mode is `Free` . \\n\\n"
             + "The schema of the output port is:\\n"
             + "    <string result, uint64 elapsedTime>  \\n"
             + ", which delivers the result of copy process and the elapsed time in miliseconds. \\n\\n"
@@ -558,27 +558,27 @@ public class IHdfsConstants {
     public static final String DESC_HDFS_COPYY_LOCAL_FILE = "This optional parameter specifies the name of local file to be copied. \\n"
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n"
-            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyToLocalFile` and  set the value of this parameter to a directory with a slash at the end e.g.  'data/testDir/. \\n\\n"
-            + "This parameter is mandatory if the 'localFileAttrNmae' is not specified in input port.\\n\\n" 
+            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyToLocalFile` and  set the value of this parameter to a directory with a slash at the end e.g.  `data/testDir/` . \\n\\n"
+            + "This parameter is mandatory if the `localFileAttrNmae` is not specified in input port.\\n\\n" 
      		+ "The parameter `localFile` cannot be set when parameter `localFileAttrName` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_FILE = "This optional parameter specifies the name of HDFS file or directory. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to use. \\n"
-            + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n"
-            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyFromLocalFile` and set the value of this parameter to a directory with a slash at the end e.g.  '/user/userid/testDir/. \\n\\n"
-            + "This parameter is mandatory if the 'hdfsFileAttrNmae' is not specified in input port. \\n\\n" 
+            + "If it does not start with a slash, it is considered a relative path, relative to the `/user/*userid*/hdfsFile` . \\n"
+            + "If you want to copy all incoming files from input port to a directory set the value of direction to `copyFromLocalFile` and set the value of this parameter to a directory with a slash at the end e.g.  `/user/userid/testDir/` . \\n\\n"
+            + "This parameter is mandatory if the `hdfsFileAttrNmae` is not specified in input port. \\n\\n" 
     		+ "The parameter `hdfsFile` cannot be set when parameter `hdfsFileAttrName` is set. \\n";
 
-    public static final String DESC_HDFS_COPYY_LOCAL_ATTR_FILE = "This optional parameter specifies the value of localFile that coming through input stream. \\n"
+    public static final String DESC_HDFS_COPYY_LOCAL_ATTR_FILE = "This optional parameter specifies the value of `localFile` that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of local file that you want to copy. \\n"
             + "If it does not start with a slash, it is considered a relative path, relative to your project data directory. \\n\\n"
-            + "This parameter is mandatory if the 'localFile' is not specified. \\n\\n"
+            + "This parameter is mandatory if the `localFile` is not specified. \\n\\n"
 		    + "The parameter `localFileAttrName` cannot be set when parameter `localFile` is set. \\n";
 
     public static final String DESC_HDFS_COPYY_HDFS_ATTR_FILE = "This optional parameter specifies the value of hdfsFile that coming through input stream. \\n"
             + "If the name starts with a slash, it is considered an absolute path of HDFS file that you want to copy. \\n"
-            + "If it does not start with a slash, it is considered a relative path, relative to the '/user/*userid*/hdfsFile. \\n\\n"
-            + "This parameter is mandatory if the 'hdfsFile' is not specified. \\n\\n"
+            + "If it does not start with a slash, it is considered a relative path, relative to the `/user/*userid*/hdfsFile` . \\n\\n"
+            + "This parameter is mandatory if the `hdfsFile` is not specified. \\n\\n"
             + "The parameter `hdfsFileAttrName` cannot be set when parameter `hdfsFile` is set.";
 
     public static final String DESC_HDFS_COPYY_DIRECTION = "This parameter specifies the direction of copy. The parameter can be set with the following values. \\n"
