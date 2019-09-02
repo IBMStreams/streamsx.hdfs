@@ -29,7 +29,7 @@
 <div class="section"><h2 class="title sectiontitle splhead-1">General Information</h2>
 
 
-<p class="p">The <strong class="ph b">streamsx.hdfs</strong> toolkit provides operators that can read and write data from Hadoop Distributed File System <strong class="ph b">(HDFS)</strong> version 2 or later. It support also copy files from local file system to the remote HDFS and from HDFS to the local file system. 
+<p class="p">The <strong class="ph b">streamsx.hdfs</strong> toolkit provides operators that can read and write data from Hadoop Distributed File System <strong class="ph b">(HDFS)</strong> version 2 or later. It supports also copy files from local file system to the remote HDFS and from HDFS to the local file system. 
 </p>
 
 <p class="p"><strong class="ph b">HDFS2FileSource</strong>     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
@@ -67,7 +67,7 @@
 <p class="p">Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 </p>
 
-<p class="p">You can access Hadoop remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS.
+<p class="p">You can access Hadoop remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to WEBHDFS.
 </p>
 
 <p class="p">For example:
@@ -106,7 +106,7 @@
 
 </div>
 
-<p class="p"> This example copies the file test.txt from local path ./data/ into /user/hdfs/works directory of HDFS.   The parameter <strong class="ph b">credentials</strong> is a JSON string that contains <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">webhdsf</tt>.
+<p class="p"> This example copies the file test.txt from local path ./data/ into /user/hdfs/works directory of HDFS.   The parameter <strong class="ph b">credentials</strong> is a JSON string that contains <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt>.
 </p>
 
 <div class="p">
@@ -161,7 +161,7 @@
 
 </div>
 
-<p class="p">Copy the created keytab into local streams server for example in etc directory of your SPL application.
+<p class="p">Copy the created keytab into local streams server for example in <tt class="ph tt">etc</tt> directory of your SPL application.
 </p>
 
 <p class="p">Before you start your SPL application, you can check the keytab with <strong class="ph b">kinit</strong> tool
