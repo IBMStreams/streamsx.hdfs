@@ -22,7 +22,7 @@
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 4.4.1</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSource</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 5.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; HDFS2FileSource</p>
 
 </div>
 
@@ -32,27 +32,24 @@
 
 <div class="section">
 
-<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator reads files from a Hadoop Distributed File System (HDFS).
+<p class="p">The <strong class="ph b">HDFS2FileSource</strong> operator reads files from a Hadoop Distributed File System (HDFS)
 </p>
 
-<p class="p">The operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
+<p class="p">The operator opens a file on HDFS and sends out its contents in tuple format on its output port. 
 </p>
 
-<p class="p">If the optional input port is not specified, the operator reads the HDFS file that is specified in the <strong class="ph b">file</strong> parameter and  provides the file contents on the output port.  If the optional input port is configured, the operator reads the files that are  named by the attribute in the tuples that arrive on its input port and places a punctuation marker between each file.
+<p class="p">If the optional input port is not specified, the operator reads the HDFS file that is specified in the <tt class="ph tt">file</tt> parameter and  provides the file contents on the output port.  If the optional input port is configured, the operator reads the files that are  named by the attribute in the tuples that arrive on its input port and places a punctuation marker between each file. 
 </p>
 
 </div>
 
-<div class="section"><h2 class="title sectiontitle">Behavior in a consistent region
+<div class="section"><h2 class="title sectiontitle">Behavior in a consistent region 
 </h2>
 
-<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator can participate in a consistent region. The operator can be at the start of a consistent region if there is no input port.
+<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator can participate in a consistent region.  The operator can be at the start of a consistent region if there is no input port.  The operator supports periodic and operator-driven consistent region policies.  If the consistent region policy is set as operator driven, the operator initiates a drain after a file is fully read.  If the consistent region policy is set as periodic, the operator respects the period setting and establishes consistent states accordingly.  This means that multiple consistent states can be established before a file is fully read. 
 </p>
 
-<p class="p">The operator supports periodic and operator-driven consistent region policies. If the consistent region policy is set as operator driven, the operator initiates a drain after a file is fully read. If the consistent region policy is set as periodic, the operator respects the period setting and establishes consistent states accordingly. This means that multiple consistent states can be established before a file is fully read.
-</p>
-
-<p class="p">At checkpoint, the operator saves the current file name and file cursor location. If the operator does not have an input port, upon application failures, the operator resets the file cursor back to the checkpointed location, and starts replaying tuples from the cursor location. If the operator has an input port and is in a consistent region, the operator relies on its upstream operators to properly reply the filenames for it to re-read the files from the beginning.
+<p class="p">At checkpoint, the operator saves the current file name and file cursor location.  If the operator does not have an input port, upon application failures, the operator resets the file cursor back to the checkpointed location, and starts replaying tuples from the cursor location.  If the operator has an input port and is in a consistent region, the operator relies on its upstream operators to properly reply the filenames for it to re-read the files from the beginning. 
 </p>
 
 </div>
@@ -62,15 +59,15 @@
 
 <div class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator terminates in the following cases:
 <ul class="ul">
-<li class="li"> The operator cannot connect to HDFS.</li>
+<li class="li"> The operator cannot connect to HDFS. </li>
 
-<li class="li"> The file cannot be opened.</li>
+<li class="li"> The file cannot be opened. </li>
 
-<li class="li"> The file does not exist.</li>
+<li class="li"> The file does not exist. </li>
 
-<li class="li"> The file becomes unreadable.</li>
+<li class="li"> The file becomes unreadable. </li>
 
-<li class="li"> A tuple cannot be created from the file contents (such as a problem with the file format).</li>
+<li class="li"> A tuple cannot be created from the file contents (such as a problem with the file format). </li>
 
 </ul>
 
@@ -102,9 +99,9 @@
  
   <dt class="dt dlterm">Parameters</dt>
 
-  <dd class="dd">This operator supports 18 parameters.
+  <dd class="dd">This operator supports 20 parameters.
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
+<a class="xref" href="#spldoc_operator__parameter__appConfigName">appConfigName</a>, <a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__credentials">credentials</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 </dd>
@@ -113,7 +110,7 @@
  
   <dt class="dt dlterm">Metrics</dt>
 
-  <dd class="dd">This operator reports 1 metric.</dd>
+  <dd class="dd">This operator does not report any metrics.</dd>
 
  
 </dl>
@@ -140,7 +137,7 @@
 
    <dd class="dd">
 
-<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator has one optional input port. If an input port is specified, the operator expects an input tuple with a single attribute of type rstring. The input tuples contain the file names that the operator opens for reading. The input port is non-mutating.
+<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator has one optional input port. If an input port is specified, the operator expects an input tuple with a single attribute of type rstring. The input tuples contain the file names that the operator opens for reading.  The input port is non-mutating.  
 </p>
    </dd>
 
@@ -192,7 +189,7 @@
 
    <dd class="dd">
 
-<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator has one output port.  The tuples on the output port contain the data that is read from the files. The operator supports two modes of reading.  To read a file line-by-line, the expected output schema of the output port is tuple&lt;rstring line&gt; or tuple&lt;ustring line&gt;. To read a file as binary, the expected output schema of the output port is tuple&lt;blob data&gt;.  Use the blockSize parameter to control how much data to retrieve on each read. The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.
+<p class="p">The <tt class="ph tt">HDFS2FileSource</tt> operator has one output port.  The tuples on the output port contain the data that is read from the files.  The operator supports two modes of reading.  To read a file line-by-line, the expected output schema of the output port is tuple&lt;rstring line&gt; or tuple&lt;ustring line&gt;.  To read a file as binary, the expected output schema of the output port is tuple&lt;blob data&gt;.  Use the blockSize parameter to control how much data to retrieve on each read.  The operator includes a punctuation marker at the conclusion of each file. The output port is mutating.
 </p>
 
 <p class="p"/>
@@ -230,18 +227,48 @@
 
 <div class="section">
 <p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters">Parameters</a></strong></p>
-
-
+This operator supports 20 parameters.
 <p class="p"> Optional: 
-<a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
+<a class="xref" href="#spldoc_operator__parameter__appConfigName">appConfigName</a>, <a class="xref" href="#spldoc_operator__parameter__authKeytab">authKeytab</a>, <a class="xref" href="#spldoc_operator__parameter__authPrincipal">authPrincipal</a>, <a class="xref" href="#spldoc_operator__parameter__blockSize">blockSize</a>, <a class="xref" href="#spldoc_operator__parameter__configPath">configPath</a>, <a class="xref" href="#spldoc_operator__parameter__credFile">credFile</a>, <a class="xref" href="#spldoc_operator__parameter__credentials">credentials</a>, <a class="xref" href="#spldoc_operator__parameter__encoding">encoding</a>, <a class="xref" href="#spldoc_operator__parameter__file">file</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsPassword">hdfsPassword</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUri">hdfsUri</a>, <a class="xref" href="#spldoc_operator__parameter__hdfsUser">hdfsUser</a>, <a class="xref" href="#spldoc_operator__parameter__initDelay">initDelay</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePassword">keyStorePassword</a>, <a class="xref" href="#spldoc_operator__parameter__keyStorePath">keyStorePath</a>, <a class="xref" href="#spldoc_operator__parameter__libPath">libPath</a>, <a class="xref" href="#spldoc_operator__parameter__policyFilePath">policyFilePath</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionBound">reconnectionBound</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionInterval">reconnectionInterval</a>, <a class="xref" href="#spldoc_operator__parameter__reconnectionPolicy">reconnectionPolicy</a>
 
 </p>
 <dl class="dl">
 
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__appConfigName"><!-- --></a><tt class="ph tt">appConfigName</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter <tt class="ph tt">credentials</tt>.  The <tt class="ph tt">credentials</tt> is a JSON string that contains key/value pairs for <tt class="ph tt">user</tt> and <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> .  If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence.  An application configuration can be created in the Streams Console or using the <tt class="ph tt">streamtool mkappconfig ... &lt;configObject name&gt;</tt>.
+</p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__authKeytab"><!-- --></a><tt class="ph tt">authKeytab</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the file that contains the encrypted keys for the user that is specified by the <strong class="ph b">authPrincipal</strong> parameter.  The operator uses this keytab file to authenticate the user. The keytab file is generated by the administrator.  You must specify this parameter to use Kerberos authentication.
+<p class="p">This parameter specifies the file that contains the encrypted keys for the user that is specified by the <tt class="ph tt">authPrincipal</tt> parameter.  The operator uses this keytab file to authenticate the user.  The keytab file is generated by the administrator.  You must specify this parameter to use Kerberos authentication.
 </p>
 <dl class="dl">
 
@@ -272,7 +299,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__authPrincipal"><!-- --></a><tt class="ph tt">authPrincipal</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the Kerberos principal that you use for authentication. This value is set to the principal that is created for the IBM Streams instance owner. You must specify this parameter if you want to use Kerberos authentication.
+<p class="p">This parameter specifies the Kerberos principal that you use for authentication.  This value is set to the principal that is created for the IBM Streams instance owner.  You must specify this parameter if you want to use Kerberos authentication.
 </p>
 <dl class="dl">
 
@@ -303,7 +330,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__blockSize"><!-- --></a><tt class="ph tt">blockSize</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to <tt class="ph tt">4096</tt>.
+<p class="p">This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to <tt class="ph tt">4096</tt> .
 </p>
 <dl class="dl">
 
@@ -334,23 +361,15 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__configPath"><!-- --></a><tt class="ph tt">configPath</tt></dt>
 
 <dd class="dd">
-<div class="p">This parameter specifies the absolute path to the directory that contains the <tt class="ph tt">core-site.xml</tt> file, which is an HDFS configuration file. If this parameter is not specified, by default the operator looks for the <tt class="ph tt">core-site.xml</tt> file in the following locations:
+<div class="p">This parameter specifies the path to the directory that contains the <tt class="ph tt">core-site.xml</tt> file, which is an HDFS configuration file. If this parameter is not specified, by default the operator looks for the <tt class="ph tt">core-site.xml</tt> file in the following locations:
 <ul class="ul">
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt></li>
-
 <li class="li"> <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt></li>
 
 <li class="li"> <tt class="ph tt">$HADOOP_HOME/conf</tt></li>
 
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/hdfs/*</tt></li>
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/lib</tt> </li>
 
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/*</tt></li>
-
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/share/hadoop/common/lib/*</tt></li>
-
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/lib/*</tt></li>
-
-<li class="li"> <tt class="ph tt">$HADOOP_HOME/*</tt></li>
+<li class="li"> <tt class="ph tt">$HADOOP_HOME/</tt></li>
 
 </ul>
 <strong class="ph b">Note:</strong> For connections to Hadoop instances deployed on IBM Analytics Engine, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and should not be used.
@@ -384,8 +403,57 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__credFile"><!-- --></a><tt class="ph tt">credFile</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies a file that contains login credentials. The credentials are used to connect to GPFS remotely by using the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema.  The credentials file must contain information about how to authenticate with IBM Analytics Engine when using the webhdfs schema.  For example, the file must contain the  user name and password for an IBM Analytics Engine user.  When connecting to HDFS instances deployed on IBM Analytics Engine, the credentials are provided using the <strong class="ph b">hdfsUser</strong> and <strong class="ph b">hdfsPassword</strong> parameters.
+<p class="p">This parameter specifies a file that contains login credentials. The credentials are used to connect to GPFS remotely by using the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema.  The credentials file must contain information about how to authenticate with IBM Analytics Engine when using the <tt class="ph tt">webhdfs</tt> schema.  For example, the file must contain the username and password for an IBM Analytics Engine user.  When connecting to HDFS instances deployed on IBM Analytics Engine,  the credentials are provided using the <tt class="ph tt">hdfsUser</tt> and <tt class="ph tt">hdfsPassword</tt> parameters.
 </p>
+<dl class="dl">
+
+ <dt class="dt dlterm">Properties </dt>
+
+ <dd class="dd">
+  <ul class="sl simple">
+  <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__type">Type</a>: rstring
+  </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__cardinality">Cardinality</a>: 1
+     </li>
+
+     <li class="sli"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__parameters__parameter__optional">Optional</a>: true
+     </li>
+
+  </ul>
+
+ </dd>
+
+
+</dl>
+
+</dd>
+
+
+
+<dt class="dt dlterm"><a name="spldoc_operator__parameter__credentials"><!-- --></a><tt class="ph tt">credentials</tt></dt>
+
+<dd class="dd">
+<p class="p">This optional parameter specifies the JSON string that contains the hdfs credentials key/value pairs for <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt> . 
+</p>
+
+<p class="p">This parameter can also be specified in an application configuration.
+</p>
+
+<p class="p">The JSON string must to have the following format:
+</p>
+
+<div class="p">
+<pre class="pre codeblock">
+{
+    "user"     : "clsadmin",
+    "password" : "IAE-password",
+    "webhdfs"  : "webhdfs://ip-address:8443"
+}
+</pre>
+
+
+</div>
 <dl class="dl">
 
  <dt class="dt dlterm">Properties </dt>
@@ -415,7 +483,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__encoding"><!-- --></a><tt class="ph tt">encoding</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the encoding to use when reading files. The default value is <tt class="ph tt">UTF-8</tt>.
+<p class="p">This optional parameter specifies the encoding to use when reading files. The default value is <tt class="ph tt">UTF-8</tt> .
 </p>
 <dl class="dl">
 
@@ -446,7 +514,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__file"><!-- --></a><tt class="ph tt">file</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the name of the file that the operator opens and reads.  This parameter must be specified when the optional input port is not configured. If the optional input port is used and the file name is specified, the operator generates an error.
+<p class="p">This parameter specifies the name of the file that the operator opens and reads.  This parameter must be specified when the optional input port is not configured.  If the optional input port is used and the file name is specified, the operator generates an error.
 </p>
 <dl class="dl">
 
@@ -477,7 +545,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsPassword"><!-- --></a><tt class="ph tt">hdfsPassword</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the password to use when you connecting to a Hadoop instance deployed on IBM Analytics Engine.   If this parameter is not specified, attempts to connect to a Hadoop instance deployed on IBM Analytics Engine will cause an exception.
+<p class="p">This parameter specifies the password to use when you connecting to a Hadoop instance deployed on IBM Analytics Engine.  If this parameter is not specified, attempts to connect to a Hadoop instance deployed on IBM Analytics Engine will cause an exception.
 </p>
 <dl class="dl">
 
@@ -510,19 +578,19 @@
 <dd class="dd">
 <div class="p">This parameter specifies the uniform resource identifier (URI) that you can use to connect to  the HDFS file system.  The URI has the following format:
 <ul class="ul">
-<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://hdfshost:hdfsport</tt></li>
+<li class="li"> To access HDFS locally or remotely, use <tt class="ph tt">hdfs://hdfshost:hdfsport</tt> </li>
 
-<li class="li"> To access GPFS locally, use <tt class="ph tt">gpfs:///</tt>.</li>
+<li class="li"> To access GPFS locally, use <tt class="ph tt">gpfs:///</tt> . </li>
 
-<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt>.</li>
+<li class="li"> To access GPFS remotely, use <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> . </li>
 
-<li class="li"> To access HDFS via a web connection for HDFS deployed on IBM Analytics Engine, use <tt class="ph tt">webhdfs://webhdfshost:webhdfsport</tt>.</li>
+<li class="li"> To access HDFS via a web connection for HDFS deployed on IBM Analytics Engine, use <tt class="ph tt">webhdfs://webhdfshost:webhdfsport</tt> . </li>
 
 </ul>
 
 </div>
 
-<p class="p">If this parameter is not specified, the operator expects that the HDFS URI is specified as the <tt class="ph tt">fs.defaultFS</tt> or  <tt class="ph tt">fs.default.name</tt> property in the <tt class="ph tt">core-site.xml</tt> HDFS configuration file.  The operator expects the <tt class="ph tt">core-site.xml</tt>  file to be in <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt> or <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt>  or in the directory specified by the <strong class="ph b">configPath</strong> parameter. <strong class="ph b">Note:</strong> For connections to HDFS on IBM Analytics Engine, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and so either  <strong class="ph b">hdfsUri</strong> or <strong class="ph b">configPath</strong>  must be specified.
+<p class="p">If this parameter is not specified, the operator expects that the HDFS URI is specified as the <tt class="ph tt">fs.defaultFS</tt> or <tt class="ph tt">fs.default.name</tt> property in the <tt class="ph tt">core-site.xml</tt> HDFS configuration file.  The operator expects the <tt class="ph tt">core-site.xml</tt>  file to be in <tt class="ph tt">$HADOOP_HOME/../hadoop-conf</tt> or <tt class="ph tt">$HADOOP_HOME/etc/hadoop</tt>  or in the directory specified by the <tt class="ph tt">configPath</tt> parameter.  <strong class="ph b">Note:</strong> For connections to HDFS on IBM Analytics Engine, the <tt class="ph tt">$HADOOP_HOME</tt> environment variable is not supported and so either  <tt class="ph tt">hdfsUri</tt> or <tt class="ph tt">configPath</tt>  must be specified.
 </p>
 <dl class="dl">
 
@@ -553,10 +621,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__hdfsUser"><!-- --></a><tt class="ph tt">hdfsUser</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the user ID to use when you connect to the HDFS file system. If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS. When connecting to Hadoop instances on IBM Analytics Engine, this parameter must be specified otherwise the connection will be unsuccessful.  When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the  values that are specified in the <strong class="ph b">authPrincipal</strong> and <strong class="ph b">authKeytab</strong> parameters.  After successful authentication, the operator uses the user ID that is specified by the <strong class="ph b">hdfsUser</strong> parameter to perform all other operations on the file system.
-</p>
-
-<p class="p"><strong class="ph b">NOTE:</strong> When using Kerberos authentication, the IBM Streams instance owner must have super user privileges on HDFS or GPFS to perform operations as the user that is specified by the <strong class="ph b">hdfsUser</strong> parameter.
+<p class="p">This parameter specifies the user ID to use when you connect to the HDFS file system.  If this parameter is not specified, the operator uses the instance owner ID to connect to HDFS.  When connecting to Hadoop instances on IBM Analytics Engine, this parameter must be specified otherwise the connection will be unsuccessful.  When you use Kerberos authentication, the operator authenticates with the Hadoop file system as the instance owner by using the  values that are specified in the <tt class="ph tt">authPrincipal</tt> and <tt class="ph tt">authKeytab</tt> parameters.  After successful authentication, the  operator uses the user ID that is specified by the <tt class="ph tt">hdfsUser</tt> parameter to perform all other operations on the file system.
 </p>
 <dl class="dl">
 
@@ -587,7 +652,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__initDelay"><!-- --></a><tt class="ph tt">initDelay</tt></dt>
 
 <dd class="dd">
-<p class="p">This parameter specifies the time to wait in seconds before the operator reads the first file.   The default value is <tt class="ph tt">0</tt>.
+<p class="p">This parameter specifies the time to wait in seconds before the operator reads the first file.  The default value is <tt class="ph tt">0</tt> .
 </p>
 <dl class="dl">
 
@@ -618,7 +683,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__keyStorePassword"><!-- --></a><tt class="ph tt">keyStorePassword</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine. It specifies the password for the keystore file. This attribute is specified when the <strong class="ph b">keyStore</strong> attribute is specified and the keystore file is protected by a password. If the keyStorePassword is invalid the operator terminates.
+<p class="p">This optional parameter is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine.  It specifies the password for the keystore file. This attribute is specified when the <tt class="ph tt">keyStore</tt> attribute is specified and the keystore file is protected by a password.  If the keyStorePassword is invalid the operator terminates.
 </p>
 <dl class="dl">
 
@@ -649,7 +714,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__keyStorePath"><!-- --></a><tt class="ph tt">keyStorePath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional attribute is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine. It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to.  <strong class="ph b">Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.</strong>  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates. The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.  See the section on "SSL Configuration" in the main page of this toolkit's documentation for information on how to configure the keystore. The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.
+<p class="p">This optional parameter is only supported when connecting to a Hadoop instance deployed on IBM Analytics Engine.  It specifies the path to the keystore file, which is in PEM format. The keystore file is used when making a secure connection to the HDFS server and must contain the public certificate of the HDFS server that will be connected to.  <strong class="ph b">Note: If this parameter is omitted, invalid certificates for secure connections will be accepted.</strong>  If the keystore file does not exist, or if the certificate it contains is invalid, the operator terminates.  The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.  See the section on <tt class="ph tt">SSL Configuration</tt> in the main page of this toolkit's documentation for information on how to configure the keystore.  The location of the keystore file can be absolute path on the filesystem or a path that is relative to the application directory.
 </p>
 <dl class="dl">
 
@@ -680,7 +745,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__libPath"><!-- --></a><tt class="ph tt">libPath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the absolute path to the directory that contains the Hadoop library files. If this parameter is omitted and <tt class="ph tt">$HADOOP_HOME</tt> is not set, the IBM Analytics Engine specific libraries within the <tt class="ph tt">impl/lib/ext</tt> folder of the toolkit will be used.  When specified, this parameter takes precedence over the <tt class="ph tt">$HADOOP_HOME</tt> environment variable and the libraries within the folder indicated by <tt class="ph tt">$HADOOP_HOME</tt> will not be used.
+<p class="p">This optional parameter specifies the absolute path to the directory that contains the Hadoop library files.  If this parameter is omitted and <tt class="ph tt">$HADOOP_HOME</tt> is not set, the apache hadoop specific libraries within the <tt class="ph tt">impl/lib/ext</tt> folder of the toolkit will be used.  When specified, this parameter takes precedence over the <tt class="ph tt">$HADOOP_HOME</tt> environment variable and the libraries within the folder indicated by <tt class="ph tt">$HADOOP_HOME</tt> will not be used.
 </p>
 <dl class="dl">
 
@@ -711,7 +776,10 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__policyFilePath"><!-- --></a><tt class="ph tt">policyFilePath</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter is relevant when connecting to IBM Analytics Engine on IBM Cloud. It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar). The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK. See the section on "Policy file configuration" in the main page of this toolkit's documentation for information on how to configure the policy files. If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. <strong class="ph b">Note:</strong> This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE. The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.
+<p class="p">This optional parameter is relevant when connecting to IBM Analytics Engine on IBM Cloud.  It specifies the path to the directory that contains the Java Cryptography Extension policy files (US_export_policy.jar and local_policy.jar).  The policy files enable the Java operators to use encryption with key sizes beyond the limits specified by the JDK.  See the section on <tt class="ph tt">Policy file configuration</tt> in the main page of this toolkit's documentation for information on how to configure the policy files.  If this parameter is omitted the JVM default policy files will be used. When specified, this parameter takes precedence over the JVM default policy files. 
+</p>
+
+<p class="p"><strong class="ph b">Note:</strong> This parameter changes a JVM property. If you set this property, be sure it is set to the same value in all HDFS operators that are in the same PE.  The location of the policy file directory can be absolute path on the file system or a path that is relative to the application directory.
 </p>
 <dl class="dl">
 
@@ -742,7 +810,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__reconnectionBound"><!-- --></a><tt class="ph tt">reconnectionBound</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs.  It is used only when the <strong class="ph b">reconnectionPolicy</strong> parameter is set to <tt class="ph tt">BoundedRetry</tt>; otherwise, it is ignored. The default value is <tt class="ph tt">5</tt>.
+<p class="p">This optional parameter specifies the number of successive connection attempts that occur when a connection fails or a disconnect occurs.  It is used only when the <tt class="ph tt">reconnectionPolicy</tt> parameter is set to <tt class="ph tt">BoundedRetry</tt>; otherwise, it is ignored. The default value is <tt class="ph tt">5</tt> .
 </p>
 <dl class="dl">
 
@@ -773,7 +841,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__reconnectionInterval"><!-- --></a><tt class="ph tt">reconnectionInterval</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts.  It is used only when the <strong class="ph b">reconnectionPolicy</strong>  parameter is set to <tt class="ph tt">BoundedRetry</tt> or <tt class="ph tt">InfiniteRetry</tt>; othewise, it is ignored.  The default value is <tt class="ph tt">10</tt>.
+<p class="p">This optional parameter specifies the amount of time (in seconds) that the operator waits between successive connection attempts.  It is used only when the <tt class="ph tt">reconnectionPolicy</tt> parameter is set to <tt class="ph tt">BoundedRetry</tt> or <tt class="ph tt">InfiniteRetry</tt>; othewise, it is ignored.  The default value is <tt class="ph tt">10</tt> .
 </p>
 <dl class="dl">
 
@@ -804,7 +872,7 @@
 <dt class="dt dlterm"><a name="spldoc_operator__parameter__reconnectionPolicy"><!-- --></a><tt class="ph tt">reconnectionPolicy</tt></dt>
 
 <dd class="dd">
-<p class="p">This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures.  The valid values are: <tt class="ph tt">NoRetry</tt>, <tt class="ph tt">InfiniteRetry</tt>, and <tt class="ph tt">BoundedRetry</tt>. The default value is <tt class="ph tt">BoundedRetry</tt>. If <tt class="ph tt">NoRetry</tt> is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again.  The operator shuts down at startup time if the initial connection attempt fails. If <tt class="ph tt">BoundedRetry</tt> is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times. The maximum number of connection attempts is specified in the <strong class="ph b">reconnectionBound</strong> parameter.  The sequence of connection attempts occurs at startup time. If a connection does not exist, the sequence of connection attempts also occurs before each operator is run.  If <tt class="ph tt">InfiniteRetry</tt> is specified, the operator continues to try and connect indefinitely until a connection is made.  This behavior blocks all other operator operations while a connection is not successful.  For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.
+<p class="p">This optional parameter specifies the policy that is used by the operator to handle HDFS connection failures.  The valid values are: <tt class="ph tt">NoRetry</tt>, <tt class="ph tt">InfiniteRetry</tt> , and <tt class="ph tt">BoundedRetry</tt> . The default value is <tt class="ph tt">BoundedRetry</tt> .  If <tt class="ph tt">NoRetry</tt> is specified and a HDFS connection failure occurs, the operator does not try to connect to the HDFS again.  The operator shuts down at startup time if the initial connection attempt fails.  If <tt class="ph tt">BoundedRetry</tt> is specified and a HDFS connection failure occurs, the operator tries to connect to the HDFS again up to a maximum number of times.  The maximum number of connection attempts is specified in the <tt class="ph tt">reconnectionBound</tt> parameter.  The sequence of connection attempts occurs at startup time.  If a connection does not exist, the sequence of connection attempts also occurs before each operator is run.  If <tt class="ph tt">InfiniteRetry</tt> is specified, the operator continues to try and connect indefinitely until a connection is made.  This behavior blocks all other operator operations while a connection is not successful.  For example, if an incorrect connection password is specified in the connection configuration document, the operator remains in an infinite startup loop until a shutdown is requested.
 </p>
 <dl class="dl">
 
@@ -836,78 +904,16 @@
 </div>
 
 <div class="section">
-<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__codetemplate">Code Templates</a></strong></p>
-  <dl class="dl">
-    
-     <dt class="dt dlterm">HDFS2FileSource</dt>
-
-     <dd class="dd">
-       <pre class="pre codeblock">
-stream&lt;${streamType}&gt; ${streamName} = HDFS2FileSource() {
-                param
-                 file : "${filename}";
-                }
-      </pre>
-
-     <p class="p"/>
-
-     </dd>
-
-    
-    
-     <dt class="dt dlterm">HDFS2FileSource connecting to IBM Analytics Engine</dt>
-
-     <dd class="dd">
-       <pre class="pre codeblock">
-stream&lt;${streamType}&gt; ${streamName} = HDFS2FileSource() {
-                param
-               	 file: "${filename}";
-               	 hdfsUser: "${hdfsUser}";
-               	 hdfsPassword: "${hdfsPassword}";
-                 hdfsUri: "${hdfsUri}";
-                }
-      </pre>
-
-     <p class="p"/>
-
-     </dd>
-
-    
-  </dl>
-
-</div>
-
-<div class="section">
-<p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__metrics">Metrics</a></strong></p>
-<dl class="dl">
-  
-    <dt class="dt dlterm"><tt class="ph tt">nFilesOpened</tt> - <a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__metrics_kind_counter">Counter</a></dt>
-
-    <dd class="dd">
-
-<p class="p">The number of files that are opened by the operator for reading data.
-</p>
-
-     <p class="p"/>
-
-     </dd>
-
-  
-</dl>
-
-</div>
-
-<div class="section">
 <p class="p splhead-1"><strong class="ph b"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies">Libraries</a></strong></p>
 
  <dl class="dl">
  
-  <dt class="dt dlterm">Java operator class library
+  <dt class="dt dlterm">Operator class library
   </dt>
 
   <dd class="dd"/>
 
-  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">../../impl/java/bin, ../../impl/lib/BigData.jar</tt></dd>
+  <dd class="dd"><a class="xref" href="../references/OperatorModel.html#spldoc_reference_operator_model__context__dependencies__managedlibrary__libpath">Library Path</a>: <tt class="ph tt">../../impl/lib/BigData.jar</tt></dd>
 
  
  </dl>

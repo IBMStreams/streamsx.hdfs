@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="reference"/>
+<meta name="DC.Title" content="Examples"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="spldoc_page"/>
+<link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
+<link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
+<title>Examples</title>
+</head>
+<body id="spldoc_page">
+
+
+<h1 class="title topictitle1">Examples </h1>
+
+<div class="body refbody">
+<div class="section">
+<p class="p">
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 5.0.0</a> &gt; <a class="xref" href="ns$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs</a> &gt; <a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileCopy.html">HDFS2FileCopy</a> &gt; Examples </p>
+
+</div>
+
+
+<div class="section">
+<p class="p">This example copies the file <tt class="ph tt">test.txt</tt> from local path ./data/ into <tt class="ph tt">/user/hdfs/</tt> directory. 
+</p>
+
+<div class="p">
+<pre class="pre codeblock">
+streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
+    param
+        localFile                : "test.txt"; 
+        hdfsFile                 : "/user/hdfs/test.txt"; 
+        deleteSourceFile         : false; 
+        overwriteDestinationFile : true; 
+        direction                : copyFromLocalFile
+}
+</pre>
+
+
+</div>
+
+<div class="p">This example copies all files from the local path <tt class="ph tt">/tmp/work</tt> into HDFS directory <tt class="ph tt">/user/hdfs/work</tt> . 
+<pre class="pre codeblock">
+// DirectoryScan operator with an absolute directory argument. 
+// The output port returns all local file names in directory /tmp/work. 
+stream&lt;rstring localFile&gt; DirScan = DirectoryScan() 
+{  
+    param 
+        directory       : "/tmp/work"; 
+        initDelay       : 1.0; 
+} 
+
+// Copies all incoming files from input port into /user/hdfs/work directory. 
+// The output port returns the result of copy action and the elapsed time 
+stream&lt;rstring message, uint64 elapsedTime&gt; CopyFromLocal = HDFS2FileCopy(DirScan)
+{ 
+    param
+          hdfsUser                 : "hdfs"; 
+          localFileAttrName        : "localFile"; 
+          hdfsFile                 : "/user/hdfs/work/"; 
+          deleteSourceFile         : false; 
+          overwriteDestinationFile : true; 
+          direction                : copyFromLocalFile; 
+}
+</pre>
+
+
+</div>
+
+<p class="p">This example copies all files from the HDFS directory <tt class="ph tt">/user/hdfs/work</tt> into the local directory <tt class="ph tt">/tmp/work2</tt> . 
+</p>
+
+<div class="p">You have to perform the follwing steps for kerberos configuration:
+<ul class="ul">
+<li class="li"> Copy the kerberos keytab file of your hdfs user from  HDFS server into etc directory. </li>
+
+<li class="li"> Replace the kerberos principal with your hdsf principal. </li>
+
+<li class="li"> Copy the <tt class="ph tt">core-site.xml</tt> file from your HDFS server into local <tt class="ph tt">etc</tt> directory. </li>
+
+<li class="li"> Copy the kerberos configuration file <tt class="ph tt">krb5.conf</tt> into main <tt class="ph tt">/etc</tt> directory of your streams server. </li>
+
+</ul>
+The output port of <tt class="ph tt">HDFS2FileCopy</tt> operator returns the result of copy action and the elapsed time. 
+<pre class="pre codeblock">
+// HDFS2DirectoryScan operator with an absolute directory argument and with kerberos authentication 
+// The output port returns all HDFS file names. 
+stream&lt;rstring hdfsFile&gt; HdfsDirScan = HDFS2DirectoryScan() 
+{  
+    param 
+        configPath               : "etc"; 
+        authKeytab               : "etc/hdfs.headless.keytab"; 
+        authPrincipal            : "hdfs-hdpcluster@HDP2.COM"; 
+        directory                : "/user/hdfs/work"; 
+        sleepTime                : 2.0; 
+        vmArg                    : "-Djava.security.krb5.conf=/etc/krb5.conf"; 
+} 
+
+
+// CopyToLocal copies all incoming HDFS files from input port into local directory /tmp/work2 . 
+stream&lt;rstring message, uint64 elapsedTime&gt; CopyToLocal = HDFS2FileCopy(HdfsDirScan) 
+{ 
+    param
+        configPath               : "etc"; 
+        authKeytab               : "etc/hdfs.headless.keytab"; 
+        authPrincipal            : "hdfs-hdpcluster@HDP2.COM"; 
+        hdfsFileAttrName         : "hdfsFile"; 
+        localFile                : "/tmp/work2"; 
+        deleteSourceFile         : false; 
+        overwriteDestinationFile : true; 
+        direction                : copyToLocalFile; 
+        vmArg                    : "-Djava.security.krb5.conf=/etc/krb5.conf"; 
+}
+</pre>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+</body>
+</html>

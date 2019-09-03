@@ -7,29 +7,29 @@
 <meta name="copyright" content="(C) Copyright 2005"/>
 <meta name="DC.rights.owner" content="(C) Copyright 2005"/>
 <meta name="DC.Type" content="reference"/>
-<meta name="DC.Title" content="Toolkit com.ibm.streamsx.hdfs 4.4.1"/>
+<meta name="DC.Title" content="Toolkit com.ibm.streamsx.hdfs 5.0.0"/>
 <meta name="DC.Format" content="XHTML"/>
 <meta name="DC.Identifier" content="spldoc_toolkit"/>
 <link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
 <link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
-<title>Toolkit com.ibm.streamsx.hdfs 4.4.1</title>
+<title>Toolkit com.ibm.streamsx.hdfs 5.0.0</title>
 </head>
 <body id="spldoc_toolkit">
 
 
-<h1 class="title topictitle1 spltoolkitname">Toolkit <tt class="ph tt">com.ibm.streamsx.hdfs 4.4.1</tt></h1>
+<h1 class="title topictitle1 spltoolkitname">Toolkit <tt class="ph tt">com.ibm.streamsx.hdfs 5.0.0</tt></h1>
 
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; com.ibm.streamsx.hdfs 4.4.1</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; com.ibm.streamsx.hdfs 5.0.0</p>
 
 </div>
 
 <div class="section"><h2 class="title sectiontitle splhead-1">General Information</h2>
 
 
-<p class="p">The HDFS Toolkit provides operators that can read and write data from Hadoop Distributed File System (HDFS) version 2 or later.
+<p class="p">The <strong class="ph b">streamsx.hdfs</strong> toolkit provides operators that can read and write data from Hadoop Distributed File System <strong class="ph b">(HDFS)</strong> version 2 or later. It supports also copy files from local file system to the remote HDFS and from HDFS to the local file system. 
 </p>
 
 <p class="p"><strong class="ph b">HDFS2FileSource</strong>     This operator opens a file on HDFS and sends out its contents in tuple format on its output port.  
@@ -41,13 +41,24 @@
 <p class="p"><strong class="ph b">HDFS2DirectoryScan</strong>  This operator repeatedly scans an HDFS directory and writes the names of new or modified files that are found in the directory to the output port. The operator sleeps between scans.
 </p>
 
-<div class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and GPFS. The operators support the following versions of Hadoop distributions:
+<p class="p"><strong class="ph b">HDFS2FileCopy</strong>       This operator copies files from local file system to the remote HDFS and from HDFS to the local disk.
+</p>
+
+<div class="p">The operators in this toolkit use Hadoop Java APIs to access HDFS and WEBHDFS. The operators support the following versions of Hadoop distributions:
 <ul class="ul">
 <li class="li"> Apache Hadoop versions 2.7 </li>
+
+<li class="li"> Apache Hadoop versions 3.0 or higher</li>
 
 <li class="li"> Cloudera distribution including Apache Hadoop version 4 (CDH4) and version 5 (CDH 5)</li>
 
 <li class="li"> Hortonworks Data Platform (HDP) Version 2.6 or higher</li>
+
+<li class="li"> Hortonworks Data Platform (HDP) Version 3.0 or higher</li>
+
+<li class="li"> IBM Analytic Engine 1.1 (HDP 2.7)</li>
+
+<li class="li"> IBM Analytic Engine 1.2 (HDP 3.1)</li>
 
 </ul>
 
@@ -56,7 +67,7 @@
 <p class="p">Note: The reference platforms that were used for testing are Hadoop 2.7.3, HDP .
 </p>
 
-<p class="p">You can access Hadoop remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to GPFS.
+<p class="p">You can access Hadoop remotely by specifying the <tt class="ph tt">webhdfs://hdfshost:webhdfsport</tt> schema in the URI that you use to connect to WEBHDFS.
 </p>
 
 <p class="p">For example:
@@ -89,6 +100,26 @@
               hdfsUri  : "hdfs": 
               hdfsUser : "hdfs://your-hdfs-host-ip-address:8020"
               file     : "LineInput.txt" ;                  
+  }
+</pre>
+
+
+</div>
+
+<p class="p"> This example copies the file test.txt from local path ./data/ into /user/hdfs/works directory of HDFS.   The parameter <strong class="ph b">credentials</strong> is a JSON string that contains <tt class="ph tt">user</tt>, <tt class="ph tt">password</tt> and <tt class="ph tt">webhdfs</tt>.
+</p>
+
+<div class="p">
+<pre class="pre codeblock">
+  streams&lt;boolean succeed&gt; copyFromLocal =  HDFS2FileCopy()
+  {
+         param
+              localFile                : "test.txt"; 
+              hdfsFile                 : "/user/hdfs/works/test.txt"; 
+              deleteSourceFile         : false; 
+              overwriteDestinationFile : true; 
+              direction                : copyFromLocalFile;
+              credentials              : $credentials ;
   }
 </pre>
 
@@ -130,7 +161,7 @@
 
 </div>
 
-<p class="p">Copy the created keytab into local streams server for example in etc directory of your SPL application.
+<p class="p">Copy the created keytab into local streams server for example in <tt class="ph tt">etc</tt> directory of your SPL application.
 </p>
 
 <p class="p">Before you start your SPL application, you can check the keytab with <strong class="ph b">kinit</strong> tool
@@ -179,7 +210,16 @@
 
 </div>
 
+<p class="p"> The HDSF configuration file <strong class="ph b">core-site.xml</strong>  has to be copied into local <tt class="ph tt">etc</tt> directory.
+</p>
+
   <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$1.html">Developing and running applications that use the HDFS Toolkit</a>
+</dt>
+<dd class="dd">
+</dd>
+</dl>
+
+  <dl class="dl"><dt class="dt dlterm"><a class="xref" href="tk$com.ibm.streamsx.hdfs$2.html">What is new</a>
 </dt>
 <dd class="dd">
 </dd>
@@ -189,7 +229,7 @@
   
   <dt class="dt dlterm">Version</dt>
 
-  <dd class="dd">4.4.1</dd>
+  <dd class="dd">5.0.0</dd>
 
   
   
@@ -238,6 +278,8 @@
         <dd class="dd">
 <ul class="sl simple">
 <li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2DirectoryScan.html">HDFS2DirectoryScan</a></li>
+
+<li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileCopy.html">HDFS2FileCopy</a></li>
 
 <li class="sli"><a class="xref" href="op$com.ibm.streamsx.hdfs$HDFS2FileSink.html">HDFS2FileSink</a></li>
 

@@ -7,22 +7,22 @@
 <meta name="copyright" content="(C) Copyright 2005"/>
 <meta name="DC.rights.owner" content="(C) Copyright 2005"/>
 <meta name="DC.Type" content="reference"/>
-<meta name="DC.Title" content="What is new in version 4.4.1"/>
+<meta name="DC.Title" content="What is new in version 4.3.0"/>
 <meta name="DC.Format" content="XHTML"/>
 <meta name="DC.Identifier" content="spldoc_page"/>
 <link rel="stylesheet" type="text/css" href="../../html/commonltr.css"/>
 <link rel="stylesheet" type="text/css" href="../../html/spldoc.css"/>
-<title>What is new in version 4.4.1</title>
+<title>What is new in version 4.3.0</title>
 </head>
 <body id="spldoc_page">
 
 
-<h1 class="title topictitle1">What is new in version 4.4.1</h1>
+<h1 class="title topictitle1">What is new in version 4.3.0</h1>
 
 <div class="body refbody">
 <div class="section">
 <p class="p">
-<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 4.4.1</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs$1.html">Developing and running applications that use the HDFS Toolkit</a> &gt; What is new in version 4.4.1</p>
+<a class="xref" href="../toolkits/toolkits.html">IBMStreams com.ibm.streamsx.hdfs Toolkit</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs.html">com.ibm.streamsx.hdfs 5.0.0</a> &gt; <a class="xref" href="tk$com.ibm.streamsx.hdfs$2.html">What is new</a> &gt; What is new in version 4.3.0</p>
 
 </div>
 
@@ -30,11 +30,14 @@
 <div class="section">
 <div class="p">
 <ul class="ul">
-<li class="li"> The pom.xml file has been upgraded to use hadoop version 2.8.5 libraries. </li>
+<li class="li"> The operator HDFS2FileSink provides a new parameter 'tempFile'.</li>
 
 </ul>
 
 </div>
+
+<p class="p">The 'tempFile' parameter specifies the name of the file that the operator writes to. When the file is closed the file is renamed to the final filename defined by the <strong class="ph b">file</strong> parameter.
+</p>
 
 </div>
 
