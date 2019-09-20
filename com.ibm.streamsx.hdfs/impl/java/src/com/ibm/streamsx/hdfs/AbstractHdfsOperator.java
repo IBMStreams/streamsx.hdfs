@@ -348,7 +348,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 					libList.add(HADOOP_HOME + "/lib/*");
 					libList.add(HADOOP_HOME + "/client/*");
 				}
-				if (fConfigPath == null){
+				if (fConfigPath != null){
 					libList.add(getAbsolutePath(getConfigPath()));
 				}
 
