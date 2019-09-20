@@ -810,7 +810,7 @@ public class HDFS2FileSink extends AbstractHdfsOperator implements StateHandler 
 					}
 
 					nSikedFiles.incrementValue(1);
-					System.out.println(fFileToWrite + " " + nSikedFiles.getValue() + " files written.");
+					System.out.println(nSikedFiles.getValue() + " : file " + fs.getHomeDirectory() + "/" +  fFileToWrite.getPath() + " created.");
 
 					// operators can perform additional
 					if (hasOutputPort && success) {

@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -50,8 +51,28 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 
 		if (configPath != null && !configPath.isEmpty()) {
 			try {
-				URL url = new URL("file", null, configPath + "/core-site.xml");
-				fConfiguration.addResource(url);
+				String coreSiteXmlFileName = configPath + "/core-site.xml";
+				String hdfsSiteXmlFileName = configPath + "/hdfs-site.xml";
+			
+				File coreSiteXmlFile = new File(coreSiteXmlFileName);
+				if (coreSiteXmlFile.exists()){
+					URL coreSiteXmlUrl = new URL("file", null, coreSiteXmlFileName);
+					fConfiguration.addResource(coreSiteXmlUrl);
+					LOGGER.log(TraceLevel.INFO, "core-site.xml file: " + coreSiteXmlFileName);
+					System.out.println("core-site.xml file: " + coreSiteXmlFileName);
+				}
+				else{
+					LOGGER.log(TraceLevel.ERROR, "core-site.xml file doesn't exist in " + configPath);					
+				}
+
+				File hdfsSiteXmlFile = new File(hdfsSiteXmlFileName);
+				if (hdfsSiteXmlFile.exists()){
+					URL hdsfSiteXmlUrl = new URL("file", null, hdfsSiteXmlFileName);
+					fConfiguration.addResource(hdsfSiteXmlUrl);
+					LOGGER.log(TraceLevel.INFO, "hdfs-site.xml file: " + hdfsSiteXmlFile);
+					System.out.println("hdfs-site.xml file: " + hdfsSiteXmlFile);
+				}
+				
 			} catch (MalformedURLException e) {
 				LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
 			}

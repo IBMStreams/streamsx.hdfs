@@ -14,7 +14,7 @@ public class IHdfsConstants {
     public static final String PARAM_TUPLES_PER_FILE = "tuplesPerFile";
     public static final String PARAM_BYTES_PER_FILE = "bytesPerFile";
     public static final String PARAM_FILE_NAME_ATTR = "fileAttributeName";
-    public static final String PARAM_TEMP_FILE = "tempfile";
+    public static final String PARAM_TEMP_FILE = "tempFile";
     public static final String PARAM_TIME_FORMAT = "timeFormat";
   
     // HDFSFileCopy parameters
@@ -156,7 +156,7 @@ public class IHdfsConstants {
 
     public static final String DESC_BLOCK_SIZE = "This parameter specifies the maximum number of bytes to be read at one time when reading a file into binary mode (ie, into a blob); thus, it is the maximum size of the blobs on the output stream. The parameter is optional, and defaults to `4096` .";
 
-    public static final String DESC_CREDENTIALS ="This optional parameter specifies the JSON string that contains the hdfs credentials: `user`, `password` and `hdfsUri` or `webhdfs` . \\n\\n"
+    public static final String DESC_CREDENTIALS ="This optional parameter specifies the JSON string that contains the hdfs credentials key/value pairs for `user`, `password` and `webhdfs` . \\n\\n"
 			+ "This parameter can also be specified in an application configuration.\\n\\n"
     		+ "The JSON string must to have the following format:\\n\\n"
 	        + "    {\\n"
@@ -166,9 +166,10 @@ public class IHdfsConstants {
 			+ "    }\\n";
 
     
-    public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter 'credentials'. "
-    		+ " The `credentials` is a JSON string that contains `user` and `password` and `webhdfs` . "
-    		+ " If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. ";
+    public static final String DESC_APP_CONFIG_NAME ="This optional parameter specifies the name of the application configuration that contains HDFS connection related configuration parameter `credentials`. "
+    		+ " The `credentials` is a JSON string that contains key/value pairs for `user` and `password` and `webhdfs` . "
+    		+ " If a value is specified in the application configuration and as operator parameter, the application configuration parameter value takes precedence. "
+    		+ " An application configuration can be created in the Streams Console or using the `streamtool mkappconfig ... <configObject name>`.";
     
     public static final String DESC_SOURCE_FILE = "This parameter specifies the name of the file that the operator opens and reads. \\n"
             + "This parameter must be specified when the optional input port is not configured. \\n"

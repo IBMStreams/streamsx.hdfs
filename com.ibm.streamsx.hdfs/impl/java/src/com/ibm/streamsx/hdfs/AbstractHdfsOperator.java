@@ -348,6 +348,9 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 					libList.add(HADOOP_HOME + "/lib/*");
 					libList.add(HADOOP_HOME + "/client/*");
 				}
+				if (fConfigPath == null){
+					libList.add(getAbsolutePath(getConfigPath()));
+				}
 
 			}
 		}
@@ -453,21 +456,30 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 			JSONObject obj = JSONObject.parse(jsonString);
 			fHdfsUser = (String) obj.get("user");
 			if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
-				LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUser' is required to create HDFS connection."));
-				throw new Exception(Messages.getString("'fHdfsUser' is required to create HDFS connection."));
+				fHdfsUser = (String) obj.get("hdfsUser");
+				if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
+					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUser' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsUser' is required to create HDFS connection."));
+				}
 			}
 
 			fHdfsPassword = (String) obj.get("password");
 			if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
-				LOGGER.log(LogLevel.ERROR, Messages.getString(
+				fHdfsPassword = (String) obj.get("hdfsPassword");
+				if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
+					LOGGER.log(LogLevel.ERROR, Messages.getString(
 						"'fHdfsPassword' is required to create HDFS connection."));
-				throw new Exception(Messages.getString("'fHdfsPassword' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsPassword' is required to create HDFS connection."));
+				}
 			}
 
 			fHdfsUri = (String) obj.get("webhdfs");
 			if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {
-				LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
-				throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
+				fHdfsUri = (String) obj.get("hdfsUri");
+				if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {				
+					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
+				}
 			}
 
 		} catch (Exception ex) {
