@@ -86,7 +86,194 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 			this.getCredentials(credentials);
 		}
 		setupClassPaths(context);
+		addConfigPathToClassPaths(context);
 		createConnection();
+
+	}
+
+	/** 
+	 * set policy file path and https.protocols in JAVA system properties 
+	 */
+	private void setJavaSystemProperty() {
+		String policyFilePath = getAbsolutePath(getPolicyFilePath());
+		if (policyFilePath != null) {
+			TRACE.log(TraceLevel.INFO, "Policy file path: " + policyFilePath);
+			System.setProperty("com.ibm.security.jurisdictionPolicyDir", policyFilePath);
+		}
+		System.setProperty("https.protocols", "TLSv1.2");
+		String httpsProtocol = System.getProperty("https.protocols");
+		TRACE.log(TraceLevel.INFO, "streamsx.hdfs https.protocols " + httpsProtocol);
+	}
+
+	/**
+	 * read the application config into a map
+	 * 
+	 * @param context the operator context
+	 */
+	protected void loadAppConfig(OperatorContext context) {
+
+		// if no appconfig name is specified, create empty map
+		if (appConfigName == null) {
+			appConfig = new HashMap<String, String>();
+			return;
+		}
+
+		appConfig = context.getPE().getApplicationConfiguration(appConfigName);
+		if (appConfig.isEmpty()) {
+			LOGGER.log(LogLevel.WARN, "Application config not found or empty: " + appConfigName);
+		}
+
+		for (Map.Entry<String, String> kv : appConfig.entrySet()) {
+			TRACE.log(TraceLevel.DEBUG, "Found application config entry: " + kv.getKey() + "=" + kv.getValue());
+		}
+
+		if (null != appConfig.get("credentials")) {
+			credentials = appConfig.get("credentials");
+		}
+	}
+
+	/**
+	 * read the credentials and set user name fHdfsUser, fHfsPassword and
+	 * hdfsUrl.
+	 * 
+	 * @param credentials
+	 */
+	public void getCredentials(String credentials) throws IOException {
+		String jsonString = credentials;
+		try {
+			JSONObject obj = JSONObject.parse(jsonString);
+			fHdfsUser = (String) obj.get("user");
+			if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
+				fHdfsUser = (String) obj.get("hdfsUser");
+				if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
+					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUser' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsUser' is required to create HDFS connection."));
+				}
+			}
+
+			fHdfsPassword = (String) obj.get("password");
+			if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
+				fHdfsPassword = (String) obj.get("hdfsPassword");
+				if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
+					LOGGER.log(LogLevel.ERROR, Messages.getString(
+						"'fHdfsPassword' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsPassword' is required to create HDFS connection."));
+				}
+			}
+
+			fHdfsUri = (String) obj.get("webhdfs");
+			if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {
+				fHdfsUri = (String) obj.get("hdfsUri");
+				if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {				
+					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
+					throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
+				}
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * set the class path for Hadoop libraries 
+	 * 
+	 * @param context
+	 */
+	private void setupClassPaths(OperatorContext context) {
+
+		ArrayList<String> libList = new ArrayList<>();
+		String HADOOP_HOME = System.getenv("HADOOP_HOME");
+		if (getLibPath() != null) {
+			String user_defined_path = getLibPath() + "/*";
+			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
+			libList.add(user_defined_path);
+		} else {
+			// add class path for delivered jar files from ./impl/lib/ext/ directory
+			String default_dir = context.getToolkitDirectory() + "/impl/lib/ext/*";
+			TRACE.log(TraceLevel.INFO, "Adding /impl/lib/ext/* to classpath");
+			libList.add(default_dir);
+
+			if (HADOOP_HOME != null) {
+				// if no config path and no HdfsUri is defined it checks the
+				// HADOOP_HOME/config directory for default core-site.xml file
+				if ((fConfigPath == null) && (fHdfsUri == null)) {
+					libList.add(HADOOP_HOME + "/conf");
+					libList.add(HADOOP_HOME + "/../hadoop-conf");
+					libList.add(HADOOP_HOME + "/etc/hadoop");
+					libList.add(HADOOP_HOME + "/*");
+					libList.add(HADOOP_HOME + "/../hadoop-hdfs");
+					libList.add(HADOOP_HOME + "/lib/*");
+					libList.add(HADOOP_HOME + "/client/*");
+				}
+				
+				
+
+			}
+		}
+		for (int i = 0; i < libList.size(); i++) {
+			TRACE.log(TraceLevel.INFO, "calss path list " + i + " : " + libList.get(i));
+		}
+
+		try {
+			context.addClassLibraries(libList.toArray(new String[0]));
+
+		} catch (MalformedURLException e) {
+			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR", e);
+		}
+	}
+	
+	private void addConfigPathToClassPaths(OperatorContext context) {
+
+		ArrayList<String> libList = new ArrayList<>();
+		if (getConfigPath() != null) {
+			String user_defined_config_path = getAbsolutePath(getConfigPath())+ "/*";
+			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_config_path + " to classpath");
+			libList.add(user_defined_config_path);
+			System.out.println("AAAAA Adding " + user_defined_config_path + " to classpath");
+		}
+
+		for (int i = 0; i < libList.size(); i++) {
+			TRACE.log(TraceLevel.INFO, "calss path list " + i + " : " + libList.get(i));
+		}
+
+		try {
+			context.addClassLibraries(libList.toArray(new String[0]));
+
+		} catch (MalformedURLException e) {
+			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR", e);
+		}
+	}
+	
+	
+	/** createConnection creates a connection to the hadoop file system. */
+	private synchronized void createConnection() throws Exception {
+		// Delay in miliseconds as specified in fReconnectionInterval parameter
+		final long delay = TimeUnit.MILLISECONDS.convert((long) fReconnectionInterval, TimeUnit.SECONDS);
+		LOGGER.log(TraceLevel.INFO, "createConnection  ReconnectionPolicy " + fReconnectionPolicy + "  ReconnectionBound "
+				+ fReconnectionBound + "  ReconnectionInterval " + fReconnectionInterval);
+		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_NORETRY) {
+			fReconnectionBound = 1;
+		}
+
+		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_INFINITERETRY) {
+			fReconnectionBound = 9999;
+		}
+
+		for (int nConnectionAttempts = 0; nConnectionAttempts < fReconnectionBound; nConnectionAttempts++) {
+			LOGGER.log(TraceLevel.INFO, "createConnection   nConnectionAttempts is: " + nConnectionAttempts + " delay "
+					+ delay);
+			try {
+				fHdfsClient = createHdfsClient();
+				fs = fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
+				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
+				break;
+			} catch (Exception e) {
+				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", e.toString()));
+				Thread.sleep(delay);
+			}
+		}
+
 	}
 
 	
@@ -278,91 +465,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		return this.appConfigName;
 	}
 
-	
-	
-	/** createConnection creates a connection to the hadoop file system. */
-	private synchronized void createConnection() throws Exception {
-		// Delay in miliseconds as specified in fReconnectionInterval parameter
-		final long delay = TimeUnit.MILLISECONDS.convert((long) fReconnectionInterval, TimeUnit.SECONDS);
-		LOGGER.log(TraceLevel.INFO, "createConnection  ReconnectionPolicy " + fReconnectionPolicy + "  ReconnectionBound "
-				+ fReconnectionBound + "  ReconnectionInterval " + fReconnectionInterval);
-		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_NORETRY) {
-			fReconnectionBound = 1;
-		}
-
-		if (fReconnectionPolicy == IHdfsConstants.RECONNPOLICY_INFINITERETRY) {
-			fReconnectionBound = 9999;
-		}
-
-		for (int nConnectionAttempts = 0; nConnectionAttempts < fReconnectionBound; nConnectionAttempts++) {
-			LOGGER.log(TraceLevel.INFO, "createConnection   nConnectionAttempts is: " + nConnectionAttempts + " delay "
-					+ delay);
-			try {
-				fHdfsClient = createHdfsClient();
-				fs = fHdfsClient.connect(getHdfsUri(), getHdfsUser(), getAbsolutePath(getConfigPath()));
-				LOGGER.log(TraceLevel.INFO, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", fHdfsUri));
-				break;
-			} catch (Exception e) {
-				LOGGER.log(TraceLevel.ERROR, Messages.getString("HDFS_CLIENT_AUTH_CONNECT", e.toString()));
-				Thread.sleep(delay);
-			}
-		}
-
-	}
-
-	/** set policy file path and https.protocols in JAVA system properties */
-	private void setJavaSystemProperty() {
-		String policyFilePath = getAbsolutePath(getPolicyFilePath());
-		if (policyFilePath != null) {
-			TRACE.log(TraceLevel.INFO, "Policy file path: " + policyFilePath);
-			System.setProperty("com.ibm.security.jurisdictionPolicyDir", policyFilePath);
-		}
-		System.setProperty("https.protocols", "TLSv1.2");
-		String httpsProtocol = System.getProperty("https.protocols");
-		TRACE.log(TraceLevel.INFO, "streamsx.hdfs https.protocols " + httpsProtocol);
-	}
-
-	private void setupClassPaths(OperatorContext context) {
-
-		ArrayList<String> libList = new ArrayList<>();
-		String HADOOP_HOME = System.getenv("HADOOP_HOME");
-		if (getLibPath() != null) {
-			String user_defined_path = getLibPath() + "/*";
-			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_path + " to classpath");
-			libList.add(user_defined_path);
-		} else {
-			// add class path for delivered jar files from ./impl/lib/ext/ directory
-			String default_dir = context.getToolkitDirectory() + "/impl/lib/ext/*";
-			TRACE.log(TraceLevel.INFO, "Adding /impl/lib/ext/* to classpath");
-			libList.add(default_dir);
-
-			if (HADOOP_HOME != null) {
-				// if no config path and no HdfsUri is defined it checks the
-				// HADOOP_HOME/config directory for default core-site.xml file
-				if ((fConfigPath == null) && (fHdfsUri == null)) {
-					libList.add(HADOOP_HOME + "/conf");
-					libList.add(HADOOP_HOME + "/../hadoop-conf");
-					libList.add(HADOOP_HOME + "/etc/hadoop");
-					libList.add(HADOOP_HOME + "/*");
-					libList.add(HADOOP_HOME + "/../hadoop-hdfs");
-					libList.add(HADOOP_HOME + "/lib/*");
-					libList.add(HADOOP_HOME + "/client/*");
-				}
-
-			}
-		}
-		for (int i = 0; i < libList.size(); i++) {
-			TRACE.log(TraceLevel.INFO, "calss path list " + i + " : " + libList.get(i));
-		}
-
-		try {
-			context.addClassLibraries(libList.toArray(new String[0]));
-
-		} catch (MalformedURLException e) {
-			LOGGER.log(TraceLevel.ERROR, "LIB_LOAD_ERROR", e);
-		}
-	}
-
 	@Override
 	public void allPortsReady() throws Exception {
 		super.allPortsReady();
@@ -439,76 +541,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 	protected IHdfsClient getHdfsClient() {
 		return fHdfsClient;
-	}
-
-	/**
-	 * read the credentials and set user name fHdfsUser, fHfsPassword and
-	 * hdfsUrl.
-	 * 
-	 * @param credentials
-	 */
-	public void getCredentials(String credentials) throws IOException {
-		String jsonString = credentials;
-		try {
-			JSONObject obj = JSONObject.parse(jsonString);
-			fHdfsUser = (String) obj.get("user");
-			if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
-				fHdfsUser = (String) obj.get("hdfsUser");
-				if (fHdfsUser == null || fHdfsUser.trim().isEmpty()) {
-					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUser' is required to create HDFS connection."));
-					throw new Exception(Messages.getString("'fHdfsUser' is required to create HDFS connection."));
-				}
-			}
-
-			fHdfsPassword = (String) obj.get("password");
-			if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
-				fHdfsPassword = (String) obj.get("hdfsPassword");
-				if (fHdfsPassword == null || fHdfsPassword.trim().isEmpty()) {
-					LOGGER.log(LogLevel.ERROR, Messages.getString(
-						"'fHdfsPassword' is required to create HDFS connection."));
-					throw new Exception(Messages.getString("'fHdfsPassword' is required to create HDFS connection."));
-				}
-			}
-
-			fHdfsUri = (String) obj.get("webhdfs");
-			if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {
-				fHdfsUri = (String) obj.get("hdfsUri");
-				if (fHdfsUri == null || fHdfsUri.trim().isEmpty()) {				
-					LOGGER.log(LogLevel.ERROR, Messages.getString("'fHdfsUri' is required to create HDFS connection."));
-					throw new Exception(Messages.getString("'fHdfsUri' is required to create HDFS connection."));
-				}
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-
-	/**
-	 * read the application config into a map
-	 * 
-	 * @param context the operator context
-	 */
-	protected void loadAppConfig(OperatorContext context) {
-
-		// if no appconfig name is specified, create empty map
-		if (appConfigName == null) {
-			appConfig = new HashMap<String, String>();
-			return;
-		}
-
-		appConfig = context.getPE().getApplicationConfiguration(appConfigName);
-		if (appConfig.isEmpty()) {
-			LOGGER.log(LogLevel.WARN, "Application config not found or empty: " + appConfigName);
-		}
-
-		for (Map.Entry<String, String> kv : appConfig.entrySet()) {
-			TRACE.log(TraceLevel.DEBUG, "Found application config entry: " + kv.getKey() + "=" + kv.getValue());
-		}
-
-		if (null != appConfig.get("credentials")) {
-			credentials = appConfig.get("credentials");
-		}
 	}
 
 }
