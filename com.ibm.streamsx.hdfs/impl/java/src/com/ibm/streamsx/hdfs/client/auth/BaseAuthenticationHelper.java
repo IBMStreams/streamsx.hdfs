@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.apache.hadoop.conf.Configuration;
@@ -50,8 +51,28 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 
 		if (configPath != null && !configPath.isEmpty()) {
 			try {
-				URL url = new URL("file", null, configPath + "/core-site.xml");
-				fConfiguration.addResource(url);
+				String coreSiteXmlFileName = configPath + "/core-site.xml";
+				String hdfsSiteXmlFileName = configPath + "/hdfs-site.xml";
+			
+				File coreSiteXmlFile = new File(coreSiteXmlFileName);
+				if (coreSiteXmlFile.exists()){
+					URL coreSiteXmlUrl = new URL("file", null, coreSiteXmlFileName);
+					fConfiguration.addResource(coreSiteXmlUrl);
+					LOGGER.log(TraceLevel.INFO, "core-site.xml file: " + coreSiteXmlFileName);
+					System.out.println("core-site.xml file: " + coreSiteXmlFileName);
+				}
+				else{
+					LOGGER.log(TraceLevel.ERROR, "core-site.xml file doesn't exist in " + configPath);					
+				}
+
+				File hdfsSiteXmlFile = new File(hdfsSiteXmlFileName);
+				if (hdfsSiteXmlFile.exists()){
+					URL hdsfSiteXmlUrl = new URL("file", null, hdfsSiteXmlFileName);
+					fConfiguration.addResource(hdsfSiteXmlUrl);
+					LOGGER.log(TraceLevel.INFO, "hdfs-site.xml file: " + hdfsSiteXmlFile);
+					System.out.println("hdfs-site.xml file: " + hdfsSiteXmlFile);
+				}
+				
 			} catch (MalformedURLException e) {
 				LOGGER.log(TraceLevel.ERROR, e.getMessage(), e);
 			}
@@ -81,19 +102,19 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 			fConfiguration.set("fs.webhdfs.impl", com.ibm.streamsx.hdfs.client.webhdfs.KnoxWebHdfsFileSystem.class
 					.getName());
 			fConfiguration.set(IHdfsConstants.KNOX_USER, hdfsUser);
-			String keyStore = connectionProperties.get(IHdfsConstants.KEYSTORE);
+			String keyStore = connectionProperties.get(IHdfsConstants.PARAM_KEY_STOR_PATH);
 			if (keyStore != null) {
-				fConfiguration.set(IHdfsConstants.KEYSTORE, keyStore);
-				String keyStorePass = connectionProperties.get(IHdfsConstants.KEYSTORE_PASSWORD);
+				fConfiguration.set(IHdfsConstants.PARAM_KEY_STOR_PATH, keyStore);
+				String keyStorePass = connectionProperties.get(IHdfsConstants.PARAM_KEY_STOR_PASSWORD);
 				if (keyStorePass == null) {
 					keyStorePass = "";
 				}
-				fConfiguration.set(IHdfsConstants.KEYSTORE_PASSWORD, keyStorePass);
+				fConfiguration.set(IHdfsConstants.PARAM_KEY_STOR_PASSWORD, keyStorePass);
 			} else {
 				// LOGGER.log(TraceLevel.WARN, "INSECURE_SSL_CONNECTION");
 				LOGGER.log(TraceLevel.DEBUG, Messages.getString("INSECURE_SSL_CONNECTION"));
 			}
-			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.HDFS_PASSWORD));
+			fConfiguration.set(IHdfsConstants.KNOX_PASSWORD, connectionProperties.get(IHdfsConstants.PARAM_HDFS_PASSWORD));
 		}
 		LOGGER.log(TraceLevel.DEBUG, Messages.getString("HDFS_CLIENT_AUTH_ATTEMPTING_CONNECT", getHdfsUri()
 				.toString()));
@@ -102,7 +123,7 @@ public abstract class BaseAuthenticationHelper implements IAuthenticationHelper 
 	}
 
 	protected boolean isConnectionToBluemix(String hdfsUser, Map<String, String> connectionProperties) {
-		return hdfsUser != null && connectionProperties.get(IHdfsConstants.HDFS_PASSWORD) != null;
+		return hdfsUser != null && connectionProperties.get(IHdfsConstants.PARAM_HDFS_PASSWORD) != null;
 	}
 
 	protected FileSystem internalGetFileSystem(URI hdfsUri, String hdfsUser) throws Exception {

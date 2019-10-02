@@ -38,8 +38,8 @@ public class HDFSAuthenticationHelper extends BaseAuthenticationHelper {
 		if (getAuthType() == AuthType.KERBEROS) { // Connect using Kerberos
 													 // authentication
 			if (connectionProperties != null) {
-				String kerberosPrincipal = connectionProperties.get(IHdfsConstants.AUTH_PRINCIPAL);
-				String kerberosKeytab = connectionProperties.get(IHdfsConstants.AUTH_KEYTAB);
+				String kerberosPrincipal = connectionProperties.get(IHdfsConstants.PARAM_AUTH_PRINCIPAL);
+				String kerberosKeytab = connectionProperties.get(IHdfsConstants.PARAM_AUTH_KEYTAB);
 
 				if (kerberosPrincipal == null || kerberosKeytab == null) {
 					throw new Exception(

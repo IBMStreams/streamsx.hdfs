@@ -361,6 +361,7 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 		String hdfsFileNmae = "";
 		// get the start time
 		long millisStart = Calendar.getInstance().getTimeInMillis();
+		long size = 0;
 		try {
 			if (localFileAttrName != null) {
 				localFile = tuple.getString(localFileAttrName);
@@ -391,7 +392,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						} else {
 							hdfsFullPath = fs.getUri().toString() + hdfsFileNmae;
 						}
-						message = "Successfully copied from " + localFile + "  to  " + hdfsFullPath + " .";
+						size = new File(localFile).length();
+						message = size  + " bytes successfully copied from "  + localFile + " to " + hdfsFullPath + " .";
 						nCopiedFiles.incrementValue(1);
 						System.out.println(localPath + " --> " + hdfsPath + "  " + nCopiedFiles.getValue()
 								+ " files copied.");
@@ -413,7 +415,8 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 						} else {
 							hdfsFullPath = fs.getUri().toString() + hdfsFile;
 						}
-						message = "Successfully copied from " + hdfsFullPath + "  to  " + localFileName + " .";
+						size = new File(localFileName).length();
+						message = size  + " bytes successfully copied from "  + hdfsFullPath + " to " + localFileName + " .";
 						nCopiedFiles.incrementValue(1);
 						System.out.println(hdfsPath + " --> " + localPath + "  " + nCopiedFiles.getValue()
 								+ " files copied.");

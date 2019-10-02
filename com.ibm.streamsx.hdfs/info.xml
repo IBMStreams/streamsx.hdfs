@@ -175,10 +175,12 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 * Adapting of com.ibm.streamsx.hdfs.client.webhdfs java package to support `knox` HttpURLConnection.
 * The pom.xml file has been upgraded to use Hadoop version 3.1.0 libraries. 
  
+++ What is new in version 5.1.0
 
+* Check if core-site.xml file exist in configPath
  
 </description>
-    <version>5.0.0</version>
+    <version>5.1.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>

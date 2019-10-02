@@ -1,0 +1,124 @@
+
+/*******************************************************************************
+* Copyright (C) 2019, International Business Machines Corporation
+* All Rights Reserved
+*******************************************************************************/
+namespace application ;
+
+use com.ibm.streamsx.hdfs::* ;
+
+/**
+ * The webHDFS sample demonstrates how to access webhdfs via knox useer and password.
+ * A Beacon operator generates some test line 
+ * HdfsFileSink writes every 10 lines in a new file in /user/hdfs/out directory
+ * HdfsDirScanOut scans the given directory (out) from HDFS, which is the user's home directory and returns the file names
+ * HdfsFileSource reads files and returns lines. It uses the file name from directory scan to read the file
+ * CopyFromHdfsToLocal copies all incoming files (/user/hdfs/out/output-xx.txt) from input port into local directory data.
+ * Prints operators are Custom and prints the output of HDFS operators
+ *
+ * Please replace the credentials in SPL with your credentials.
+ */
+composite webHDFS
+{
+  param
+    expression<rstring> $credentials : getSubmissionTimeValue("credentials", 
+    	"{ 'user': 'hdfs', 'webhdfs': 'webhdfs://<your-hdfs-server>:8443', 'password': 'hdf-spassword'}" );
+  graph
+
+ 
+    // generates lines
+    stream<rstring line> CreateLines = Beacon()
+    {
+        param
+            initDelay : 1.0 ;
+            iterations : 100u ;
+        output
+            CreateLines : line = (rstring)IterationCount() + ": This line will be written into a HDFS file." ;
+    }
+
+    // HdfsFileSink writes every 10 lines from CreateLines in a new file in /user/hdfs/out directory
+    stream<rstring fileName, uint64 size> HdfsFileSink = HDFS2FileSink(CreateLines)
+    {
+      param
+        credentials : $credentials ;
+        file : "out/output-%FILENUM.txt" ;
+        tuplesPerFile : 10l ;
+    }
+
+    //print out the file names and the size of file
+    () as PrintHdfsFileSink = Custom(HdfsFileSink)
+    {
+      logic
+        onTuple HdfsFileSink :
+        {
+          printStringLn("HdfsFileSink fileName , size : " +(rstring) HdfsFileSink) ;
+        }
+
+    }
+
+      // HdfsDirScanOut scans the given directory from HDFS, default to . which is the user's home directory
+    stream<rstring hdfsFile> HdfsDirScanOut = HDFS2DirectoryScan()
+    {
+      param
+        initDelay : 10.0 ;
+        directory : "out" ;
+        credentials : $credentials ;
+        strictMode : false ;
+    }
+
+
+    //print out the names of each file found in the directory
+    () as PrintHdfsDirScanOut = Custom(HdfsDirScanOut)
+    {
+      logic
+        onTuple HdfsDirScanOut :
+        {
+          printStringLn("HdfsDirScanOut fileName  : " +(rstring) HdfsDirScanOut) ;
+        }
+
+    }
+
+    // HdfsFileSource reads files and returns lines into output port
+    // It uses the file name from directory scan to read the file
+    stream<rstring lines> HdfsFileSource = HDFS2FileSource(HdfsDirScanOut)
+    {
+      param
+        credentials : $credentials ;
+    }
+
+    //print out the names of each file found in the directory
+    () as PrintHdfsFileSource = Custom(HdfsFileSource)
+    {
+      logic
+        onTuple HdfsFileSource :
+        {
+          printStringLn("HdfsFileSource   line : " + lines) ;
+        }
+
+    }
+
+    // copies all incoming files from input port /user/hdfs/out/outputx.txt into local data directory.
+    stream<rstring message, uint64 elapsedTime> CopyFromHdfsToLocal = HDFS2FileCopy(HdfsDirScanOut)
+    {
+        param
+            hdfsFileAttrName : "hdfsFile" ;
+            localFile : "./" ;
+                deleteSourceFile : false ;
+                overwriteDestinationFile : true ;
+                direction : copyToLocalFile ;
+                credentials : $credentials ;
+  
+    }
+
+    //print out the message and the elapsed time  
+    () as PrintCopyFromHdfsToLocal = Custom(CopyFromHdfsToLocal)
+    {
+      logic
+        onTuple CopyFromHdfsToLocal :
+        {
+          printStringLn("CopyFromHdfsToLocal message,  elapsedTime : " +(rstring) CopyFromHdfsToLocal) ;
+        }
+
+    }
+
+}
