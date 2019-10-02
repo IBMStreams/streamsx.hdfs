@@ -33,10 +33,10 @@ public class WebHdfsAuthenticationHelper extends BaseAuthenticationHelper {
 
 		// in order to authenticate with WebHDFS, need to set the filesystem
 		// to the local filesystem so the cred file can be found
-		fConfiguration.set("fs.defaultFS", "file:///");
+/*		fConfiguration.set("fs.defaultFS", "file:///");
 
 		if (connectionProperties != null) {
-			String credFilePath = connectionProperties.get(IHdfsConstants.CRED_FILE);
+			String credFilePath = connectionProperties.get(IHdfsConstants.PARAM_CRED_FILE);
 			setHdfsUri(formatUriWithCredFile(getHdfsUri(), credFilePath));
 
 			// set to the hdfsUser to the user in the credfile,
@@ -45,12 +45,12 @@ public class WebHdfsAuthenticationHelper extends BaseAuthenticationHelper {
 				hdfsUser = getUsernameFromCredFile(credFilePath);
 			}
 		}
-
+*/
 		FileSystem fs = null;
 		if (getAuthType() == AuthType.KERBEROS) {
 			if (connectionProperties != null) {
-				String kerberosPrincipal = connectionProperties.get(IHdfsConstants.AUTH_PRINCIPAL);
-				String kerberosKeytab = connectionProperties.get(IHdfsConstants.AUTH_KEYTAB);
+				String kerberosPrincipal = connectionProperties.get(IHdfsConstants.PARAM_AUTH_PRINCIPAL);
+				String kerberosKeytab = connectionProperties.get(IHdfsConstants.PARAM_AUTH_KEYTAB);
 
 				if (kerberosPrincipal == null || kerberosKeytab == null) {
 					throw new Exception(
@@ -77,7 +77,7 @@ public class WebHdfsAuthenticationHelper extends BaseAuthenticationHelper {
 
 		return fs;
 	}
-
+/*
 	private String getUsernameFromCredFile(String credFilePath) throws Exception {
 		Properties props = new Properties();
 		props.load(new FileReader(credFilePath));
@@ -102,7 +102,7 @@ public class WebHdfsAuthenticationHelper extends BaseAuthenticationHelper {
 
 		return encodedPath;
 	}
-
+*/
 	@Override
 	public void disconnect() {
 		// TODO Auto-generated method stub

@@ -97,8 +97,8 @@ public class KnoxWebHdfsFileSystem extends SWebHdfsFileSystem {
 		Configuration conf = getConf();
 		// if the keystore and its password aren't specified, we assume that the
 		// user is not interested in certificate validation.
-		String keyStore = conf.get(IHdfsConstants.KEYSTORE);
-		String keyStorePassword = conf.get(IHdfsConstants.KEYSTORE_PASSWORD, "");
+		String keyStore = conf.get(IHdfsConstants.PARAM_KEY_STOR_PATH);
+		String keyStorePassword = conf.get(IHdfsConstants.PARAM_KEY_STOR_PASSWORD, "");
 		SSLSocketFactory factory;
 		try {
 			factory = URLUtils.getSocketFactory(keyStore, keyStorePassword);

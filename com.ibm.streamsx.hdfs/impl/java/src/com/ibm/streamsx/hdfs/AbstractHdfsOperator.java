@@ -8,6 +8,8 @@ package com.ibm.streamsx.hdfs;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,9 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import com.ibm.json.java.JSONObject;
+import com.ibm.json.java.JSONArray;
+import com.ibm.json.java.*;
+
 import com.ibm.streams.operator.AbstractOperator;
 import com.ibm.streams.operator.OperatorContext;
 import com.ibm.streams.operator.OperatorContext.ContextCheck;
@@ -83,8 +88,17 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		setJavaSystemProperty();
 		loadAppConfig(context);
 		if (credentials != null) {
-			this.getCredentials(credentials);
+			if (!this.getCredentials(credentials)){
+				return;
+			}
 		}
+
+		if (fCredFile != null) {
+			if (!this.getCredentialsFormFile(fCredFile)){
+				return;
+			}
+		}
+	
 		setupClassPaths(context);
 		addConfigPathToClassPaths(context);
 		createConnection();
@@ -132,13 +146,37 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 		}
 	}
 
+	
 	/**
-	 * read the credentials and set user name fHdfsUser, fHfsPassword and
-	 * hdfsUrl.
+	 * read the credentials from file and set fHdfsUser, fHdfsPassword and  fHdfsUrl.
+	 * @param credFile
+	 */
+	public boolean getCredentialsFormFile(String credFile) throws IOException {
+		
+        String credentials = null;    
+        try
+        {
+        	credentials = new String ( Files.readAllBytes( Paths.get(getAbsolutePath(credFile)) ) );
+        }
+        catch (IOException e)
+        {
+        	LOGGER.log(LogLevel.ERROR, "The credentials file " + getAbsolutePath(credFile) + "does not exist." );
+        	return false;
+        }
+
+        if ((credentials != null ) &&  (!credentials.isEmpty())) {
+        	return getCredentials(credentials);
+        }
+        return false;
+       }
+	
+	
+	/**
+	 * read the credentials and set fHdfsUser, fHfsPassword and fHdfsUrl.
 	 * 
 	 * @param credentials
 	 */
-	public void getCredentials(String credentials) throws IOException {
+	public boolean getCredentials(String credentials) throws IOException {
 		String jsonString = credentials;
 		try {
 			JSONObject obj = JSONObject.parse(jsonString);
@@ -172,7 +210,9 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 	/**
@@ -230,7 +270,6 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 			String user_defined_config_path = getAbsolutePath(getConfigPath())+ "/*";
 			TRACE.log(TraceLevel.INFO, "Adding " + user_defined_config_path + " to classpath");
 			libList.add(user_defined_config_path);
-			System.out.println("AAAAA Adding " + user_defined_config_path + " to classpath");
 		}
 
 		for (int i = 0; i < libList.size(); i++) {
@@ -302,7 +341,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	
-	@Parameter(name = "hdfsUri", optional = true, description = IHdfsConstants.DESC_HDFS_URL)
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_URI, optional = true, description = IHdfsConstants.DESC_HDFS_URL)
 	public void setHdfsUri(String hdfsUri) {
 		TRACE.log(TraceLevel.DEBUG, "setHdfsUri: " + hdfsUri);
 		fHdfsUri = hdfsUri;
@@ -313,7 +352,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	
-	@Parameter(name = "hdfsUser", optional = true, description = IHdfsConstants.DESC_HDFS_USER)
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_USER, optional = true, description = IHdfsConstants.DESC_HDFS_USER)
 	public void setHdfsUser(String hdfsUser) {
 		this.fHdfsUser = hdfsUser;
 	}
@@ -323,7 +362,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	
-	@Parameter(name = "hdfsPassword", optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
+	@Parameter(name = IHdfsConstants.PARAM_HDFS_PASSWORD, optional = true, description = IHdfsConstants.DESC_HDFS_PASSWORD)
 	public void setHdfsPassword(String hdfsPassword) {
 		fHdfsPassword = hdfsPassword;
 	}
@@ -334,7 +373,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 
 	// Parameter reconnectionPolicy
-	@Parameter(name = "reconnectionPolicy", optional = true, description = IHdfsConstants.DESC_REC_POLICY)
+	@Parameter(name = IHdfsConstants.PARAM_REC_POLICY, optional = true, description = IHdfsConstants.DESC_REC_POLICY)
 	public void setReconnectionPolicy(String reconnectionPolicy) {
 		this.fReconnectionPolicy = reconnectionPolicy;
 	}
@@ -345,7 +384,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 	
 	// Parameter reconnectionBound
-	@Parameter(name = "reconnectionBound", optional = true, description = IHdfsConstants.DESC_REC_BOUND)
+	@Parameter(name = IHdfsConstants.PARAM_REC_BOUND, optional = true, description = IHdfsConstants.DESC_REC_BOUND)
 	public void setReconnectionBound(int reconnectionBound) {
 		this.fReconnectionBound = reconnectionBound;
 	}
@@ -355,7 +394,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter reconnectionInterval
-	@Parameter(name = "reconnectionInterval", optional = true, description = IHdfsConstants.DESC_REC_INTERVAL)
+	@Parameter(name = IHdfsConstants.PARAM_REC_INTERVAL, optional = true, description = IHdfsConstants.DESC_REC_INTERVAL)
 	public void setReconnectionInterval(double reconnectionInterval) {
 		this.fReconnectionInterval = reconnectionInterval;
 	}
@@ -365,7 +404,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter authPrincipal
-	@Parameter(name = "authPrincipal", optional = true, description = IHdfsConstants.DESC_PRINCIPAL)
+	@Parameter(name = IHdfsConstants.PARAM_AUTH_PRINCIPAL, optional = true, description = IHdfsConstants.DESC_PRINCIPAL)
 	public void setAuthPrincipal(String authPrincipal) {
 		this.fAuthPrincipal = authPrincipal;
 	}
@@ -375,7 +414,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 	
 	// Parameter authKeytab
-	@Parameter(name = "authKeytab", optional = true, description = IHdfsConstants.DESC_AUTH_KEY)
+	@Parameter(name = IHdfsConstants.PARAM_AUTH_KEYTAB, optional = true, description = IHdfsConstants.DESC_AUTH_KEY)
 	public void setAuthKeytab(String authKeytab) {
 		this.fAuthKeytab = authKeytab;
 	}
@@ -385,7 +424,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter CredFile
-	@Parameter(name = "credFile", optional = true, description = IHdfsConstants.DESC_CRED_FILE)
+	@Parameter(name = IHdfsConstants.PARAM_CRED_FILE, optional = true, description = IHdfsConstants.DESC_CRED_FILE)
 	public void setCredFile(String credFile) {
 		this.fCredFile = credFile;
 	}
@@ -395,7 +434,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter ConfigPath
-	@Parameter(name = "configPath", optional = true, description = IHdfsConstants.DESC_CONFIG_PATH)
+	@Parameter(name = IHdfsConstants.PARAM_CONFIG_PATH, optional = true, description = IHdfsConstants.DESC_CONFIG_PATH)
 	public void setConfigPath(String configPath) {
 		this.fConfigPath = configPath;
 	}
@@ -405,7 +444,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter keyStorePath
-	@Parameter(name = "keyStorePath", optional = true, description = IHdfsConstants.DESC_KEY_STOR_PATH)
+	@Parameter(name = IHdfsConstants.PARAM_KEY_STOR_PATH, optional = true, description = IHdfsConstants.DESC_KEY_STOR_PATH)
 	public void setKeyStorePath(String keyStorePath) {
 		fKeyStorePath = keyStorePath;
 	}
@@ -415,7 +454,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter keyStorePassword
-	@Parameter(name = "keyStorePassword", optional = true, description = IHdfsConstants.DESC_KEY_STOR_PASSWORD)
+	@Parameter(name = IHdfsConstants.PARAM_KEY_STOR_PASSWORD, optional = true, description = IHdfsConstants.DESC_KEY_STOR_PASSWORD)
 	public void setKeyStorePassword(String keyStorePassword) {
 		fKeyStorePassword = keyStorePassword;
 	}
@@ -425,7 +464,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter libPath
-	@Parameter(name = "libPath", optional = true, description = IHdfsConstants.DESC_LIB_PATH)
+	@Parameter(name = IHdfsConstants.PARAM_LIB_PATH, optional = true, description = IHdfsConstants.DESC_LIB_PATH)
 	public void setLibPath(String libPath) {
 		fLibPath = libPath;
 	}
@@ -435,7 +474,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter policyFilePath
-	@Parameter(name = "policyFilePath" ,optional = true, description = IHdfsConstants.DESC_POLICY_FILE_PATH)
+	@Parameter(name = IHdfsConstants.PARAM_POLICY_FILE_PATH ,optional = true, description = IHdfsConstants.DESC_POLICY_FILE_PATH)
 	public void setPolicyFilePath(String policyFilePath) {
 		fPolicyFilePath = policyFilePath;
 	}
@@ -445,7 +484,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	}
 
 	// Parameter credentials
-	@Parameter(name = "credentials", optional = true, description = IHdfsConstants.DESC_CREDENTIALS)
+	@Parameter(name = IHdfsConstants.PARAM_CREDENTIALS, optional = true, description = IHdfsConstants.DESC_CREDENTIALS)
 	public void setcredentials(String credentials) {
 		this.credentials = credentials;
 	}
@@ -456,7 +495,7 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 
 	
 	// Parameter appConfigName
-	@Parameter(name = "appConfigName", optional = true, description = IHdfsConstants.DESC_APP_CONFIG_NAME)
+	@Parameter(name = IHdfsConstants.PARAM_APP_CONFIG_NAME, optional = true, description = IHdfsConstants.DESC_APP_CONFIG_NAME)
 	public void setAppConfigName(String appConfigName) {
 		this.appConfigName = appConfigName;
 	}
@@ -515,13 +554,12 @@ public abstract class AbstractHdfsOperator extends AbstractOperator implements S
 	protected IHdfsClient createHdfsClient() throws Exception {
 		IHdfsClient client = new HdfsJavaClient();
 
-		client.setConnectionProperty(IHdfsConstants.KEYSTORE, getAbsolutePath(getKeyStorePath()));
-		client.setConnectionProperty(IHdfsConstants.KEYSTORE_PASSWORD, getKeyStorePassword());
+		client.setConnectionProperty(IHdfsConstants.PARAM_KEY_STOR_PATH, getAbsolutePath(getKeyStorePath()));
+		client.setConnectionProperty(IHdfsConstants.PARAM_KEY_STOR_PASSWORD, getKeyStorePassword());
 
-		client.setConnectionProperty(IHdfsConstants.HDFS_PASSWORD, getHdfsPassword());
-		client.setConnectionProperty(IHdfsConstants.AUTH_PRINCIPAL, getAuthPrincipal());
-		client.setConnectionProperty(IHdfsConstants.AUTH_KEYTAB, getAbsolutePath(getAuthKeytab()));
-		client.setConnectionProperty(IHdfsConstants.CRED_FILE, getAbsolutePath(getCredFile()));
+		client.setConnectionProperty(IHdfsConstants.PARAM_HDFS_PASSWORD, getHdfsPassword());
+		client.setConnectionProperty(IHdfsConstants.PARAM_AUTH_PRINCIPAL, getAuthPrincipal());
+		client.setConnectionProperty(IHdfsConstants.PARAM_AUTH_KEYTAB, getAbsolutePath(getAuthKeytab()));
 
 		return client;
 	}
