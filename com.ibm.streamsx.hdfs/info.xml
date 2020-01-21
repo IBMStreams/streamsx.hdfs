@@ -181,8 +181,8 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
  
 ++ What is new in version 5.2.0
 
-* The pom.xml file has been upgraded to use jackson.core libraries version 2.10.1.
-* Add new error messages for translation. 
+* The pom.xml file has been upgraded to use jackson.core libraries version 2.10.2.
+* New error message has been added for translation. 
  
  
 </description>
