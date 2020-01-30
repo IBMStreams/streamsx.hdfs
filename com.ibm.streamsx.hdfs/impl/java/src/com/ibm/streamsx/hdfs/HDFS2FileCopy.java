@@ -195,16 +195,12 @@ public class HDFS2FileCopy extends AbstractHdfsOperator implements StateHandler 
 
 		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME)) && (!context
 				.getParameterNames().contains(IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR))) {
-			checker.setInvalidContext("One of these parameters must be set in opeartor: '"
-					+ IHdfsConstants.PARAM_LOCAL_FILE_NAME + "' or '" + IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR + "'",
-					null);
+			checker.setInvalidContext(Messages.getString("HDFS_FAILED_ONE_OF_TWO_PARAMS", IHdfsConstants.PARAM_LOCAL_FILE_NAME, IHdfsConstants.PARAM_LOCAL_FILE_NAME_ATTR), new Object[] {});
 		}
 
 		if ((!context.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME)) && (!context
 				.getParameterNames().contains(IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR))) {
-			checker.setInvalidContext("One of these parameters must be set in opeartor: '"
-					+ IHdfsConstants.PARAM_HDFS_FILE_NAME + "' or '" + IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR + "'",
-					null);
+				checker.setInvalidContext(Messages.getString("HDFS_FAILED_ONE_OF_TWO_PARAMS", IHdfsConstants.PARAM_HDFS_FILE_NAME, IHdfsConstants.PARAM_HDFS_FILE_NAME_ATTR), new Object[] {});
 		}
 	}
 

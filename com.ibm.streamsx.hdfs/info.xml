@@ -179,8 +179,14 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * Check if core-site.xml file exist in configPath
  
+++ What is new in version 5.2.0
+
+* The pom.xml file has been upgraded to use jackson.core libraries version 2.10.2.
+* New error message has been added for translation. 
+ 
+ 
 </description>
-    <version>5.1.0</version>
+    <version>5.2.0</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
