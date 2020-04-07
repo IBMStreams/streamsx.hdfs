@@ -187,9 +187,12 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * New error message has been added for translation. 
  
+++ What is new in version 5.2.2
+
+* pom.xml updated to use commons-configuration2 version 2.7
  
 </description>
-    <version>5.2.1</version>
+    <version>5.2.2</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
