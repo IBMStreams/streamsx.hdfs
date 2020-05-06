@@ -25,6 +25,6 @@ https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-access-webhdfs-via-knox)
 
 ## Getting started with development:
  
-* See the [sample](https://github.com/IBMStreams/streamsx.hdfs/samples/webHDFS) for usage examples.
+* See the [sample](https://github.com/IBMStreams/streamsx.hdfs/tree/master/samples/webHDFS) for usage examples.
 
 
