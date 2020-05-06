@@ -13,9 +13,9 @@ sidebar:
 
 
 
-The **HDFS Toolkit** has possibility to access to HDFS via webhdfs.
+The **HDFS Toolkit** has possibility to access to HDFS via **webhdfs**.
 
-The following documents help you to creates credentilas for webhdf:
+The following documents help you to creates credentials for webhdf:
 
 [How to connect to the IBM Analytics Engine on Cloud via HDFS Toolkit](https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-connect-to-IAE-via-HDFS-Toolkit)
 
