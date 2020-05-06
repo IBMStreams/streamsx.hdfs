@@ -19,5 +19,18 @@ sidebar:
 ## kerberos authentication
 [How to use kerberos authentication](https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-use-kerberos-authentication-in-streamsx.hdfs-toolkit)
 
+## webHDFS 
+[How to connect to the IBM Analytics Engine on Cloud via HDFS Toolkit](https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-connect-to-IAE-via-HDFS-Toolkit)
+
+[How to access webhdfs via knox](
+https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-access-webhdfs-via-knox)
+
+
+[How to read files via FTP and write them into HDFS filesystem.](https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-read-files-via-FTP-and-write-them-into-HDFS-filesystem.)
+
+[How to connect to several HDFS file systems from one SPL application](
+https://github.com/IBMStreams/streamsx.hdfs/wiki/How-to-connect-to-several-HDFS-file-systems-from-one-SPL-application)
+
+
 
 
