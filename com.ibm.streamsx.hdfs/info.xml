@@ -191,8 +191,12 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * pom.xml updated to use commons-configuration2 version 2.7
  
+++ What is new in version 5.2.3
+
+* pom.xml updated to use commons-codec version 1.14
+
 </description>
-    <version>5.2.2</version>
+    <version>5.2.3</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
