@@ -25,6 +25,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -39,6 +40,7 @@ import java.util.StringTokenizer;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.codec.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -85,11 +87,11 @@ import org.apache.hadoop.security.token.TokenSelector;
 import org.apache.hadoop.security.token.delegation.AbstractDelegationTokenSelector;
 import org.apache.hadoop.util.Progressable;
 import org.apache.hadoop.util.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.ibm.json.java.JSON;
 
 /** A FileSystem for HDFS over the web. */
 public class WebHdfsFileSystem extends FileSystem implements DelegationTokenRenewer.Renewable,
@@ -326,30 +328,34 @@ public class WebHdfsFileSystem extends FileSystem implements DelegationTokenRene
 		return f.isAbsolute() ? f : new Path(workingDir, f);
 	}
 
-	static Map<?, ?> jsonParse(final HttpURLConnection c, final boolean useErrorStream) throws IOException {
-		if (c.getContentLength() == 0) {
-			return null;
+	
+	static Map<?, ?> jsonParse(final HttpURLConnection c, final boolean useErrorStream) throws IOException 
+	{
+		if (c.getContentLength() == 0) 
+		{
+		  return null;
 		}
-		final InputStream in = useErrorStream ? c.getErrorStream() : c.getInputStream();
-		if (in == null) {
-			throw new IOException("The " + (useErrorStream ? "error" : "input") + " stream is null.");
+		final InputStream in = useErrorStream? c.getErrorStream(): c.getInputStream();
+		if (in == null) 
+		{
+		  throw new IOException("The " + (useErrorStream? "error": "input") + " stream is null.");
 		}
-		try {
-			final String contentType = c.getContentType();
-			if (contentType != null) {
-				final MediaType parsed = MediaType.valueOf(contentType);
-				if (!MediaType.APPLICATION_JSON_TYPE.isCompatible(parsed)) {
-					throw new IOException("Content-Type \"" + contentType + "\" is incompatible with \""
-							+ MediaType.APPLICATION_JSON + "\" (parsed=\"" + parsed + "\")");
-				}
+		final String contentType = c.getContentType();
+		if (contentType != null) 
+		{
+			final MediaType parsed = MediaType.valueOf(contentType);
+			if (!MediaType.APPLICATION_JSON_TYPE.isCompatible(parsed)) 
+			{
+				throw new IOException("Content-Type \"" + contentType
+						+ "\" is incompatible with \"" + MediaType.APPLICATION_JSON
+						+ "\" (parsed=\"" + parsed + "\")");
 			}
-			ObjectMapper mapper = new ObjectMapper();
-			return mapper.reader(Map.class).readValue(in);
-		} finally {
-			in.close();
 		}
+		    
+		return (Map<?, ?>)JSON.parse(new InputStreamReader(in, Charsets.UTF_8));
 	}
 
+	
 	private static Map<?, ?> validateResponse(final HttpOpParam.Op op, final HttpURLConnection conn,
 			boolean unwrapException) throws IOException {
 		final int code = conn.getResponseCode();
@@ -879,10 +885,8 @@ public class WebHdfsFileSystem extends FileSystem implements DelegationTokenRene
 			try {
 				symLinkPath = new Path(f.getSymlink().getName());
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -934,7 +938,7 @@ public class WebHdfsFileSystem extends FileSystem implements DelegationTokenRene
 		return new FsPathBooleanRunner(op, src, new DestinationParam(makeQualified(dst).toUri().getPath())).run();
 	}
 
-	@SuppressWarnings("deprecation")
+//	@SuppressWarnings("deprecation")
 	@Override
 	public void rename(final Path src, final Path dst, final Options.Rename... options) throws IOException {
 		statistics.incrementWriteOps(1);

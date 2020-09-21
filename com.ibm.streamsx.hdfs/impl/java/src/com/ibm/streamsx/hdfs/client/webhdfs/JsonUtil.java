@@ -66,8 +66,11 @@ import java.util.Map;
 
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.XAttrHelper;
-import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.httpclient.URIException;
+//import org.apache.commons.httpclient.util.URIUtil;
+//import org.apache.http.client.HttpClient.;
+
+//import org.apache.commons.httpclient.util.URIUtil;
+//import org.apache.commons.httpclient.URIException;
 
 import org.apache.hadoop.hdfs.web.resources.DelegationParam;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -322,7 +325,6 @@ public class JsonUtil {
 			return null;
 		}
 
-		// TODO: Fix storageID
 		final Map<String, Object> m = new TreeMap<String, Object>();
 		m.put("ipAddr", datanodeinfo.getIpAddr());
 		// 'name' is equivalent to ipAddr:xferPort. Older clients (1.x, 0.23.x)
@@ -416,7 +418,6 @@ public class JsonUtil {
 			throw new IOException("Invalid or missing 'xferPort' in server response.");
 		}
 
-		// TODO: Fix storageID
 		return new DatanodeInfoBuilder().setIpAddr(ipAddr).setHostName((String) m.get("hostName")).setDatanodeUuid(
 				(String) m.get("storageID")).setXferPort(xferPort).setInfoPort(((Number) m.get("infoPort")).intValue())
 				.setInfoSecurePort(getInt(m, "infoSecurePort", 0)).setIpcPort(((Number) m.get("ipcPort")).intValue())
@@ -430,131 +431,7 @@ public class JsonUtil {
 				.setLastBlockReportMonotonic(getLong(m, "lastBlockReportMonotonic", 0L)).build();
 	}
 
-	/* /** Convert a Json map to an DatanodeInfo object.
-	 * static DatanodeInfo toDatanodeInfo2(final Map<?, ?> m)
-	 * throws IOException {
-	 * if (m == null) {
-	 * return null;
-	 * }
-	 * // ipAddr and xferPort are the critical fields for accessing data.
-	 * // If any one of the two is missing, an exception needs to be thrown.
-	 * // Handle the case of old servers (1.x, 0.23.x) sending 'name' instead
-	 * // of ipAddr and xferPort.
-	 * Object tmpValue = m.get("xferPort");
-	 * int xferPort = -1;
-	 * if (tmpValue == null) {
-	 * xferPort = -1;
-	 * }
-	 * else {
-	 * xferPort = (tmpValue instanceof
-	 * Integer)?((Integer)tmpValue).intValue():((Long)tmpValue).intValue();
-	 * }
-	 * tmpValue = m.get("ipAddr");
-	 * String ipAddr = (tmpValue == null) ? null : (String)tmpValue;
-	 * if (ipAddr == null) {
-	 * tmpValue = m.get("name");
-	 * if (tmpValue != null) {
-	 * String name = (String)tmpValue;
-	 * int colonIdx = name.indexOf(':');
-	 * if (colonIdx > 0) {
-	 * ipAddr = name.substring(0, colonIdx);
-	 * xferPort = Integer.parseInt(name.substring(colonIdx +1));
-	 * } else {
-	 * throw new IOException(
-	 * "Invalid value in server response: name=[" + name + "]");
-	 * }
-	 * } else {
-	 * throw new IOException(
-	 * "Missing both 'ipAddr' and 'name' in server response.");
-	 * }
-	 * // ipAddr is non-null & non-empty string at this point.
-	 * }
-	 * // Check the validity of xferPort.
-	 * if (xferPort == -1) {
-	 * throw new IOException(
-	 * "Invalid or missing 'xferPort' in server response.");
-	 * }
-	 * /*
-	 * private String location = NetworkTopology.DEFAULT_RACK;
-	 * private long capacity;
-	 * private long dfsUsed;
-	 * private long remaining;
-	 * private long blockPoolUsed;
-	 * private long cacheCapacity;
-	 * private long cacheUsed;
-	 * private long lastUpdate;
-	 * private long lastUpdateMonotonic;
-	 * private int xceiverCount;
-	 * private DatanodeInfo.AdminStates adminState;
-	 * private String upgradeDomain;
-	 * private String ipAddr;
-	 * private String hostName;
-	 * private String datanodeUuid;
-	 * private int xferPort;
-	 * private int infoPort;
-	 * private int infoSecurePort;
-	 * private int ipcPort;
-	 * private long nonDfsUsed = 0L;
-	 * private long lastBlockReportTime = 0L;
-	 * private long lastBlockReportMonotonic = 0L;
-	 * private int numBlocks;
-	 * return new DatanodeInfo(
-	 * ipAddr,
-	 * hostName,
-	 * datanodeUuid,
-	 * xferPort,
-	 * infoPort,
-	 * infoSecurePort,
-	 * ipcPort,
-	 * capacity,
-	 * dfsUsed, nonDfsUsed,
-	 * remaining, blockPoolUsed, cacheCapacity, cacheUsed, lastUpdate,
-	 * lastUpdateMonotonic, xceiverCount,
-	 * location,
-	 * adminState,
-	 * upgradeDomain,
-	 * lastBlockReportTime,
-	 * lastBlockReportMonotonic,
-	 * numBlocks);
-	 * /*
-	 * The constructor DatanodeInfo(
-	 * String,
-	 * String,
-	 * String,
-	 * int, int, int, int,
-	 * long, long, long, long, long, long, long, long, long,
-	 * int, String, DatanodeInfo.AdminStates, String, long, long, int) is not
-	 * visible
-	 * // TODO: Fix storageID
-	 * return new DatanodeInfo(
-	 * "","","",
-	 * 0,0,0,0,
-	 * 0L,0L,0L,0L,0L,0L,0L,0L,0L,
-	 * 0,
-	 * "",
-	 * AdminStates.valueOf(getString(m, "adminState", "NORMAL")), "", 0L,0l,0);
-	 * return new DatanodeInfo(
-	 * ipAddr,
-	 * (String)m.get("hostName"),
-	 * (String)m.get("storageID"),
-	 * xferPort,
-	 * ((Number) m.get("infoPort")).intValue(),
-	 * getInt(m, "infoSecurePort", 0),
-	 * ((Number) m.get("ipcPort")).intValue(),
-	 * getLong(m, "capacity", 0L),
-	 * getLong(m, "dfsUsed", 0L),
-	 * getLong(m, "remaining", 0L),
-	 * getLong(m, "blockPoolUsed", 0L),
-	 * getLong(m, "cacheCapacity", 0L),
-	 * getLong(m, "cacheUsed", 0L),
-	 * getLong(m, "lastUpdate", 0L),
-	 * getLong(m, "lastUpdateMonotonic", 0L),
-	 * getInt(m, "xceiverCount", 0),
-	 * xferPort, getString(m, "networkLocation", ""),
-	 * AdminStates.valueOf(getString(m, "adminState", "NORMAL")), null, 0L, 0L,
-	 * 0);
-	 * }
-	 * /** Convert a DatanodeInfo[] to a Json array. */
+	/** Convert a DatanodeInfo[] to a Json array. */
 	private static Object[] toJsonArray(final DatanodeInfo[] array) {
 		if (array == null) {
 			return null;
@@ -1063,11 +940,13 @@ public class JsonUtil {
 	 */
 	public static String encodeQueryValue(final String value) {
 		try {
-			return URIUtil.encodeWithinQuery(value, "UTF-8");
-		} catch (URIException e) {
-			throw new AssertionError("JVM does not support UTF-8"); // should
-																	 // never
-																	 // happen!
+			String encodedURL = java.net.URLEncoder.encode(value.toString(), "ISO-8859-1").replace("+", "%20");
+
+			return encodedURL;
+		} catch (Exception e) {
+			
+			throw new AssertionError("JVM does not support UTF-8"); 
+			// should never happen!
 		}
 	}
 
