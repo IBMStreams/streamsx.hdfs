@@ -13,6 +13,7 @@
 has been fixed. 
 
 The maven pom.xml file has been upgraded to use hadoop client 3.3 
+
 The following JAVA classes have been upgraded:
 - com/ibm/streamsx/hdfs/client/webhdfs/JsonUtil.java
 - com/ibm/streamsx/hdfs/client/webhdfs/WebHdfsFileSystem.java
