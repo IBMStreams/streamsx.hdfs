@@ -20,8 +20,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import com.ibm.json.java.JSONObject;
-import com.ibm.json.java.JSONArray;
-import com.ibm.json.java.*;
 
 import com.ibm.streams.operator.AbstractOperator;
 import com.ibm.streams.operator.OperatorContext;
