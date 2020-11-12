@@ -1,6 +1,11 @@
 # Changes
 =======
 
+## develop branch latest
+
+* [#132](https://github.com/IBMStreams/streamsx.hdfs/issues/132) Makefiles of samples updated
+
+
 ## v5.3.0:
 * [#129](https://github.com/IBMStreams/streamsx.hdfs/issues/129) The Vulnerability issue for 3rd party libraries:
 
