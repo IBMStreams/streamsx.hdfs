@@ -5,8 +5,17 @@
 
 .PHONY: all clean
 
-#SPLC_FLAGS = -t $(STREAMS_INSTALL)/toolkits/com.ibm.streamsx.hdfs  --data-directory data
-SPLC_FLAGS = -t ../../com.ibm.streamsx.hdfs  --data-directory data
+TOOLKIT_NAME=com.ibm.streamsx.hdfs
+STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../../../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../../../$(TOOLKIT_NAME)) ||\
+			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
+			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
+
+ifdef STREAMS_BUILDSERVICE
+  STREAMS_HDFS_TOOLKIT = ../toolkits:$(STREAMS_INSTALL)/toolkits
+endif
+
+SPLC_FLAGS = -a -t $(STREAMS_HDFS_TOOLKIT) --data-directory data
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 
@@ -22,7 +31,7 @@ data:
 	mkdir data
 clean:
 	$(SPLC) $(SPLC_FLAGS) -C -M $(SPL_MAIN_COMPOSITE1) --output-dir output
-	-rm -rf toolkit.xml
-	-rm -rf data/*.*
-
+	-rm -f toolkit.xml
+	-rm -rf data
+	-rm -rf output
 

@@ -11,9 +11,13 @@ STREAMS_HDFS_TOOLKIT ?= $(shell ([ -e "../../$(TOOLKIT_NAME)/toolkit.xml" ] && e
 			         ([ -e "../$(TOOLKIT_NAME)/toolkit.xml" ] && echo ../$(TOOLKIT_NAME)) ||\
 			           echo $(STREAMS_INSTALL)/toolkits/$(TOOLKIT_NAME))
 
-SPLC_FLAGS = -a --data-directory data
+ifdef STREAMS_BUILDSERVICE
+  STREAMS_HDFS_TOOLKIT = ../toolkits:$(STREAMS_INSTALL)/toolkits
+endif
 
-SPL_CMD_ARGS ?= -t $(STREAMS_HDFS_TOOLKIT)
+SPLC_FLAGS = -a -t $(STREAMS_HDFS_TOOLKIT) --data-directory data
+
+SPL_CMD_ARGS ?= 
 
 SPLC = $(STREAMS_INSTALL)/bin/sc
 SPL_MAIN_COMPOSITE1 = HDFS2FileSinkSampleLineFormat
@@ -33,4 +37,5 @@ clean:
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE1) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE1)
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_COMPOSITE2) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_COMPOSITE2)
 	$(SPLC) $(SPLC_FLAGS) -C -M hdfsexample::$(SPL_MAIN_DYNAMIC) --output-dir ./$(BUILD_OUTPUT_DIR)/$(SPL_MAIN_DYNAMIC) $(SPL_CMD_ARGS)
-	-rm -rf toolkit.xml
+	-rm -f toolkit.xml
+	-rm -rf output
