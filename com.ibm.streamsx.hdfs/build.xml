@@ -42,6 +42,7 @@
 		<delete dir="${test.run.dir}"/>
 		<delete dir="${test.build.dir}"/>
 		<delete dir="${gensrc.dir}"/>
+		<delete dir="${ext.downloads.dir}"/>
 	</target>
 
 
