@@ -1,8 +1,8 @@
 # Changes
 =======
 
-## develop branch latest
-
+## v5.3.1:
+* [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/133) guava jar updated
 * [#132](https://github.com/IBMStreams/streamsx.hdfs/issues/132) Makefiles of samples updated
 
 

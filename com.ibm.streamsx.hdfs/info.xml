@@ -199,9 +199,12 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * pom.xml updated to use new jar library hadoop version 3.3 and guava version 29.0-jre
 
+++ What is new in version 5.3.1
+
+* pom.xml updated to use guava version 30.0-jre
 
 </description>
-    <version>5.3.0</version>
+    <version>5.3.1</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
