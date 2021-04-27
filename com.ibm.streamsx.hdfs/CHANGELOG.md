@@ -1,6 +1,9 @@
 # Changes
 =======
 
+## latest
+* [#135](https://github.com/IBMStreams/streamsx.hdfs/issues/135) commons-io jar updated
+
 ## v5.3.1:
 * [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/133) guava jar updated
 * [#132](https://github.com/IBMStreams/streamsx.hdfs/issues/132) Makefiles of samples updated
