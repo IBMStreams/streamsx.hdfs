@@ -1,7 +1,10 @@
 # Changes
 =======
 
-## latest
+## v5.3.2:
+* [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/140) slf4j jars updated (fix the log4j issue)
+
+## v5.3.1:
 * [#135](https://github.com/IBMStreams/streamsx.hdfs/issues/135) commons-io jar updated
 
 ## v5.3.1:
