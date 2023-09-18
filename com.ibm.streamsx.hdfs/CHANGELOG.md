@@ -1,6 +1,12 @@
 # Changes
 =======
 
+## v5.3.3:
+* [#133}fix Vulnerabilities in 3rd party jar libraries)
+
+## v5.3.2:
+* [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/140) slf4j jars updated (fix the log4j issue)
+
 ## v5.3.2:
 * [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/140) slf4j jars updated (fix the log4j issue)
 

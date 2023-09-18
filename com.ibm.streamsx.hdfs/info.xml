@@ -207,9 +207,13 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * pom.xml updated to use  slf4j libraries version 1.7.36
       
+++ What is new in version 5.3.3
+
+* pom.xml updated to use the latest apache libraries
+
 
 </description>
-    <version>5.3.2</version>
+    <version>5.3.3</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
