@@ -1,8 +1,12 @@
 # Changes
 =======
 
+## v5.3.4:
+* fix Vulnerabilities CVE-2022-42889,  CVE-2022-25168 and CVE-2021-33036
+  hadoop jar libraries upgraded to version 3.3.6
+
 ## v5.3.3:
-* [#133}fix Vulnerabilities in 3rd party jar libraries)
+* fix Vulnerabilities in 3rd party jar libraries
 
 ## v5.3.2:
 * [#133](https://github.com/IBMStreams/streamsx.hdfs/issues/140) slf4j jars updated (fix the log4j issue)

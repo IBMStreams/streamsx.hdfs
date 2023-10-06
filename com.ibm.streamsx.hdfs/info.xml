@@ -211,9 +211,16 @@ The 'tempFile' parameter specifies the name of the file that the operator writes
 
 * pom.xml updated to use the latest apache libraries
 
+++ What is new in version 5.3.4
+
+* The Vulnerability issues for 3rd party libraries have been fixed
+* hadoop libraries upgraded to version 3.3.6
+* commons-cli upgraded to 1.5.0
+* commons-codecs upgraded to 1.16.1
+
 
 </description>
-    <version>5.3.3</version>
+    <version>5.3.4</version>
     <requiredProductVersion>4.2.0.0</requiredProductVersion>
   </identity>
   <dependencies/>
